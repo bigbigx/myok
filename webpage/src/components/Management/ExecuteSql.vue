@@ -149,10 +149,10 @@ export default {
             let text = ''
             if (row.status === 2) {
               color = 'blue'
-              text = '审核中'
+              text = '待审核'
             } else if (row.status === 0) {
               color = 'red'
-              text = '审核拒绝'
+              text = '审核驳回'
             } else if (row.status === 1) {
               color = 'orange'
               text = '待执行'
