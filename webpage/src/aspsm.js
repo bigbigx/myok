@@ -117,7 +117,7 @@ const store = new Vuex.Store({
             })
             menuList[i - 1].children = childrenArr
           }
-
+        }
       })
       state.menuList = menuList
     },
