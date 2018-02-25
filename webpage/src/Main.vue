@@ -20,7 +20,7 @@
         <div class="main-breadcrumb">
           <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
         </div>
-      </div>Adddasddddd
+      </div>
       <div class="header-avator-con">
         <a href="#" target="_Blank">使用说明</a>
         <div @click="handleFullScreen" v-if="showFullScreenBtn" class="full-screen-btn-con">
