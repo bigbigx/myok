@@ -82,7 +82,7 @@ const store = new Vuex.Store({
             })
             menuList[i - 1].children = childrenArr
           }
-        }else if (item.access === 2) {  // 如果是权限页面  access=2    // approver 用户访问
+        } else if (item.access === 2) {  // 如果是权限页面  access=2    // approver 用户访问
           if (item.children.length <= 1) {
             menuList.push(item)
           } else {
@@ -99,8 +99,7 @@ const store = new Vuex.Store({
             })
             menuList[i - 1].children = childrenArr
           }
-        }
-        else {  // 如果是权限页面   // 其他 用户访问
+        } else {  // 如果是权限页面   // 其他 用户访问
           if (item.children.length <= 1) {
             menuList.push(item)
           } else {
