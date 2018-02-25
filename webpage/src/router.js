@@ -154,6 +154,23 @@ export const appRouter = [
     path: '/management',
     icon: 'social-buffer',
     name: 'management',
+    title: '审核',
+    access: 2,
+    component: Index,
+    children: [
+      {
+        path: 'management-audit',
+        name: 'managerment-audit',
+        title: '审核',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Management/AuditSql.vue'], resolve)
+        }
+      },
+  }, {
+    path: '/management',
+    icon: 'social-buffer',
+    name: 'management',
     title: '管理',
     access: 0,
     component: Index,
@@ -173,14 +190,6 @@ export const appRouter = [
         'icon': 'social-buffer',
         component: resolve => {
           require(['./components/Management/MamagementBase.vue'], resolve)
-        }
-      }, {
-        path: 'management-audit',
-        name: 'managerment-audit',
-        title: '审核',
-        'icon': 'edit',
-        component: resolve => {
-          require(['./components/Management/AuditSql.vue'], resolve)
         }
       }, {
         path: 'management-execute',

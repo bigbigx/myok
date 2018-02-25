@@ -23,7 +23,6 @@ class sqlorder(baseview.BaseView):
     put   美化sql  测试sql
     post 提交工单
     '''
-
     def put(self, request, args=None):
         if args == 'beautify':
             try:

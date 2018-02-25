@@ -65,15 +65,11 @@ class SuperUserpermissions(APIView):
     def delete(self, request, args: str = None):
         pass
 
-#  create ,update ,delete  code snippets ,指定哪些用户拥有这些权限
+# 审核人
 class Approverpermissions(APIView):
-    #authentication_classes = (
-    #    BasicAuthentication,
-        # SessionAuthentication,
-        # TokenAuthentication,
-    #)
+
     permission_classes = (IsAuthenticated,)
-    #authentication_classes = ()
+
     def get(self, request, args: str = None):
         pass
 
