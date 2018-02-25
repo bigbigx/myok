@@ -301,7 +301,7 @@ export default {
         })
         .then(res => {
           this.$Notice.success({
-            title: '执行成功',
+            title: '审核成功',
             desc: res.data
           })
           this.mou_data()

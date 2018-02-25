@@ -113,8 +113,14 @@ export default {
             let auth = res.data['permissions']
             if (auth === 'admin') {
               Cookies.set('access', 0)
-            } else {
-              Cookies.set('access', 1)
+            } else if (auth === 'approver'){
+              Cookies.set('access', 2)
+            } else if (auth === 'executer'){
+              Cookies.set('access', 3)
+            }else if (auth === 'guest'){
+              Cookies.set('access', 1) // guest用户
+            }else {
+              Cookies.set('access', 4) // 其他用户
             }
             this.$router.push({
               name: 'home_index'

@@ -8,4 +8,13 @@
 
 
 
+-- 资源表，这里主要是menu表
+create table t_resource(
+  id int primary key ,
+  name char(30) not null,
+  type char(15) not null,
+  status char(40) not null,
+  order_num int ,
+  is_parent  int default 0 not null
+)
 

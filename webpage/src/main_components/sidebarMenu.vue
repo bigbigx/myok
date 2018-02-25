@@ -28,7 +28,7 @@
           <Icon :type="item.icon" :size="iconSize"></Icon>
           <span class="layout-text">{{ item.title }}</span>
         </template>
-  <template v-for="child in item.children">
+        <template v-for="child in item.children">
           <MenuItem :name="child.name" :key="child.name" style="margin-left: -5%">
             <Icon :type="child.icon" :size="iconSize" :key="child.name"></Icon>
             <span class="layout-text" :key="child.name">{{ child.title }}</span>

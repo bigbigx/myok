@@ -3,11 +3,33 @@ from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view
 from rest_framework.permissions import (
     IsAdminUser,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
     AllowAny
+    #DjangoModelPermissions
 )
+## 上面的权限分别用于指定权限, 所有人, 登录用户, 非登录用户只读，管理员
+
+
+from rest_framework import permissions
 from rest_framework.authentication import BasicAuthentication   #jianglb
-from rest_framework.permissions import IsAuthenticated  #jianglb
 from rest_framework.views import APIView
+
+### 审核人，超级管理员，工单提交人
+
+##  jianglb
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission to only allow owners of an object to edit it.
+    """
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed to the owner of the snippet.
+        return obj.owner == request.user
 
 @method_decorator(api_view(['DELETE', 'GET', 'POST', 'PUT']), 'dispatch')
 class BaseView(View):
@@ -30,7 +52,6 @@ class BaseView(View):
 class SuperUserpermissions(APIView):
     
     permission_classes = (IsAdminUser,)
-    #permission_classes = (IsAuthenticated,)
 
     def get(self, request, args: str = None):
         pass
@@ -44,17 +65,15 @@ class SuperUserpermissions(APIView):
     def delete(self, request, args: str = None):
         pass
 
-
-
-#某些认证的模块管理者权限
-class AuthenticatedUserpermissions(APIView):
+#  create ,update ,delete  code snippets ,指定哪些用户拥有这些权限
+class Approverpermissions(APIView):
     #authentication_classes = (
     #    BasicAuthentication,
         # SessionAuthentication,
         # TokenAuthentication,
     #)
     permission_classes = (IsAuthenticated,)
-
+    #authentication_classes = ()
     def get(self, request, args: str = None):
         pass
 

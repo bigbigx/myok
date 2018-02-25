@@ -101,6 +101,8 @@ export default {
       showFullScreenBtn: window.navigator.userAgent.indexOf('MSIE') < 0,
       isFullScreen: false,
       lockScreenSize: 0,
+      // rightList: [], // 登录者拥有的权限列表
+      // menuList: [], // 登录者拥有的菜单列表
       avatorPath: 'static/bird-fast-v2.png'
     };
   },
@@ -142,6 +144,7 @@ export default {
         });
       }
     },
+
     // 全屏
     handleFullScreen () {
       let main = document.getElementById('main');

@@ -46,7 +46,7 @@ const store = new Vuex.Store({
       let accessCode = parseInt(Cookies.get('access')) // 0
       let menuList = []
       appRouter.forEach((item, index) => {
-        if (item.access !== undefined) { // item.access=0
+        if (item.access !== undefined) { // item.access=0  guest用户访问
           if (util.showThisRoute(item.access, accessCode)) {
             if (item.children.length <= 1) {
               menuList.push(item)
@@ -65,7 +65,24 @@ const store = new Vuex.Store({
               menuList[i - 1].children = childrenArr
             }
           }
-        } else { // 如果是权限页面
+        } else if (item.access == 1){ // 如果是权限页面  access=1     // admin 用户访问
+          if (item.children.length <= 1) {
+            menuList.push(item)
+          } else {
+            let i = menuList.push(item)
+            let childrenArr = []
+            childrenArr = item.children.filter(child => {
+              if (child.access !== undefined) {
+                if (util.showThisRoute(child.access, accessCode)) {
+                  return child
+                }
+              } else {
+                return child
+              }
+            })
+            menuList[i - 1].children = childrenArr
+          }
+        }else if (item.access == 2){ // 如果是权限页面  access=2    // approver 用户访问
           if (item.children.length <= 1) {
             menuList.push(item)
           } else {
@@ -83,6 +100,25 @@ const store = new Vuex.Store({
             menuList[i - 1].children = childrenArr
           }
         }
+        else { // 如果是权限页面   // 其他 用户访问
+          if (item.children.length <= 1) {
+            menuList.push(item)
+          } else {
+            let i = menuList.push(item)
+            let childrenArr = []
+            childrenArr = item.children.filter(child => {
+              if (child.access !== undefined) {
+                if (util.showThisRoute(child.access, accessCode)) {
+                  return child
+                }
+              } else {
+                return child
+              }
+            })
+            menuList[i - 1].children = childrenArr
+          }
+        }
+
       })
       state.menuList = menuList
     },

@@ -26,11 +26,10 @@ CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 
 #class audit(baseview.SuperUserpermissions):
-class audit(baseview.AuthenticatedUserpermissions):
+class audit(baseview.Approverpermissions):
     '''
     SQL审核相关
     '''
-
     def get(self, request, args=None):
         try:
             page = request.GET.get('page')
@@ -99,7 +98,7 @@ class audit(baseview.AuthenticatedUserpermissions):
                             try:
                                 if content.url:
                                     util.dingding(
-                                        content='工单驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
+                                        content='工单审核驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
                                         %(_tmpData['work_id'],to_user,addr_ip,text), url=content.url)
                             except:
                                 ret_info = '工单审核成功!但是钉钉推送失败,请查看错误日志排查错误.'
