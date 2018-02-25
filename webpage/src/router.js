@@ -166,7 +166,8 @@ export const appRouter = [
         component: resolve => {
           require(['./components/Management/AuditSql.vue'], resolve)
         }
-      },
+      }
+    ]
   }, {
     path: '/management',
     icon: 'social-buffer',
