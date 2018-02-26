@@ -241,7 +241,6 @@ export const appRouter = [
     icon: 'social-buffer',
     name: 'logger',
     title: '日志查看',
-    access: 0,
     component: Index,
     children: [
       {
@@ -259,7 +258,7 @@ export const appRouter = [
     icon: 'social-buffer',
     name: 'logger-manager',
     title: '日志管理',
-    access: 1,
+    access: 0,
     component: Index,
     children: [
       {
