@@ -236,6 +236,42 @@ export const appRouter = [
         }
       }
     ]
+  }, {
+    path: '/logger',
+    icon: 'social-buffer',
+    name: 'logger',
+    title: '日志查看',
+    access: 0,
+    component: Index,
+    children: [
+      {
+        path: 'logger-view',
+        name: 'logger-view',
+        title: '我的日志',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Management/LoggerView.vue'], resolve)
+        }
+      }
+    ]
+  }, {
+    path: '/logger-manager',
+    icon: 'social-buffer',
+    name: 'logger-manager',
+    title: '日志管理',
+    access: 1,
+    component: Index,
+    children: [
+      {
+        path: 'logger-manager',
+        name: 'logger-manager',
+        title: '日志管理',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Logger/LoggerManager.vue'], resolve)
+        }
+      }
+    ]
   }
 ]
 
