@@ -153,7 +153,7 @@ export const appRouter = [
   }, {
     path: '/management',
     icon: 'social-buffer',
-    name: 'management',
+    name: 'sql-approver',
     title: '数据库管理',
     access: 2,
     component: Index,
@@ -171,7 +171,7 @@ export const appRouter = [
   }, {
     path: '/management',
     icon: 'social-buffer',
-    name: 'management',
+    name: 'sql-executer',
     title: '数据库管理',
     access: 3,
     component: Index,
