@@ -40,7 +40,8 @@ class execute(baseview.SuperUserpermissions):
             return HttpResponse(status=500)
         else:
             try:
-                pagenumber = SqlOrder.objects.filter(assigned=username).aggregate(alter_number=Count('id'))
+                #pagenumber = SqlOrder.objects.filter(assigned=username).aggregate(alter_number=Count('id'))
+                pagenumber = SqlOrder.objects.filter(status=1).aggregate(alter_number=Count('id'))
                 start = (int(page) - 1) * 20
                 end = int(page) * 20
                     #'''
