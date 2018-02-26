@@ -255,7 +255,7 @@ export const appRouter = [
       }
     ]
   }, {
-    path: '/logger-manager',
+    path: '/logger',
     icon: 'social-buffer',
     name: 'logger-manager',
     title: '日志管理',
