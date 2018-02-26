@@ -25,7 +25,8 @@ addr_ip = conf.ipaddress
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 
-class execute(baseview.SuperUserpermissions):
+#class execute(baseview.SuperUserpermissions):
+class execute(baseview.Approverpermissions):
 
     '''
     SQL执行相关
