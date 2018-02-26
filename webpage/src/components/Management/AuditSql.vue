@@ -132,7 +132,7 @@ export default {
               text = '审核驳回'
             } else if (row.status === 1) {
               color = 'orange'
-              text = '已审核'
+              text = '审核同意'
             } else if (row.status === 3) {
               color = 'red'
               text = '执行驳回'
@@ -152,7 +152,7 @@ export default {
           },
           sortable: true,
           filters: [{
-              label: '待执行',
+              label: '审核同意',
               value: 1
             },
             {

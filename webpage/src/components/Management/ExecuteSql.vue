@@ -48,10 +48,10 @@
         <span>{{ formitem.username }}</span>
       </FormItem>
       <FormItem label="审核时间:">
-        <span>{{ formitem.approve_date }}</span>
+        <span>{{ formitem.approve_time }}</span>
       </FormItem>
       <FormItem label="审核人:">
-        <span>{{ formitem.approver }}</span>
+        <span>{{ formitem.assigned }}</span>
       </FormItem>
       <FormItem label="机房:">
         <span>{{ formitem.computer_room }}</span>
@@ -155,7 +155,7 @@ export default {
               text = '审核驳回'
             } else if (row.status === 1) {
               color = 'orange'
-              text = '已审核'
+              text = '审核同意'
             } else if (row.status === 3) {
               color = 'red'
               text = '执行驳回'
@@ -175,7 +175,7 @@ export default {
           },
           sortable: true,
           filters: [{
-              label: '已审核',
+              label: '审核同意',
               value: 1
             },
             {

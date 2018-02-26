@@ -147,20 +147,13 @@ class execute(baseview.Approverpermissions):
                         SqlOrder.objects.filter(id=id).update(status=5)
                         c = SqlOrder.objects.filter(id=id).first()
                         title = f'工单:{c.work_id}执行成功通知'
-
-
                         '''
-
                         根据工单编号拿出对应sql的拆解数据
-
-                        '''
-
+                     '''
                         SQL_LIST = DatabaseList.objects.filter(id=c.bundle_id).first()
                         '''
-
                         发送sql语句到inception中执行
-
-                        '''
+                     '''
                         with call_inception.Inception(
                             LoginDic={
                                 'host': SQL_LIST.ip,
