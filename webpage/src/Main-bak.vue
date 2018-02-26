@@ -14,7 +14,7 @@
       <div class="navicon-con">
         <Button :style="{transform: 'rotateZ(' + (this.hideMenuText ? '-90' : '0') + 'deg)'}" type="text" @click="toggleClick">
             <Icon type="navicon" size="32"></Icon>
-          </Button>
+          </Button
       </div>
       <div class="header-middle-con">
         <div class="main-breadcrumb">
@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="header-avator-con">
-        <a href="https://cookiey.github.io/Yearning-document/used/" target="_Blank">使用说明</a>
+        <a href="#" target="_Blank">使用说明</a>
         <div @click="handleFullScreen" v-if="showFullScreenBtn" class="full-screen-btn-con">
           <Tooltip :content="isFullScreen ? '退出全屏' : '全屏'" placement="bottom">
             <Icon :type="isFullScreen ? 'arrow-shrink' : 'arrow-expand'" :size="23"></Icon>
@@ -82,6 +82,7 @@ import sidebarMenuShrink from './main_components/sidebarMenuShrink.vue';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import util from './libs/util.js';
+
 export default {
   components: {
     sidebarMenu,
@@ -100,6 +101,8 @@ export default {
       showFullScreenBtn: window.navigator.userAgent.indexOf('MSIE') < 0,
       isFullScreen: false,
       lockScreenSize: 0,
+      // rightList: [], // 登录者拥有的权限列表
+      // menuList: [], // 登录者拥有的菜单列表
       avatorPath: 'static/bird-fast-v2.png'
     };
   },
@@ -141,6 +144,7 @@ export default {
         });
       }
     },
+
     // 全屏
     handleFullScreen () {
       let main = document.getElementById('main');
