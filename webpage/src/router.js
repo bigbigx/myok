@@ -208,7 +208,7 @@ export const appRouter = [
         component: resolve => {
           require(['./components/Order/GenIndex.vue'], resolve)
         }
-      },
+      }
     ]
   }, {
     path: '/view',
