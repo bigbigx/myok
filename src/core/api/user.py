@@ -164,38 +164,13 @@ class userinfo(baseview.SuperUserpermissions):
                         email=email)
                     user.save()
                     return Response('%s 用户注册成功!' % username)
-                elif group == 'guest':
+                else:
                     user = Account.objects.create_user(
                         username=username,
                         password=password,
                         department=department,
                         group=group,
                         is_staff=0,
-                        email=email
-                        )
-                    user.save()
-                    return Response('%s 用户注册成功!' % username)
-
-                elif group == 'approver':
-                    user = Account.objects.create_user(
-                        username=username,
-                        password=password,
-                        department=department,
-                        group=group,
-                        is_staff=1,
-                        email=email
-                        )
-                    user.save()
-                    return Response('%s 用户注册成功!' % username)
-
-
-                elif group == 'executer':
-                    user = Account.objects.create_user(
-                        username=username,
-                        password=password,
-                        department=department,
-                        group=group,
-                        is_staff=1,
                         email=email
                         )
                     user.save()
