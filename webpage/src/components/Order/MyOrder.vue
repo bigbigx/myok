@@ -54,13 +54,13 @@ export default {
             let text = ''
             if (row.status === 2) {
               color = 'blue'
-              text = '审核中'
+              text = '待审核'
             } else if (row.status === 0) {
               color = 'red'
               text = '审核拒绝'
             } else if (row.status === 1) {
-              color = 'green'
-              text = '审核同意,待执行'
+              color = 'orange'
+              text = '审核同意'
             } else if (row.status === 3) {
               color = 'gray'
               text = '执行驳回'
@@ -81,7 +81,7 @@ export default {
           },
           sortable: true,
           filters: [{
-              label: '审核同意,待执行',
+              label: '审核同意',
               value: 1
             },
             {
@@ -89,7 +89,7 @@ export default {
               value: 0
             },
             {
-              label: '审核中',
+              label: '待审核',
               value: 2
             },
             {
