@@ -24,7 +24,7 @@
         <FormItem label="部门" prop="department">
           <Input v-model="userinfo.department" placeholder="请输入"></Input>
         </FormItem>
-        <FormItem label="权限" prop="group">
+        <FormItem label="角色" prop="group">
           <Select v-model="userinfo.group" placeholder="请选择">
               <Option value="admin">管理员</Option>
               <Option value="approver">审核员</Option>
@@ -82,7 +82,7 @@
       <FormItem label="用户名">
         <Input v-model="username" readonly="readonly"></Input>
       </FormItem>
-      <FormItem label="权限">
+      <FormItem label="角色">
         <Select v-model="editInfodForm.group" placeholder="请选择">
             <Option value="admin">管理员</Option>
             <Option value="approver">审核员</Option>
@@ -158,7 +158,7 @@ export default {
           sortable: true
         },
         {
-          title: '权限',
+          title: '角色',
           key: 'group',
           sortable: true
         },
@@ -315,7 +315,7 @@ export default {
         ],
         group: [{
           required: true,
-          message: '请输入权限',
+          message: '请输入角色',
           trigger: 'blur'
         }],
         department: [{

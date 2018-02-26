@@ -87,7 +87,7 @@ export const appRouter = [
     path: '/order',
     icon: 'folder',
     name: 'order',
-    title: '工单',
+    title: '数据库工单',
     component: Index,
     children: [
       {
@@ -154,7 +154,7 @@ export const appRouter = [
     path: '/management',
     icon: 'social-buffer',
     name: 'management',
-    title: '审核',
+    title: '数据库管理',
     access: 2,
     component: Index,
     children: [
@@ -172,7 +172,7 @@ export const appRouter = [
     path: '/management',
     icon: 'social-buffer',
     name: 'management',
-    title: '执行',
+    title: '数据库管理',
     access: 3,
     component: Index,
     children: [
@@ -190,7 +190,7 @@ export const appRouter = [
     path: '/management',
     icon: 'social-buffer',
     name: 'management',
-    title: '管理',
+    title: '数据库管理',
     access: 0,
     component: Index,
     children: [
