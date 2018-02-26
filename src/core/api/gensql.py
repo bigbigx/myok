@@ -59,7 +59,7 @@ class addressing(baseview.BaseView):
             try:
                 info = DatabaseList.objects.all()
                 _serializers = Area(info, many=True)
-                info = Account.objects.filter(is_staff=1).all()
+                info = Account.objects.filter(is_staff=0).all()
                 serializers = UserINFO(info, many=True)
                 return Response({'connection': _serializers.data, 'person': serializers.data})
             except Exception as e:
