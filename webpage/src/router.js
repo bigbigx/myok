@@ -160,7 +160,7 @@ export const appRouter = [
     children: [
       {
         path: 'management-audit',
-        name: 'managerment-audit',
+        name: 'managerment-audit-approver',
         title: '审核',
         'icon': 'edit',
         component: resolve => {
@@ -178,7 +178,7 @@ export const appRouter = [
     children: [
       {
         path: 'management-execute',
-        name: 'managerment-execute',
+        name: 'managerment-execute-man',
         title: '执行',
         'icon': 'edit',
         component: resolve => {
