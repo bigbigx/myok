@@ -110,14 +110,14 @@ class userinfo(baseview.SuperUserpermissions):
                         Account.objects.filter(username=username).update(
                             group=group,
                             department=department,
-                            is_staff=2
+                            is_staff=1
                             )
                         return Response('%s--用户组修改成功!' % username)
                     elif group == 'executer':
                         Account.objects.filter(username=username).update(
                             group=group,
                             department=department,
-                            is_staff=3
+                            is_staff=1
                             )
                         return Response('%s--用户组修改成功!' % username)
 
@@ -182,7 +182,7 @@ class userinfo(baseview.SuperUserpermissions):
                         password=password,
                         department=department,
                         group=group,
-                        is_staff=2,
+                        is_staff=1,
                         email=email
                         )
                     user.save()
@@ -195,7 +195,7 @@ class userinfo(baseview.SuperUserpermissions):
                         password=password,
                         department=department,
                         group=group,
-                        is_staff=3,
+                        is_staff=1,
                         email=email
                         )
                     user.save()
