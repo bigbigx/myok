@@ -132,7 +132,7 @@ export default {
               text = '审核驳回'
             } else if (row.status === 1) {
               color = 'orange'
-              text = '待执行'
+              text = '已审核'
             } else if (row.status === 3) {
               color = 'red'
               text = '执行驳回'

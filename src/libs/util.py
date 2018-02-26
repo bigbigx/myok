@@ -20,7 +20,7 @@ import ssl
 import time
 import ldap3
 import configparser
-
+import hashlib
 
 #def dingding(content: str = None, url: str = None):
 def dingding(content = None, url = None):
@@ -56,6 +56,9 @@ def workId():
     #now = '{now}{_ran}'
     return now
 
+# 其次性能非常棒的是SHA1：
+def generateTokens():
+    return hashlib.sha1(os.urandom(24)).hexdigest()
 
 #def ser(_obj: object) -> list:
 def ser(_obj):
