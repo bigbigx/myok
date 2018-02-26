@@ -233,7 +233,7 @@ export default {
                     this.edit_tab(params.index)
                   }
                 }
-              }, '执行SQL')
+              }, '立即执行S')
             ])
           }
         }
