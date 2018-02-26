@@ -17,7 +17,7 @@
           <Icon type="android-send"></Icon>
           工单{{ this.$route.query.workid }}详细信息
           <br>
-          <Button type="text" v-if="this.$route.query.status === 3" @click.native="_RollBack()">查看回滚语句</Button>
+          <Button type="text" v-if="this.$route.query.status === 4" @click.native="_RollBack()">查看回滚语句</Button>
           <Button type="text" v-else-if="this.$route.query.status === 0 && this.$route.query.type === 1" @click.native="PutData()">重新提交</Button>
           <Button type="text" v-if="this.$route.query.status === 2" @click.native="delorder()">工单撤销</Button>
           <Button type="text"  @click.native="$router.go(-1)">返回</Button>

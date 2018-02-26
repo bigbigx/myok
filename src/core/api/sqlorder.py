@@ -67,6 +67,7 @@ class sqlorder(baseview.BaseView):
             data = json.loads(request.data['data'])
             tmp = json.loads(request.data['sql'])
             user = request.data['user']
+            assigned_man=data['assigned']
             type = request.data['type']
             id = request.data['id']
         except KeyError as e:
@@ -102,7 +103,7 @@ class sqlorder(baseview.BaseView):
                         try:
                             util.dingding(
                                 content='工单提交通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单说明:%s\n状态:已提交\n备注:%s'
-                                        %(workId,user,addr_ip,data['text'],content.before), url=content.url)
+                                        %(workId,assigned_man,addr_ip,data['text'],content.before), url=content.url)
                         except:
                             #ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
                             ret_info = '工单审核成功!但是钉钉推送失败,请查看错误日志排查错误.'
@@ -112,7 +113,8 @@ class sqlorder(baseview.BaseView):
                     if mail.email:
                         mess_info = {
                             'workid': workId,
-                            'to_user': user,
+                            #'to_user': user,
+                            'to_user': assigned_man,
                             'addr': addr_ip,
                             'text': data['text'],
                             'note': content.before}

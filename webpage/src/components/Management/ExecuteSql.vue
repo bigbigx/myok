@@ -128,13 +128,13 @@ export default {
 
         {
           title: '审核时间:',
-          key: 'date',
+          key: 'approve_time',
           sortable: true,
           width: 150
         },
         {
           title: '审核人',
-          key: 'username',
+          key: 'assigned',
           sortable: true,
           width: 150
         },

@@ -21,6 +21,7 @@ import time
 import ldap3
 import configparser
 import hashlib
+import random,string
 
 #def dingding(content: str = None, url: str = None):
 def dingding(content = None, url = None):
@@ -56,9 +57,31 @@ def workId():
     #now = '{now}{_ran}'
     return now
 
-# 其次性能非常棒的是SHA1：
-def generateTokens():
-    return hashlib.sha1(os.urandom(24)).hexdigest()
+##  使用方法：  generateTokens(32)  生成32位的随机数
+def generateTokens(length):
+    #随机出数字的个数
+    numOfNum = random.randint(1,length-1)
+    numOfLetter = length - numOfNum
+    #选中numOfNum个数字
+    slcNum = [random.choice(string.digits) for i in range(numOfNum)]
+    #选中numOfLetter个字母
+    slcLetter = [random.choice(string.ascii_letters) for i in range(numOfLetter)]
+    #打乱这个组合
+    slcChar = slcNum + slcLetter
+    random.shuffle(slcChar)
+    #生成密码
+    genPwd = ''.join([i for i in slcChar])
+    return genPwd
+
+import pickle
+def dict2persis(data):
+    f1 = open('/tmp/pickle.txt', 'wb')
+    if ():
+    d = ['dasda':{'one': 'hello', 'two': 'world'}]
+    pickle.dump(d, f1)
+    f1.flush()
+    f1.close()
+
 
 #def ser(_obj: object) -> list:
 def ser(_obj):
