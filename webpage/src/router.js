@@ -99,54 +99,12 @@ export const appRouter = [
           require(['./components/Order/MyOrder.vue'], resolve)
         }
       }, {
-        path: 'ddledit',
-        name: 'ddledit',
-        title: '表结构修改',
-        'icon': 'compose',
-        component: resolve => {
-          require(['./components/Order/GenSQL.vue'], resolve)
-        }
-      }, {
-        path: 'indexedit',
-        name: 'indexedit',
-        title: '索引修改',
-        'icon': 'share',
-        component: resolve => {
-          require(['./components/Order/GenIndex.vue'], resolve)
-        }
-      }, {
         path: 'dmledit',
         name: 'dmledit',
-        title: 'SQL语句提交',
+        title: '发起工单',
         'icon': 'code',
         component: resolve => {
           require(['./components/Order/SQLsyntax.vue'], resolve)
-        }
-      }
-    ]
-  }, {
-    path: '/view',
-    icon: 'search',
-    name: 'view',
-    title: '数据库查看',
-    component: Index,
-    children: [
-      {
-        path: 'view-dml',
-        name: 'view-dml',
-        title: '数据库字典',
-        'icon': 'ios-book',
-        component: resolve => {
-          require(['./components/Search/DataBaseDic.vue'], resolve)
-        }
-      },
-      {
-        path: 'serach-sql',
-        name: 'serach-sql',
-        title: 'SQL查询',
-        'icon': 'qr-scanner',
-        component: resolve => {
-          require(['./components/Search/SearchSQL.vue'], resolve)
         }
       }
     ]
@@ -233,6 +191,49 @@ export const appRouter = [
         'icon': 'android-drafts',
         component: resolve => {
           require(['./components/Management/Record.vue'], resolve)
+        }
+      }, {
+        path: 'ddledit',
+        name: 'ddledit',
+        title: '表结构修改',
+        'icon': 'compose',
+        component: resolve => {
+          require(['./components/Order/GenSQL.vue'], resolve)
+        }
+      }, {
+        path: 'indexedit',
+        name: 'indexedit',
+        title: '索引修改',
+        'icon': 'share',
+        component: resolve => {
+          require(['./components/Order/GenIndex.vue'], resolve)
+        }
+      },
+    ]
+  }, {
+    path: '/view',
+    icon: 'search',
+    name: 'view',
+    title: '数据库查看',
+    access: 0,
+    component: Index,
+    children: [
+      {
+        path: 'view-dml',
+        name: 'view-dml',
+        title: '数据库字典',
+        'icon': 'ios-book',
+        component: resolve => {
+          require(['./components/Search/DataBaseDic.vue'], resolve)
+        }
+      },
+      {
+        path: 'serach-sql',
+        name: 'serach-sql',
+        title: 'SQL查询',
+        'icon': 'qr-scanner',
+        component: resolve => {
+          require(['./components/Search/SearchSQL.vue'], resolve)
         }
       }
     ]
