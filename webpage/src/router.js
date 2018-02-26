@@ -250,7 +250,7 @@ export const appRouter = [
         title: '我的日志',
         'icon': 'edit',
         component: resolve => {
-          require(['./components/Management/LoggerView.vue'], resolve)
+          require(['./components/Logger/LoggerView.vue'], resolve)
         }
       }
     ]
