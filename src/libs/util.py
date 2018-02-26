@@ -73,14 +73,7 @@ def generateTokens(length):
     genPwd = ''.join([i for i in slcChar])
     return genPwd
 
-import pickle
-def dict2persis(data):
-    f1 = open('/tmp/pickle.txt', 'wb')
-    if ():
-    d = ['dasda':{'one': 'hello', 'two': 'world'}]
-    pickle.dump(d, f1)
-    f1.flush()
-    f1.close()
+
 
 
 #def ser(_obj: object) -> list:
