@@ -71,7 +71,51 @@
       </Card>
     </Row>
     </Col>
-
+    <Col span="16" class-name="padding-left-5">
+    <Row>
+      <Col span="6">
+      <infor-card id-name="user_created_count" :end-val="count.createUser" iconType="android-person-add" color="#2d8cf0" intro-text="平台用户"></infor-card>
+      </Col>
+      <Col span="6" class-name="padding-left-5">
+      <infor-card id-name="visit_count" :end-val="count.link" iconType="ios-eye" color="#64d572" :iconSize="50" intro-text="数据库连接地址"></infor-card>
+      </Col>
+      <Col span="6" class-name="padding-left-5">
+      <infor-card id-name="collection_count" :end-val="count.dic" iconType="upload" color="#ffd572" intro-text="数据字典采集字段"></infor-card>
+      </Col>
+      <Col span="6" class-name="padding-left-5">
+      <infor-card id-name="transfer_count" :end-val="count.order" iconType="shuffle" color="#f25e43" intro-text="工单总数"></infor-card>
+      </Col>
+    </Row>
+    <Row class="margin-top-10">
+      <Col span="12">
+      <Card>
+        <p slot="title" class="card-title">
+          <Icon type="android-map"></Icon>
+          公告栏
+        </p>
+        <div class="data-sourcefunc-row">
+          <H2>欢迎使用蜜罐运维平台</H2>
+          <br>
+          <div class="fuc">
+            <H3>主要功能:</H3>
+            <H4 v-for="i in board.title" :key="i">{{i}}</H4>
+          </div>
+        </div>
+      </Card>
+      </Col>
+      <Col span="12" class="padding-left-10">
+      <Card>
+        <p slot="title" class="card-title">
+          <Icon type="ios-pulse-strong"></Icon>
+          申请修改表结构及SQL的工单数
+        </p>
+        <div class="data-source-row">
+          <data-source-pie></data-source-pie>
+        </div>
+      </Card>
+      </Col>
+    </Row>
+    </Col>
   </Row>
 </div>
 </template>
