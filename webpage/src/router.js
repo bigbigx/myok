@@ -143,7 +143,7 @@ export const appRouter = [
           require(['./components/Management/ExecuteSql.vue'], resolve)
         }
       }, {
-        path: 'management-record'
+        path: 'management-record',
         name: 'management-record-1',
         title: '执行记录',
         'icon': 'android-drafts',
