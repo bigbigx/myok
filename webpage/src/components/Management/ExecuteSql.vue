@@ -78,6 +78,7 @@
       <Button type="success" @click="put_button_exe()" :disabled="summit">立即执行</Button>
     </div>
   </Modal>
+  
 
   <Modal v-model="reject.reje" @on-ok="rejecttext">
     <p slot="header" style="color:#f60;font-size: 16px">
