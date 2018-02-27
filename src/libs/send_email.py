@@ -52,9 +52,9 @@ class send_email(object):
             text = '<html><body><h1>蜜罐运维 工单提交通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>登录平台: <a href="%s">%s</a></p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '<br><p>工单备注: %s</p>' \
-                   '<br><p>工单详情: &nbsp&nbsp<a href="">点击查看</p>' \
+                   '<br><p>工单详情: &nbsp&nbsp<a href="">点击查看</a></p>' \
                    '<br><p>状态: 已提交</p>' \
                    '<br><p>备注: %s</p>' \
                    '<br><p>请审核人操作: &nbsp&nbsp<a href="">审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
@@ -63,8 +63,6 @@ class send_email(object):
                    '</body></html>' % (
                        mail_data['workid'],
                        mail_data['to_user'],
-                       mail_data['addr'],
-                       mail_data['addr'],
                        mail_data['text'],
                        #mail_data['addr'],
                        #mail_data['orderID'],
