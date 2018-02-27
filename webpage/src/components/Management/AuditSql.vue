@@ -292,7 +292,7 @@ export default {
     },
     put_button () {
       this.modal2 = false
-      this.tmp[this.togoing].status = 3
+      this.tmp[this.togoing].status = 5
       axios.put(`${util.url}/audit_sql`, {
           'type': 1,
           'from_user': Cookies.get('user'),

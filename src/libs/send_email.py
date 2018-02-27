@@ -57,7 +57,7 @@ class send_email(object):
                    '<br><p>工单详情: &nbsp&nbsp<a href="">点击查看</a></p>' \
                    '<br><p>状态: 已提交</p>' \
                    '<br><p>备注: %s</p>' \
-                   '<br><p>请审核人操作: &nbsp&nbsp<a href="">审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
+                   '<br><p>请审核人操作: &nbsp&nbsp<a href="">审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
                    '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
