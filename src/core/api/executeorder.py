@@ -191,7 +191,8 @@ class execute(baseview.Approverpermissions):
                                     base=c.basename,
                                     workid=c.work_id,
                                     person=c.username,
-                                    reviewer=c.assigned,
+                                    #reviewer=c.assigned,
+                                    reviewer=from_user,
                                     affectrow=i['affected_rows'],
                                     sequence=i['sequence'],
                                     backup_dbname=i['backup_dbname']
