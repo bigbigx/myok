@@ -48,14 +48,13 @@ class send_email(object):
                        mail_data['addr'],
                        mail_data['addr'],
                        mail_data['rejected'])
-        else: #提交
+        else: #提交                    #'<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
             text = '<html><body><h1>蜜罐运维 工单提交通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>发起人: %s</p>' \
                    '<br><p>登录地址: <a href="%s">%s</a></p>' \
                    '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 已提交</p>' \
-                   '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
                    '<br><p>备注: %s</p>' \
                    '</body></html>' % (
                        mail_data['workid'],
@@ -63,9 +62,9 @@ class send_email(object):
                        mail_data['addr'],
                        mail_data['addr'],
                        mail_data['text'],
-                       mail_data['addr'],
-                       mail_data['orderID'],
-                       mail_data['tokens'],
+                       #mail_data['addr'],
+                       #mail_data['orderID'],
+                       #mail_data['tokens'],
                        mail_data['note'])
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)

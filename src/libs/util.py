@@ -73,7 +73,13 @@ def generateTokens(length):
     genPwd = ''.join([i for i in slcChar])
     return genPwd
 
-
+from kv import KV
+##  对dict进行持久化，使用kv
+def dict2persis():
+    b = KV('/tmp/demo.kv')
+    db['hello'] = 'world'
+    db[42] = ['answer', 2, {'ultimate': 'question'}]
+    dict(db)
 
 
 #def ser(_obj: object) -> list:
