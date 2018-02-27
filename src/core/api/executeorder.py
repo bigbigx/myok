@@ -147,7 +147,7 @@ class execute(baseview.Approverpermissions):
                     return HttpResponse(status=500)
                 else:
                     try:
-                        SqlOrder.objects.filter(id=id).update(status=5)
+                        SqlOrder.objects.filter(id=id).update(status=4)
                         c = SqlOrder.objects.filter(id=id).first()
                         title = f'工单:{c.work_id}执行成功通知'
                         '''
