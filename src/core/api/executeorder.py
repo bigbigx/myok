@@ -86,7 +86,7 @@ class execute(baseview.Approverpermissions):
                 else:
                     try:
                         #SqlOrder.objects.filter(id=id).update(status=0)
-                        SqlOrder.objects.filter(id=id).update(status=4)
+                        SqlOrder.objects.filter(id=id).update(status=3)
                         _tmpData = SqlOrder.objects.filter(id=id).values(
                             'work_id',
                             'bundle_id',
