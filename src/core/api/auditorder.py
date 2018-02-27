@@ -297,6 +297,7 @@ class orderdetail(baseview.BaseView):
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
 
+    # （查看回滚语句  里面调用到）
     #def post(self, request, args: str = None):
     def post(self, request, args=None):
         try:
