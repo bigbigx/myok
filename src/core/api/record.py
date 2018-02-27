@@ -10,7 +10,7 @@ from core.models import (
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 
-class recordorder(baseview.SuperUserpermissions):
+class recordorder(baseview.Approverpermissions):
 
     '''
     审核记录相关
