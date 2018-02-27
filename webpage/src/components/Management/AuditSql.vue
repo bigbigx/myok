@@ -134,7 +134,7 @@ export default {
               color = 'orange'
               text = '审核同意'
             } else if (row.status === 3) {
-              color = 'red'
+              color = 'black'
               text = '执行驳回'
             } else if (row.status === 4) {
               color = 'green'
