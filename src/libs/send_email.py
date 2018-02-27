@@ -56,6 +56,7 @@ class send_email(object):
                    '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 已提交</p>' \
                    '<br><p>备注: %s</p>' \
+                   '<br><p>请审核人操作: <a href="">同意</a> <br> <a href=''>驳回</a></p>' \
                    '</body></html>' % (
                        mail_data['workid'],
                        mail_data['to_user'],
@@ -69,7 +70,7 @@ class send_email(object):
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
         msg['To'] = self._format_addr('Dear_guest <%s>' % self.to_addr)
-        msg['Subject'] = Header('蜜罐运维 工单消息推送', 'utf-8').encode()
+        msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
 
         #server = smtplib.SMTP(smtp_server, 25)
         server = smtplib.SMTP_SSL(smtp_server,port=465)
