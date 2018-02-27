@@ -142,6 +142,14 @@ export const appRouter = [
         component: resolve => {
           require(['./components/Management/ExecuteSql.vue'], resolve)
         }
+      }, {
+        path: 'management-record'
+        name: 'management-record-1',
+        title: '执行记录',
+        'icon': 'android-drafts',
+        component: resolve => {
+          require(['./components/Management/Record.vue'], resolve)
+        }
       }
     ]
   }, {
