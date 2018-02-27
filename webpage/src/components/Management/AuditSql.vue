@@ -281,6 +281,10 @@ export default {
         this.summit = false
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+      } else if (this.tmp[index].status === 3)  {
+        this.summit = false
+        this.formitem = this.tmp[index]
+        this.sql = this.tmp[index].sql.split(';')
       } else {
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
