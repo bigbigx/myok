@@ -62,9 +62,6 @@
       <FormItem label="数据库库名:">
         <span>{{ formitem.basename }}</span>
       </FormItem>
-      <FormItem label="工单说明:">
-        <span>{{ formitem.text }}</span>
-      </FormItem>
       <FormItem label="SQL语句:">
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
@@ -74,11 +71,11 @@
     <div slot="footer">
       <Button type="warning" @click.native="test_button()">检测sql</Button>
       <Button @click="cancel_button">取消</Button>
-      <Button type="error" @click="out_button_1()" :disabled="summit">驳回</Button>
-      <Button type="success" @click="put_button_exe()" :disabled="summit">立即执行</Button>
+      <Button type="error" @click="out_button_1()" :enabled="summit">驳回</Button>
+      <Button type="success" @click="put_button_exe()" :enaabled="summit">立即执行</Button>
     </div>
   </Modal>
-  
+
 
   <Modal v-model="reject.reje" @on-ok="rejecttext">
     <p slot="header" style="color:#f60;font-size: 16px">
