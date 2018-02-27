@@ -56,7 +56,7 @@ class send_email(object):
                    '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 已提交</p>' \
                    '<br><p>备注: %s</p>' \
-                   '<br><p>请审核人操作: <a href="">同意</a> <br> <a href=''>驳回</a></p>' \
+                   '<br><p>请审核人操作: <a href="">同意</a> &nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>驳回</a></p>' \
                    '</body></html>' % (
                        mail_data['workid'],
                        mail_data['to_user'],
