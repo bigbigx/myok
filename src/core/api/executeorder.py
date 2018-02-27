@@ -89,14 +89,16 @@ class execute(baseview.Approverpermissions):
                         SqlOrder.objects.filter(id=id).update(status=4)
                         _tmpData = SqlOrder.objects.filter(id=id).values(
                             'work_id',
-                            'bundle_id'
+                            'bundle_id',
+                            'text'
                         ).first()
                         title = '工单:' + _tmpData['work_id'] + '执行驳回通知'
+                        msg_content = '工单详情是：' + _tmpData['text'] + '\n 驳回意见是： ' + text
                         Usermessage.objects.get_or_create(
                             from_user=from_user,
                             time=util.date(),
                             title=title,
-                            content=text,
+                            content=msg_content,
                             to_user=to_user,
                             state='unread'
                         )
@@ -200,7 +202,8 @@ class execute(baseview.Approverpermissions):
                         '''
                         Usermessage.objects.get_or_create(
                             from_user=from_user, time=util.date(),
-                            title=title, content='该工单已执行成功!', to_user=to_user,
+                            #title=title, content='该工单已执行成功!', to_user=to_user,
+                            title=title, content=f'该工单已审核通过! 工单说明是: {c.text}', to_user=to_user,
                             state='unread'
                         )
 

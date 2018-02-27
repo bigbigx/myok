@@ -245,6 +245,8 @@ export default {
         dataadd: '',
         database: '',
         att: '',
+        assigned: '',
+        approve_time: '',
         id: null
       },
       summit: false,
@@ -317,7 +319,7 @@ export default {
       axios.put(`${util.url}/execute_sql`, {
           'type': 1,
           'from_user': Cookies.get('user'),
-          'to_user': this.formitem.username,
+          'to_user': this.formitem.assigned,
           'id': this.formitem.id
         })
         .then(res => {
@@ -341,7 +343,7 @@ export default {
           'type': 0,
           'from_user': Cookies.get('user'),
           'text': this.reject.textarea,
-          'to_user': this.formitem.approver,
+          'to_user': this.formitem.assigned,
           'id': this.formitem.id
         })
         .then(res => {
