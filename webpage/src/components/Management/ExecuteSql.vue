@@ -74,8 +74,8 @@
     <div slot="footer">
       <Button type="warning" @click.native="test_button()">检测sql</Button>
       <Button @click="cancel_button">取消</Button>
-      <Button type="error" @click="out_button()" :disabled="summit">驳回</Button>
-      <Button type="success" @click="put_button_exe()" :disabled="summit">执行</Button>
+      <Button type="error" @click="out_button_1()" :disabled="summit">驳回</Button>
+      <Button type="success" @click="put_button_exe()" :disabled="summit">立即执行</Button>
     </div>
   </Modal>
 
@@ -333,6 +333,10 @@ export default {
         .catch(error => {
           util.ajanxerrorcode(this, error)
         })
+    },
+    out_button_1 () {
+      this.modal2 = false
+      this.reject.reje = true
     },
     rejecttext () {
       axios.put(`${util.url}/execute_sql`, {
