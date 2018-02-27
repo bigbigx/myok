@@ -51,14 +51,15 @@ class send_email(object):
         else: #提交                    #'<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
             text = '<html><body><h1>蜜罐运维 工单提交通知</h1>' \
                    '<br><p>工单号: %s</p>' \
-                   '<br><p>发起人: %s</p>' \
+                   '<br><p>工单发起人: %s</p>' \
                    '<br><p>登录平台: <a href="%s">%s</a></p>' \
                    '<br><p>工单备注: %s</p>' \
+                   '<br><p>工单详情: &nbsp&nbsp<a href="">点击查看</p>' \
                    '<br><p>状态: 已提交</p>' \
                    '<br><p>备注: %s</p>' \
-                   '<br><p>请审核人操作: <a href="">&nbsp&nbsp审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
-                   '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；</p>' \
-                   '<br><p>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
+                   '<br><p>请审核人操作: &nbsp&nbsp<a href="">审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
+                   '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
+                   '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
                        mail_data['workid'],
                        mail_data['to_user'],
