@@ -126,6 +126,7 @@ class execute(baseview.Approverpermissions):
                                         'workid':_tmpData['work_id'],
                                         'to_user':to_user,
                                         'addr': addr_ip,
+                                        'type': "执行驳回",
                                         'rejected': text}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=1)
@@ -241,6 +242,7 @@ class execute(baseview.Approverpermissions):
                                         'to_user':c.username,
                                         'addr': addr_ip,
                                         'text':c.text,
+                                        'type': "执行成功",
                                         'note': content.after}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=0)

@@ -117,6 +117,7 @@ class sqlorder(baseview.BaseView):
                             'to_user': user,
                             'addr': addr_ip,
                             'text': data['text'],
+                            'type': "成功发起",
                             'note': content.before}
                         try:
                             put_mess = send_email.send_email(to_addr=mail.email)

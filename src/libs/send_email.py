@@ -21,35 +21,35 @@ class send_email(object):
 
     def send_mail(self,mail_data=None,type=None):
         if type == 0: #同意
-            text = '<html><body><h1>蜜罐运维 工单同意通知</h1>' \
+            text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
                    '<br><p>工单号: %s</p>' \
-                   '<br><p>发起人: %s</p>' \
-                   '<br><p>地址: <a href="%s">%s</a></p>' \
+                   '<br><p>工单发起人: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 同意</p>' \
                    '<br><p>备注: %s</p>' \
                    '</body></html>' %(
+                mail_data['type'],
                 mail_data['workid'],
                 mail_data['to_user'],
-                mail_data['addr'],
-                mail_data['addr'],
                 mail_data['text'],
                 mail_data['note'])
         elif type == 1: #驳回
-            text = '<html><body><h1>蜜罐运维 工单驳回通知</h1>' \
+            text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
                    '<br><p>工单号: %s</p>' \
-                   '<br><p>发起人: %s</p>' \
-                   '<br><p>地址: <a href="%s">%s</a></p>' \
+                   '<br><p>工单发起人: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 驳回</p>' \
                    '<br><p>驳回说明: %s</p>' \
                    '</body></html>' % (
+                       mail_data['type'],
                        mail_data['workid'],
                        mail_data['to_user'],
-                       mail_data['addr'],
-                       mail_data['addr'],
+                       mail_data['text'],
                        mail_data['rejected'])
         else: #提交                    #'<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
-            text = '<html><body><h1>蜜罐运维 工单提交通知</h1>' \
+            text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
@@ -61,6 +61,7 @@ class send_email(object):
                    '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
+                       mail_data['type'],
                        mail_data['workid'],
                        mail_data['to_user'],
                        mail_data['text'],

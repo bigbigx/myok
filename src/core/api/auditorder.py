@@ -81,7 +81,7 @@ class audit(baseview.Approverpermissions):
                             'text',
                         ).first()
                         title = '工单:' + _tmpData['work_id'] + '审核驳回通知'
-                        msg_content='工单详情是：'+ _tmpData['text']+  '\n 驳回意见是： '+ text
+                        msg_content='工单详情是：'+ _tmpData['text']+  '\r\n 驳回意见是： '+ text
                         Usermessage.objects.get_or_create(
                             from_user=from_user,
                             time=util.date(),
@@ -113,6 +113,7 @@ class audit(baseview.Approverpermissions):
                                         'workid':_tmpData['work_id'],
                                         'to_user':to_user,
                                         'addr': addr_ip,
+                                        'type': "审核驳回",
                                         'rejected': text}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=1)
@@ -147,7 +148,7 @@ class audit(baseview.Approverpermissions):
                         '''
                         Usermessage.objects.get_or_create(
                             from_user=from_user, time=util.date(),
-                            title=title, content=f'该工单已审核通过! 工单说明是: {c.text}', to_user=to_user,
+                            title=title, content=f'该工单已审核通过!       \r\n 工单说明是: {c.text}', to_user=to_user,
                             state='unread'
                         )
 
@@ -184,6 +185,7 @@ class audit(baseview.Approverpermissions):
                                         'to_user':c.username,
                                         'addr': addr_ip,
                                         'text':c.text,
+                                        'type': "审核成功",
                                         'note': content.after}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=0)
