@@ -128,8 +128,10 @@ export default {
       // if (this.TableDataNew[0].state.length === 40) {
       if (this.TableDataNew[0].sql.length === 47) {
         this.openswitch = true
-        let opid = this.TableDataNew.map(item => item.sequence)
+        console.log(this.TableDataNew,'...........')
+        let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
         opid.splice(0, 1)
+        // axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
         axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
         .then(res => {
           this.formItem = res.data.data
