@@ -126,7 +126,7 @@ export default {
   methods: {
     _RollBack () {
       // if (this.TableDataNew[0].state.length === 40) {
-      if (this.TableDataNew[0].sql.length === 40) {
+      if (this.TableDataNew[0].sql.length === 47) {
         this.openswitch = true
         let opid = this.TableDataNew.map(item => item.sequence)
         opid.splice(0, 1)
