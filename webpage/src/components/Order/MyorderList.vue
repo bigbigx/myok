@@ -134,9 +134,9 @@ export default {
         // let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
         let opid = this.TableDataNew.map(function (item) {
           console.log(item, '.........3')
-          alert(item.sequence)
-          console.log(item.sequence, '.........4')
-          return item.sequence
+          alert(item.sql)
+          console.log(item.sql, '.........4')
+          return item.sql
         });
         alert(opid)  // 这里显示为空
         opid.splice(0, 1)
