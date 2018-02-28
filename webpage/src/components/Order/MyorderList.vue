@@ -131,6 +131,7 @@ export default {
         console.log(this.TableDataNew, '...........')
         alert(this.TableDataNew)
         let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
+        alert(opid)
         opid.splice(0, 1)
         // axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
         axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
