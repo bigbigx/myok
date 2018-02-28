@@ -20,7 +20,7 @@ class send_email(object):
         return formataddr((Header(name, 'utf-8').encode(), addr))
 
     def send_mail(self,mail_data=None,type=None):
-        if type == 0: #同意
+        if type == 0: #成功，通过，含审核成功和执行成功
             text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -34,7 +34,7 @@ class send_email(object):
                 mail_data['to_user'],
                 mail_data['text'],
                 mail_data['note'])
-        elif type == 1: #驳回
+        elif type == 1: #驳回，含审核驳回 和执行驳回
             text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -48,7 +48,7 @@ class send_email(object):
                        mail_data['to_user'],
                        mail_data['text'],
                        mail_data['rejected'])
-        else: #提交                    #'<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
+        else: # 提交成功 # '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
             text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -71,7 +71,7 @@ class send_email(object):
                        mail_data['note'])
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
-        msg['To'] = self._format_addr('Dear_guest <%s>' % self.to_addr)
+        msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
         msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
 
         #server = smtplib.SMTP(smtp_server, 25)

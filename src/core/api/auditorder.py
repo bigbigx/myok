@@ -63,7 +63,7 @@ class audit(baseview.Approverpermissions):
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         else:
-            if type == 0:
+            if type == 0:  #审核驳回
                 try:
                     from_user = request.data['from_user']
                     to_user = request.data['to_user']
@@ -124,7 +124,7 @@ class audit(baseview.Approverpermissions):
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
 
-            elif type == 1:
+            elif type == 1:  #审核通过
                 try:
                     from_user = request.data['from_user']
                     to_user = request.data['to_user']
@@ -184,7 +184,7 @@ class audit(baseview.Approverpermissions):
                                         'workid':c.work_id,
                                         'to_user':c.username,
                                         'addr': addr_ip,
-                                        'text':c.text,
+                                        'text': c.text,
                                         'type': "审核成功",
                                         'note': content.after}
                                     put_mess = send_email.send_email(to_addr=mail.email)
