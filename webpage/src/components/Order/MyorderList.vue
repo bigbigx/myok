@@ -128,14 +128,14 @@ export default {
       // if (this.TableDataNew[0].state.length === 40) {
       if (this.TableDataNew[0].sql.length === 47) {
         this.openswitch = true
-        console.log(this.TableDataNew, '...........')
-        console.log(this.TableDataNew[0], '...........')
+        console.log(this.TableDataNew, '...........1')
+        console.log(this.TableDataNew[0], '...........2')
         alert(this.TableDataNew)
         // let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
         let opid = this.TableDataNew.map(function (item) {
-          console.log(item, '.........')
+          console.log(item, '.........3')
           alert(item.sequence)
-          console.log(item.sequence, '.........')
+          console.log(item.sequence, '.........4')
           return item.sequence
         });
         alert(opid)  // 这里显示为空
