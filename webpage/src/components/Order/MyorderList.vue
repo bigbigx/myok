@@ -129,9 +129,11 @@ export default {
       if (this.TableDataNew[0].sql.length === 47) {
         this.openswitch = true
         console.log(this.TableDataNew, '...........')
+        console.log(this.TableDataNew[0], '...........')
         alert(this.TableDataNew)
-        let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
-        alert(opid)
+        // let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
+        let opid = this.TableDataNew[0].map(item => item.sequence)  // 问题点
+        alert(opid)  // 这里显示为空
         opid.splice(0, 1)
         // axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
         axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
