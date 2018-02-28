@@ -129,6 +129,7 @@ export default {
       if (this.TableDataNew[0].sql.length === 47) {
         this.openswitch = true
         console.log(this.TableDataNew, '...........')
+        alert(this.TableDataNew)
         let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
         opid.splice(0, 1)
         // axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
