@@ -158,7 +158,7 @@ export default {
         this.$Message.error('此工单没有备份或语句执行失败!')
       }
     },
-    DelOrder() { //删除已经被驳回的工单
+    DelOrder () { // 删除已经被驳回的工单
       axios.delelte(`${util.url}/detail`, {'id': this.$route.query.id})
         .then(res => {
             this.$Notice.info({
