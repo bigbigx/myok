@@ -19,6 +19,7 @@
           <br>
           <Button type="text" v-if="this.$route.query.status === 4" @click.native="_RollBack()">查看回滚语句</Button>
           <Button type="text" v-else-if="this.$route.query.status === 0 && this.$route.query.type === 1" @click.native="PutData()">重新提交</Button>
+          <Button type="text" v-else-if="this.$route.query.status === 0 && this.$route.query.type === 1" @click.native="DelOrder()">工单撤销</Button>
           <Button type="text" v-if="this.$route.query.status === 2" @click.native="delorder()">工单撤销</Button>
           <Button type="text"  @click.native="$router.go(-1)">返回</Button>
         </p>
@@ -134,7 +135,6 @@ export default {
         // let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
         let opid = this.TableDataNew.map(function (item) {
           console.log(item, '.........3')
-          alert(item.sql)
           console.log(item.sql, '.........4')
           return item.sql
         });
@@ -158,8 +158,22 @@ export default {
         this.$Message.error('此工单没有备份或语句执行失败!')
       }
     },
+    DelOrder() { //删除已经被驳回的工单
+      axios.delelte(`${util.url}/detail`, {'id': this.$route.query.id})
+        .then(res => {
+            this.$Notice.info({
+              title: '通知',
+              desc: '工单已撤销成功'
+            })
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
+    },
     PutData () {
-      axios.put(`${util.url}/detail`, {'id': this.$route.query.id})
+      axios.put(`${util.url}/detail`, {
+       'id': this.$route.query.id
+       })
         .then(res => {
           this.formItem = res.data.data
           this.sql = res.data.sql

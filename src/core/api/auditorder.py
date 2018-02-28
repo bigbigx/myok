@@ -249,6 +249,10 @@ class orderdetail(baseview.BaseView):
     审核工单的详细信息
 
     '''
+    # 删除工单
+    def delelte(self, request, args=None):
+        pass
+
 
     #def get(self, request, args: str = None):
     def get(self, request, args=None):
