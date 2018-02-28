@@ -135,6 +135,7 @@ export default {
         let opid = this.TableDataNew.map(function (item) {
           console.log(item, '.........')
           alert(item.sequence)
+          console.log(item.sequence, '.........')
           return item.sequence
         });
         alert(opid)  // 这里显示为空
