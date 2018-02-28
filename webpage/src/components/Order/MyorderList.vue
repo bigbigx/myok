@@ -134,8 +134,9 @@ export default {
         // let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
         let opid = this.TableDataNew.map(function(item){
           console.log(item, '.........')
+          alert(item.sequence)
           return  item.sequence
-        }
+        });
         alert(opid)  // 这里显示为空
         opid.splice(0, 1)
         // axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
