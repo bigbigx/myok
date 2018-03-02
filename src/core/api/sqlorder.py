@@ -37,7 +37,7 @@ class sqlorder(baseview.BaseView):
                     result_ddl_dml = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
                     result.append(result_select)
                     result.append(result_ddl_dml)
-                    return HttpResponse(result)
+                    return HttpResponse(result_select,result_ddl_dml)
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
