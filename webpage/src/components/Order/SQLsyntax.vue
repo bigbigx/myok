@@ -202,11 +202,11 @@ export default {
   methods: {
     beautify () {
       axios.put(`${util.url}/sqlsyntax/beautify`, {
-          'data_select': this.formItem.textarea_backup
+          'data_select': this.formItem.textarea_backup,
           'data_ddl_dml': this.formItem.textarea_ddl_dml
         })
         .then(res => {
-          this.formItem.textarea_ddl_dml = res_ddl_dml.data
+          this.formItem.textarea_ddl_dml = res_ddl_dml.data,
           this.formItem.textarea_backup = res_select.data
         })
         .catch(error => {
