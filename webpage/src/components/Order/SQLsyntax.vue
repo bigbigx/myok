@@ -207,8 +207,10 @@ export default {
         })
         .then(res => {
           alert(res)
-          this.formItem.textarea_backup = res['select']
-          this.formItem.textarea_ddl_dml = res['dml_ddl']
+          alert(res.data.select)
+          alert(res.data.dml_ddl)
+          this.formItem.textarea_backup = res.data.select
+          this.formItem.textarea_ddl_dml = res.data.dml_ddl
         })
         .catch(error => {
           this.$Notice.error({
