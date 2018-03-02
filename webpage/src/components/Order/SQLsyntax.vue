@@ -205,11 +205,10 @@ export default {
           'data_select': this.formItem.textarea_backup,
           'data_ddl_dml': this.formItem.textarea_ddl_dml
         })
-        .then(res_select => {
-          this.formItem.textarea_backup = res_select.data_select,
-        })
-        .then(res_ddl_dml => {
-          this.formItem.textarea_ddl_dml = res_ddl_dml.data_ddl_dml,
+        .then(res => {
+          data = res.result
+          this.formItem.textarea_backup = data[0],
+          this.formItem.textarea_ddl_dml = data[1]
         })
         .catch(error => {
           this.$Notice.error({
