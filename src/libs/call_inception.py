@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 from libs import util
-#import util
+
 import pymysql
 import sqlparse
 
