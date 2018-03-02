@@ -32,12 +32,12 @@ class sqlorder(baseview.BaseView):
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
                 try:
-                    result=[]
-                    result_select = call_inception.Inception.BeautifySQL(sql=data_select)
-                    result_ddl_dml = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
-                    result.append(result_select)
-                    result.append(result_ddl_dml)
-                    return HttpResponse(result_select,result_ddl_dml)
+                    result={'select':'','dml_ddl':''}
+                    data1 = call_inception.Inception.BeautifySQL(sql=data_select)
+                    data2 = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
+                    result['select']=data1
+                    result['dml_ddl']=data2
+                    return HttpResponse(result)
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)

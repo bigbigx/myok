@@ -83,7 +83,7 @@
         <Icon type="ios-crop-strong"></Icon>
         填写数据库备份语句(select)
       </p>
-      <Input v-model="formItem.textarea_backup" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
+      <Input v-model="formItem.textarea_backup" type="textarea" :autosize="{minRows: 10,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
       <br>
     </Card>
 
@@ -206,8 +206,8 @@ export default {
           'data_ddl_dml': this.formItem.textarea_ddl_dml
         })
         .then(res => {
-          this.formItem.textarea_backup = res.result_select
-          this.formItem.textarea_ddl_dml = res.result_ddl_dml
+          this.formItem.textarea_backup = res.data['select']
+          this.formItem.textarea_ddl_dml = res.data['dml_ddl']
         })
         .catch(error => {
           this.$Notice.error({
@@ -256,8 +256,8 @@ export default {
     test_sql () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
-          if (this.formItem.textarea) {
-            let tmp = this.formItem.textarea.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+          if (this.formItem.textarea_ddl_dml) {
+            let tmp = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             axios.put(`${util.url}/sqlsyntax/test`, {
                 'id': this.id[0].id,
                 'base': this.formItem.basename,
@@ -296,7 +296,7 @@ export default {
     SubmitSQL () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
-          if (this.formItem.textarea) {
+          if (this.formItem.textarea_ddl_dml) {
             this.validate_gen = true
             this.datalist.sqllist = this.formItem.textarea.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
             axios.post(`${util.url}/sqlsyntax/`, {
@@ -327,7 +327,8 @@ export default {
     },
     ClearForm () {
       this.$refs['formItem'].resetFields();
-      this.formItem.textarea = ''
+      this.formItem.textarea_ddl_dml = ''
+      this.formItem.textarea_select = ''
     }
   },
   mounted () {
