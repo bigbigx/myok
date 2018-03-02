@@ -206,11 +206,9 @@ export default {
           'data_ddl_dml': this.formItem.textarea_ddl_dml
         })
         .then(res => {
-          alert(data_select)
-          alert(data_ddl_dml)
-          alert(res.data['dml_ddl'])
-          this.formItem.textarea_backup = res.data['select']
-          this.formItem.textarea_ddl_dml = res.data['dml_ddl']
+          alert(res)
+          this.formItem.textarea_backup = res['select']
+          this.formItem.textarea_ddl_dml = res['dml_ddl']
         })
         .catch(error => {
           this.$Notice.error({

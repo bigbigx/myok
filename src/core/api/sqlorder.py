@@ -32,12 +32,12 @@ class sqlorder(baseview.BaseView):
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
                 try:
-                    data={'select':'','dml_ddl':''}
+                    res={'select':'','dml_ddl':''}
                     data1 = call_inception.Inception.BeautifySQL(sql=data_select)
                     data2 = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
-                    data['select']=data1
-                    data['dml_ddl']=data2
-                    return HttpResponse(data)
+                    res['select']=data1
+                    res['dml_ddl']=data2
+                    return HttpResponse(res)
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
