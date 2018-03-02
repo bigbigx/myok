@@ -16,6 +16,7 @@ from core.models import (
     Account,
     globalpermissions
 )
+import time
 from libs.serializers import (
     Record
 )
@@ -168,18 +169,14 @@ class execute(baseview.Approverpermissions):
                         ) as f:
                             res = f.Execute(sql=c.sql, backup=c.backup)
                             '''
-
                             修改该工单编号的state状态 ---修改为执行成功状态
-
-                            '''
+                        '''
                             SqlOrder.objects.filter(id=id).update(status=4)
-
+                            # 同时修改时间戳
+                            cur_time=int(time.time())
                             '''
-
                             遍历返回结果插入到执行记录表中
-
-                            '''
-
+                        '''
                             for i in res:
                                 SqlRecord.objects.get_or_create(
                                     date=util.date(),
@@ -195,12 +192,11 @@ class execute(baseview.Approverpermissions):
                                     reviewer=from_user,
                                     affectrow=i['affected_rows'],
                                     sequence=i['sequence'],
-                                    backup_dbname=i['backup_dbname']
+                                    backup_dbname=i['backup_dbname'],
+                                    # execute_time=i['execute_time']
                                 )
                         '''
-
                         通知消息
-
                         '''
                         Usermessage.objects.get_or_create(
                             from_user=from_user, time=util.date(),
@@ -210,9 +206,7 @@ class execute(baseview.Approverpermissions):
                         )
 
                         '''
-
                         Dingding
-
                         '''
 
                         content = DatabaseList.objects.filter(id=c.bundle_id).first()

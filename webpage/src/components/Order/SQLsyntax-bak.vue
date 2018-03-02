@@ -88,17 +88,6 @@
       <br>
       <Table :columns="columnsName" :data="Testresults" highlight-row></Table>
     </Card>
-
-        <Card>
-      <p slot="title">
-        <Icon type="ios-crop-strong"></Icon>
-        填写sql语句1111
-      </p>
-      <Input v-model="formItem.textarea" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
-      <br>
-      <br>
-      <Table :columns="columnsName" :data="Testresults" highlight-row></Table>
-    </Card>
     </Col>
   </Row>
 </div>

@@ -83,7 +83,8 @@ class Inception(object):
                     'sql': row[5],
                     'affected_rows': row[6],
                     'sequence': row[7],
-                    'backup_dbname': row[8]
+                    'backup_dbname': row[8],
+                    'execute_time': row[9]
                 } 
                 for row in result
             ]

@@ -141,6 +141,7 @@ class audit(baseview.Approverpermissions):
 
                         #############################################
                         SqlOrder.objects.filter(id=id).update(status=1)
+
                         '''
 
                         通知消息
@@ -260,10 +261,12 @@ class orderdetail(baseview.BaseView):
             workid = request.GET.get('workid')
             status = request.GET.get('status')
             id = request.GET.get('id')
+
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         else:
             type_id = SqlOrder.objects.filter(id=id).first()
+
             try:
                 if status == '1':
                     data = SqlRecord.objects.filter(workid=workid).all()

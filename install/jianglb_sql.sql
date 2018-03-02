@@ -10,4 +10,4 @@
 
 
 
-alter TABLE   core_sqlorder add  approve_time varchar(100) after assigned;
+alter TABLE   core_sqlorder add  backup_sql text after approve_time;
