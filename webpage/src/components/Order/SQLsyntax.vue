@@ -206,7 +206,7 @@ export default {
           'data_ddl_dml': this.formItem.textarea_ddl_dml
         })
         .then(res => {
-          this.formItem.textarea_backup = res.result_select,
+          this.formItem.textarea_backup = res.result_select
           this.formItem.textarea_ddl_dml = res.result_ddl_dml
         })
         .catch(error => {
