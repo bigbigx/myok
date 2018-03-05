@@ -11,3 +11,11 @@
 
 
 alter TABLE   core_sqlorder add  backup_sql text after approve_time;
+
+--  备份SQL主表
+create table core_sqlorder_bak(
+  id
+  work_id
+  order_id
+  sql_content
+);

@@ -58,11 +58,11 @@
 
             <FormItem>
               <Button type="warning" icon="android-search" @click.native="test_sql()">检测</Button>
-              <Button type="warning" icon="android-search"  @click.native="sqladvisor()">优化</Button>
+              <Button type="warning" icon="android-search" style="margin-left: 10%" @click.native="sqladvisor()">优化</Button>
             </FormItem>
 
             <FormItem>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%" :disabled="this.validate_gen">提交</Button>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()"  :disabled="this.validate_gen">提交</Button>
             </FormItem>
 
           </Form>
@@ -266,15 +266,12 @@ export default {
     //  sql 优化建议
     sqladvisor () {
 
-
-
-
-    }
+    },
     test_sql () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
           if (this.formItem.textarea_ddl_dml) {
-            let tmp = this.formItem.textarea.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            let tmp = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             axios.put(`${util.url}/sqlsyntax/test`, {
                 'id': this.id[0].id,
                 'base': this.formItem.basename,
@@ -297,7 +294,7 @@ export default {
                } else {
                  this.$Notice.error({
                    title: '警告',
-                   desc: '1-无法连接到Inception!'
+                   desc: 'ddl-dml-无法连接到Inception!'
                  })
                }
               })
@@ -307,41 +304,7 @@ export default {
           } else {
             this.$Message.error('请填写sql语句后再测试!');
           }
-          if (this.formItem.textarea_backup) {
-            let tmp = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            axios.put(`${util.url}/sqlsyntax/test`, {
-                'id': this.id[0].id,
-                'base': this.formItem.basename,
-                'sql': tmp
-              })
-              .then(res => {
-               if (res.data.status === 200) {
-                 this.textarea_backup = res.data.result
-                 let gen = 0
-                 this.textarea_backup.forEach(vl => {
-                   if (vl.errlevel !== 0) {
-                     gen += 1
-                   }
-                 })
-                 if (gen === 0) {
-                   this.validate_gen = false
-                 } else {
-                   this.validate_gen = true
-                 }
-               } else {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: '2-无法连接到Inception!'
-                 })
-               }
-              })
-              .catch(error => {
-               util.ajanxerrorcode(this, error)
-              })
-          } else {
-            this.$Message.error('请填写sql语句后再测试!');
-          }
-        }
+       }
       })
     },
     SubmitSQL () {
@@ -349,10 +312,12 @@ export default {
         if (valid) {
           if (this.formItem.textarea_ddl_dml) {
             this.validate_gen = true
-            this.datalist.sqllist = this.formItem.textarea.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
+            this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
+            this.datalist.sqllist_backup = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
             axios.post(`${util.url}/sqlsyntax/`, {
                 'data': JSON.stringify(this.formItem),
-                'sql': JSON.stringify(this.datalist.sqllist),
+                'sql': JSON.stringify(this.datalist.sqllist_ddl),
+                'backup_sql': JSON.stringify(this.datalist.sqllist_backup),
                 'user': Cookies.get('user'),
                 'type': 1,
                 'id': this.id[0].id

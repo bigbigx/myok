@@ -65,8 +65,9 @@ class sqlorder(baseview.BaseView):
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
                 try:
-                    with call_inception.Inception(LoginDic=info) as test:
-                        res = test.Check(sql=sql)
+                    with call_inception.Inception(LoginDic=info) as hello:
+                        res = hello.Check(sql=sql)
+                        print(res)
                         return Response({'result': res, 'status': 200})
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -76,6 +77,8 @@ class sqlorder(baseview.BaseView):
         try:
             data = json.loads(request.data['data'])
             tmp = json.loads(request.data['sql'])
+
+            tmp_bak = json.loads(request.data['backup_sql'])
             user = request.data['user']
             assigned_man=data['assigned']
             type = request.data['type']
@@ -100,8 +103,10 @@ class sqlorder(baseview.BaseView):
                     text=data['text'],
                     backup=data['backup'],
                     bundle_id=id,
-                    assigned=data['assigned']
+                    assigned=data['assigned'],
+                    backup_sql=tmp_bak
                     )
+#
                 content = DatabaseList.objects.filter(id=id).first()
                 mail = Account.objects.filter(username=data['assigned']).first()
                 tag = globalpermissions.objects.filter(authorization='global').first()

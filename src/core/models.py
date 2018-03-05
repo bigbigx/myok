@@ -32,6 +32,16 @@ class SqlDictionary(models.Model):
     def __str__(self):
         return self.TableName
 
+#class SqlOrderBak(models.Model):
+#    '''
+#    工单sql备份主表#
+#
+#    '''
+#    work_id = models.CharField(max_length=50, blank=True) #工单id
+#    sql = models.TextField(blank=True) #sql语句
+##    order_id = models.IntegerField(blank=True) #执行顺序
+#   status = models.IntegerField(blank=True)是 #此条SQL备份状态
+
 
 class SqlOrder(models.Model):
     '''
