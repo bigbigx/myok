@@ -72,7 +72,8 @@
       <Button type="warning" @click.native="test_button()">检测sql</Button>
       <Button @click="cancel_button">取消</Button>
       <Button type="error" @click="out_button_1()" :enabled="summit">驳回</Button>
-      <Button type="success" @click="put_button_exe()" :enaabled="summit">立即执行</Button>
+      <Button type="error" @click="put_backup()" :disabled="summit">执行备份</Button>  //  如果存在备份语句，必须执行了此部后才能 让立即执行  按钮可用
+      <Button type="success" @click="put_button_exe()" :disabled="summit">立即执行</Button>
     </div>
   </Modal>
 
@@ -160,6 +161,9 @@ export default {
             } else if (row.status === 4) {
               color = 'green'
               text = '执行成功'
+            } else if (row.status === 6) {
+              color = 'yellow'
+              text = '备份中'
             } else {
               color = 'yellow'
               text = '进行中'
@@ -195,6 +199,10 @@ export default {
             {
               label: '进行中',
               value: 5
+            },
+            {
+              label: '备份中',
+              value: 6
             }
           ],
           //            filterMultiple: false 禁止多选,
@@ -209,6 +217,8 @@ export default {
               return row.status === 3
             } else if (value === 4) {
               return row.status === 4
+            } else if (value === 6) {
+              return row.status === 6
             } else {
               return row.status === 5
             }
@@ -303,6 +313,10 @@ export default {
         this.summit = false
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+      } else if (this.tmp[index].status === 6) {
+        this.summit = false
+        this.formitem = this.tmp[index]
+        this.sql = this.tmp[index].sql.split(';')
       } else {
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
@@ -312,7 +326,9 @@ export default {
     cancel_button () {
       this.modal2 = false
     },
-
+    put_backup () {  //  数据库备份查询
+      this.modal2 = false // 保留窗口显示状
+    },
     put_button_exe () {
       this.modal2 = false
       this.tmp[this.togoing].status = 5
@@ -358,6 +374,7 @@ export default {
         })
     },
     test_button () {
+      //  ddl& dml语句检测显示
       axios.put(`${util.url}/execute_sql`, {
           'type': 'test',
           'base': this.formitem.basename,

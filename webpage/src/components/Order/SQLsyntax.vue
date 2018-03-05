@@ -58,8 +58,13 @@
 
             <FormItem>
               <Button type="warning" icon="android-search" @click.native="test_sql()">检测</Button>
+              <Button type="warning" icon="android-search"  @click.native="sqladvisor()">优化</Button>
+            </FormItem>
+
+            <FormItem>
               <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%" :disabled="this.validate_gen">提交</Button>
             </FormItem>
+
           </Form>
 
 
@@ -85,12 +90,13 @@
       </p>
       <Input v-model="formItem.textarea_backup" type="textarea" :autosize="{minRows: 10,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
       <br>
+      <Table :columns="columnsName" :data="Testresults_backup" highlight-row></Table>
     </Card>
 
         <Card>
       <p slot="title">
         <Icon type="ios-crop-strong"></Icon>
-        填写sql语句(ddl,dml)
+        填写sql语句(ddl,dml,非备份语句)
       </p>
       <Input v-model="formItem.textarea_ddl_dml" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
       <br>
@@ -159,6 +165,7 @@ export default {
         }
       ],
       Testresults: [],
+      Testresults_backup: [],
       item: {},
       datalist: {
         connection_name_list: [],
@@ -202,8 +209,8 @@ export default {
   methods: {
     beautify () {
       axios.put(`${util.url}/sqlsyntax/beautify`, {
-          'data_select': this.formItem.textarea_backup,
-          'data_ddl_dml': this.formItem.textarea_ddl_dml
+          'data1': this.formItem.textarea_backup,
+          'data2': this.formItem.textarea_ddl_dml
         })
         .then(res => {
           console.log(res)
@@ -256,11 +263,18 @@ export default {
           })
       }
     },
+    //  sql 优化建议
+    sqladvisor () {
+
+
+
+
+    }
     test_sql () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
           if (this.formItem.textarea_ddl_dml) {
-            let tmp = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            let tmp = this.formItem.textarea.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             axios.put(`${util.url}/sqlsyntax/test`, {
                 'id': this.id[0].id,
                 'base': this.formItem.basename,
@@ -283,7 +297,41 @@ export default {
                } else {
                  this.$Notice.error({
                    title: '警告',
-                   desc: '无法连接到Inception!'
+                   desc: '1-无法连接到Inception!'
+                 })
+               }
+              })
+              .catch(error => {
+               util.ajanxerrorcode(this, error)
+              })
+          } else {
+            this.$Message.error('请填写sql语句后再测试!');
+          }
+          if (this.formItem.textarea_backup) {
+            let tmp = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            axios.put(`${util.url}/sqlsyntax/test`, {
+                'id': this.id[0].id,
+                'base': this.formItem.basename,
+                'sql': tmp
+              })
+              .then(res => {
+               if (res.data.status === 200) {
+                 this.textarea_backup = res.data.result
+                 let gen = 0
+                 this.textarea_backup.forEach(vl => {
+                   if (vl.errlevel !== 0) {
+                     gen += 1
+                   }
+                 })
+                 if (gen === 0) {
+                   this.validate_gen = false
+                 } else {
+                   this.validate_gen = true
+                 }
+               } else {
+                 this.$Notice.error({
+                   title: '警告',
+                   desc: '2-无法连接到Inception!'
                  })
                }
               })
@@ -330,8 +378,8 @@ export default {
     },
     ClearForm () {
       this.$refs['formItem'].resetFields();
-      this.formItem.textarea_ddl_dml = ''
-      this.formItem.textarea_select = ''
+      this.formItem.textarea_ddl_dml = '';
+      this.formItem.textarea_backup = ''
     }
   },
   mounted () {

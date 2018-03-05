@@ -26,8 +26,10 @@ class sqlorder(baseview.BaseView):
     def put(self, request, args=None):
         if args == 'beautify':
             try:
-                data_select = request.data['data_select']
-                data_ddl_dml = request.data['data_ddl_dml']
+                data_select = request.data['data1']
+                print(data_select)
+                data_ddl_dml = request.data['data2']
+                print(data_ddl_dml)
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
@@ -37,7 +39,10 @@ class sqlorder(baseview.BaseView):
                     data2 = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
                     res['select']=data1
                     res['dml_ddl']=data2
+                    print(res)
+                    res=json.dumps(res)
                     return HttpResponse(res)
+
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)

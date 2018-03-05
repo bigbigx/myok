@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'core.apps.CoreConfig',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -59,7 +60,7 @@ CORS_ORIGIN_WHITELIST = (
 
 CSRF_TRUSTED_ORIGINS = (
     CONF_DATA.ipaddress,
-    '127.0.0.1:8080'
+    'localhost:8080'
 )
 
 CORS_ALLOW_METHODS = (

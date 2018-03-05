@@ -99,8 +99,8 @@ def conf_path():
     读取配置文件属性
     '''
     _conf = configparser.ConfigParser()
-    #_conf.read('deploy.conf')
-    _conf.read('/root/Yearning/src/deploy.conf')
+    _conf.read('deploy.conf')
+    #_conf.read('/root/Yearning/src/deploy.conf')
     conf_set = namedtuple("name", ["db", "address", "port", "username", "password", "ipaddress",
                                    "inc_host", "inc_port", "inc_user", "inc_pwd", "backupdb",
                                    "backupport", "backupuser", "backuppassword","ladp_server",
@@ -130,3 +130,4 @@ def auth(username, password):
         return True
     else:
         return False
+

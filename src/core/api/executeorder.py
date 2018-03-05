@@ -5,6 +5,7 @@ from libs import baseview
 from libs import util
 from libs import call_inception
 from libs import rollback
+from lib import exportexcel
 from rest_framework.response import Response
 from django.db.models import Count
 from django.http import HttpResponse
@@ -201,7 +202,7 @@ class execute(baseview.Approverpermissions):
                         Usermessage.objects.get_or_create(
                             from_user=from_user, time=util.date(),
                             #title=title, content='该工单已执行成功!', to_user=to_user,
-                            title=title, content=f'该工单已审核通过! 工单说明是: {c.text}', to_user=to_user,
+                            title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=to_user,
                             state='unread'
                         )
 
@@ -248,7 +249,92 @@ class execute(baseview.Approverpermissions):
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
 
-            elif type == 'test':
+
+            elif type =='backup':  ##执行前备份
+                try:
+                    from_user = request.data['from_user']
+                    to_user = request.data['to_user']
+                    id = request.data['id']
+                except KeyError as e:
+                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                    return HttpResponse(status=500)
+                else:
+                    try:
+                        SqlOrder.objects.filter(id=id).update(status=6)
+                        title = f'工单:{c.work_id}SQL备份成功通知'
+
+                        c = exportexcel.toExcel(
+                            Host=ip,
+                            User=user,
+                            Password=password,
+                            Database=db,
+                            Charset='utf8')
+                        a = c.exportTables(Conn=connection_name, Schemal=basename, TableList=data)
+                        return Response(
+                            {
+                                'status': 'excel文档已生成',
+                                'url': '%s_%s_Dictionary_%s.cvs' % (connection_name, basename, a)
+                            }
+                        )
+                    except Exception as e:
+                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                        return HttpResponse(status=500)
+
+                        '''
+                        通知消息
+                        '''
+                        Usermessage.objects.get_or_create(
+                            from_user=from_user, time=util.date(),
+                            #title=title, content='该工单已执行成功!', to_user=to_user,
+                            title=title, content=f'该工单已备份成功! 备份附件请查看邮件 ！   工单说明: {c.text}', to_user=to_user,
+                            state='unread'
+                        )
+
+                        '''
+                        Dingding
+                        '''
+
+                        content = DatabaseList.objects.filter(id=c.bundle_id).first()
+                        mail = Account.objects.filter(username=to_user).first()
+                        tag = globalpermissions.objects.filter(authorization='global').first()
+                        ret_info = '备份成功，该备份请求已经完成!并且已在相应库执行！详细备份信息请前往邮件查看！'
+
+                        if tag is None or tag.dingding == 0:
+                            pass
+                        else:
+                            try:
+                                if content.url:
+                                    util.dingding(
+                                        content='工单SQL备份成功通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单备注:%s\n状态:同意\n备注:%s'
+                                                          %(c.work_id,c.username,addr_ip,c.text,content.after), url=content.url)
+
+
+                            except:
+                                ret_info = '工单SQL备份成功!但是钉钉推送失败,请查看错误日志排查错误.'
+
+                        if tag is None or tag.email == 0:
+                            pass
+                        else:
+                            try:
+                                if mail.email:
+                                    mess_info = {
+                                        'workid':c.work_id,
+                                        'to_user':c.username,
+                                        'addr': addr_ip,
+                                        'text':c.text,
+                                        'type': "备份成功",
+                                        'note': content.after}
+                                    put_mess = send_email.send_email(to_addr=mail.email)
+                                    put_mess.send_mail(mail_data=mess_info,type=0)
+                            except:
+                                ret_info = '工单SQL备份成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                        return Response(ret_info)
+                    except Exception as e:
+                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                        return HttpResponse(status=500)
+
+
+            elif type == 'test':  ## 含ddl & dml检测和sql备份语句显示
                 try:
                     base = request.data['base']
                     id = request.data['id']
