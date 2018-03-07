@@ -103,7 +103,7 @@ class audit(baseview.Approverpermissions):
                                         content='工单审核驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
                                         %(_tmpData['work_id'],to_user,addr_ip,text), url=content.url)
                             except:
-                                ret_info = '工单审核成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                                ret_info = '工单审核驳回成功!但是钉钉推送失败,请查看错误日志排查错误.'
                         if tag is None or tag.email == 0:
                             pass
                         else:
@@ -114,11 +114,12 @@ class audit(baseview.Approverpermissions):
                                         'to_user':to_user,
                                         'addr': addr_ip,
                                         'type': "审核驳回",
+                                        'status':'back',
                                         'rejected': text}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=1)
                             except:
-                                ret_info = '工单审核成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                                ret_info = '工单审核驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
                         return Response(ret_info)
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -136,20 +137,24 @@ class audit(baseview.Approverpermissions):
                     try:
                        # SqlOrder.objects.filter(id=id).update(status=3)
                         c = SqlOrder.objects.filter(id=id).first()
+                        d = Account.objects.filter(group='executer').first()
                         title = f'工单:{c.work_id}审核通过通知'
                         #修改审核状态
 
                         #############################################
                         SqlOrder.objects.filter(id=id).update(status=1)
-
                         '''
-
                         通知消息
 
                         '''
                         Usermessage.objects.get_or_create(
                             from_user=from_user, time=util.date(),
                             title=title, content=f'该工单已审核通过!       \r\n 工单说明是: {c.text}', to_user=to_user,
+                            state='unread'
+                        )
+                        Usermessage.objects.get_or_create(
+                            from_user=from_user, time=util.date(),
+                            title=title, content=f'有最新的工单已审核，请执行人执行!       \r\n 工单说明是: {d.username}', to_user=to_user,
                             state='unread'
                         )
 
@@ -161,6 +166,7 @@ class audit(baseview.Approverpermissions):
 
                         content = DatabaseList.objects.filter(id=c.bundle_id).first()
                         mail = Account.objects.filter(username=to_user).first()
+                        mail_exe = Account.objects.filter(username=d.username).first()
                         tag = globalpermissions.objects.filter(authorization='global').first()
                         #ret_info = '操作成功，该请求已同意!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                         ret_info = '该工单已审核通过!'
@@ -171,10 +177,10 @@ class audit(baseview.Approverpermissions):
                             try:
                                 if content.url:
                                     util.dingding(
-                                        content='工单审核通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单备注:%s\n状态:同意\n备注:%s'
+                                        content='工单审核通过通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单备注:%s\n状态:同意\n备注:%s'
                                                           %(c.work_id,c.username,addr_ip,c.text,content.after), url=content.url)
                             except:
-                                ret_info = '工单审核成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                                ret_info = '工单审核通过!但是钉钉推送失败,请查看错误日志排查错误.'
 
                         if tag is None or tag.email == 0:
                             pass
@@ -184,15 +190,19 @@ class audit(baseview.Approverpermissions):
                                     mess_info = {
                                         'workid':c.work_id,
                                         'to_user':c.username,
+                                        'to_executor':d.username,
                                         'addr': addr_ip,
                                         'text': c.text,
                                         'type': "审核成功",
+                                        'status':'approve',
                                         'note': content.after}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=0)
+                                    put_mess1 = send_email.send_email(to_addr=mail_exe.email)
+                                    put_mess1.send_mail(mail_data=mess_info, type=0)
                             except:
                                 #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
-                                ret_info = '工单审核成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                                ret_info = '工单审核通过!但是邮箱推送失败,请查看错误日志排查错误.'
                         return Response(ret_info)
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -274,7 +284,11 @@ class orderdetail(baseview.BaseView):
                     return Response({'data':_serializers.data, 'type':type_id.type})
                 else:
                     data = SqlOrder.objects.filter(work_id=workid).first()
-                    _in = {'data':[{'sql': x} for x in data.sql.split(';')], 'type':type_id.type}
+
+                    mylist=[{'sql': x} for x in data.sql.split(';')]
+                    mylist.append({'backup_sql': x} for x in data.backup_sql.split(';'))
+
+                    _in = {'data':mylist, 'type':type_id.type}
                     return Response(_in)
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__} : {e}')

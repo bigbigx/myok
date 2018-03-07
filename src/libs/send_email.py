@@ -1,6 +1,10 @@
 from libs import util
 from email.header import Header
 from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email import encoders
 from email.utils import parseaddr, formataddr
 import smtplib
 
@@ -20,8 +24,8 @@ class send_email(object):
         return formataddr((Header(name, 'utf-8').encode(), addr))
 
     def send_mail(self,mail_data=None,type=None):
-        if type == 0: #成功，通过，含审核成功和执行成功
-            text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
+        if type == 0: #含审核成功
+            text = '<html><body><h1>蜜罐运维-工单审核通过通知，请执行人尽快执行</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
@@ -29,13 +33,30 @@ class send_email(object):
                    '<br><p>状态: 同意</p>' \
                    '<br><p>备注: %s</p>' \
                    '</body></html>' %(
-                mail_data['type'],
                 mail_data['workid'],
                 mail_data['to_user'],
                 mail_data['text'],
                 mail_data['note'])
+
+        elif type == 3: #执行成功
+            text = '<html><body><h1>蜜罐运维-工单执行成功通知，请发起人和审核人知悉</h1>' \
+                   '<br><p>工单号: %s</p>' \
+                   '<br><p>工单发起人: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>工单备注: %s</p>' \
+                   '<br><p>状态: %s %s</p>' \
+                   '<br><p>备注: %s  </p>' \
+                   '</body></html>' %(
+                mail_data['workid'],
+                mail_data['to_user'],
+                mail_data['text'],
+                mail_data['backup'],
+                mail_data['status'],
+                mail_data['note'])
+
+
         elif type == 1: #驳回，含审核驳回 和执行驳回
-            text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
+            text = '<html><body><h1>蜜罐运维-工单审核驳回通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
@@ -43,13 +64,26 @@ class send_email(object):
                    '<br><p>状态: 驳回</p>' \
                    '<br><p>驳回说明: %s</p>' \
                    '</body></html>' % (
-                       mail_data['type'],
                        mail_data['workid'],
                        mail_data['to_user'],
                        mail_data['text'],
                        mail_data['rejected'])
+        elif type == 4: #驳回
+            text = '<html><body><h1>蜜罐运维-工单执行驳回通知</h1>' \
+                   '<br><p>工单号: %s</p>' \
+                   '<br><p>工单发起人: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>工单备注: %s</p>' \
+                   '<br><p>状态: 执行驳回</p>' \
+                   '<br><p>驳回说明: %s</p>' \
+                   '</body></html>' % (
+                       mail_data['workid'],
+                       mail_data['to_user'],
+                       mail_data['text'],
+                       mail_data['rejected'])
+
         else: # 提交成功 # '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
-            text = '<html><body><h1>蜜罐运维-工单%s通知</h1>' \
+            text = '<html><body><h1>蜜罐运维-工单成功发起通知</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
@@ -61,7 +95,6 @@ class send_email(object):
                    '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
-                       mail_data['type'],
                        mail_data['workid'],
                        mail_data['to_user'],
                        mail_data['text'],
@@ -69,11 +102,26 @@ class send_email(object):
                        #mail_data['orderID'],
                        #mail_data['tokens'],
                        mail_data['note'])
-        msg = MIMEText(text, 'html', 'utf-8')
+        _attachments = []
+        msg = MIMEMultipart('alternative')
+        contents = MIMEText(text, 'html', 'utf-8')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
         msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
         msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
 
+        if (mail_data['status'] == 'run'):
+            for i in mail_data['file']:
+               file = MIMEBase('application', 'octet-stream')
+               file.set_payload(open(i, 'rb').read())
+               file.add_header('Content-Disposition', 'attachment', filename=i)
+               encoders.encode_base64(file)
+               _attachments.append(file)
+            for att in _attachments:
+                msg.attach(att)
+        else:
+            pass
+
+        msg.attach(contents)
         #server = smtplib.SMTP(smtp_server, 25)
         server = smtplib.SMTP_SSL(smtp_server,port=465)
         server.set_debuglevel(1)

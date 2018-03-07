@@ -26,7 +26,7 @@ def exportExcel(host,user,password,dbname,port,sql,outputpath):
     # 获取MYSQL里面的数据字段名称
     fields = cursor.description
     workbook = xlwt.Workbook()
-    sheet = workbook.add_sheet('table_'+table_name,cell_overwrite_ok=True)
+    sheet = workbook.add_sheet('table_',cell_overwrite_ok=True)
 
     # 写上字段信息
     for field in range(0,len(fields)):
@@ -41,28 +41,8 @@ def exportExcel(host,user,password,dbname,port,sql,outputpath):
 
     workbook.save(outputpath)
 
-def execude_sql(SQL):  #定义一个执行SQL的函数
-    con = pymysql.connect('ip','用户','密码','指定数据库',charset='utf8') #连接数据库
-    cur = con.cursor()  #定义一个游标　
-    cur.execute(SQL)#执行指定SQL
-    result = cur.fetchall()
-    cur.close()
-    con.close()
-#execude_sql('select id,name from student where class =1024') #调用函数，查询class=1024的id和name
 
-#def wite_to_excel(name):
-    filename = name + '.cvs'  #定义Excel名字
-    wbk = xlwt.Workbook()  #实例化一个Excel
-    sheet1 = wbk.add_sheet('result',cell_overwrite_ok=True) #添加该Excel的第一个sheet，如有需要可依次添加sheet2等
-    sheet1.write(0, filed, fileds[i], set_style('宋体', '200', True))
-    fileds = [u'ID编号',u'名字'] #直接定义结果集的各字段名
-    execude_sql(1024)  #调用函数执行SQL，获取结果集
-    for filed in range(0,len(fileds)):   #写入字段信息
-        sheet1.write(0,filed,fileds[i])
-    for row in range(1,len(result)+1):  #写入SQL查询数据
-        for col in range(0,len(fileds)):
-            sheet1.write(row,col,result[row-1][col])
-    wbk.save(filename)  #保存Excel
+
 
 def set_style(name,height,bold=False):
     style = xlwt.XFStyle() # 初始化样式
@@ -78,13 +58,13 @@ def set_style(name,height,bold=False):
     alignment.vert = xlwt.Alignment.VERT_CENTER # 可取值: VERT_TOP, VERT_CENTER, VERT_BOTTOM, VERT_JUSTIFIED, VERT_DISTRIBUTED
     style.alignment = alignment # 文字居中
 
-if __name__ == '__main__':
-    sql="select * from t_erp_sale_order t where t.bill_id='13';"
-    outputpath='d:\\jianglb111.xls'
-    host='101.236.41.66'
-    user='jianglb'
-    password='jianglb'
-    dbname='laimi_test'
-    port=3306
-    table_name=''
-    exportExcel(host, user, password, dbname,port, sql, outputpath)
+#if __name__ == '__main__':
+#    sql="select * from t_erp_sale_order t where t.bill_id='13';"
+#    outputpath='d:\\jianglb111.xls'
+#    host='101.236.41.66'
+#    user='jianglb'
+#    password='jianglb'
+##    dbname='laimi_test'
+#    port=3306
+#    table_name=''
+#    exportExcel(host, user, password, dbname,port, sql, outputpath)

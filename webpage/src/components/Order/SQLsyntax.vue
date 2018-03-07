@@ -86,7 +86,7 @@
     <Card>
       <p slot="title">
         <Icon type="ios-crop-strong"></Icon>
-        填写数据库备份语句(select)
+        填写数据库备份语句(select，注意务必不要加相关注释)
       </p>
       <Input v-model="formItem.textarea_backup" type="textarea" :autosize="{minRows: 10,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
       <br>
@@ -304,6 +304,40 @@ export default {
           } else {
             this.$Message.error('请填写sql语句后再测试!');
           }
+          if (this.formItem.textarea_backup) {
+            let tmp1 = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            axios.put(`${util.url}/sqlsyntax/test`, {
+                'id': this.id[0].id,
+                'base': this.formItem.basename,
+                'sql': tmp1
+              })
+              .then(res => {
+               if (res.data.status === 200) {
+                 this.Testresults_backup = res.data.result
+                 let gen = 0
+                 this.Testresults_backup.forEach(vl => {
+                   if (vl.errlevel !== 0) {
+                     gen += 1
+                   }
+                 })
+                 if (gen === 0) {
+                   this.validate_gen = false
+                 } else {
+                   this.validate_gen = true
+                 }
+               } else {
+                 this.$Notice.error({
+                   title: '警告',
+                   desc: 'backup-无法连接到Inception!'
+                 })
+               }
+              })
+              .catch(error => {
+               util.ajanxerrorcode(this, error)
+              })
+          } else {
+            this.$Message.error('请填写sql语句后再测试!');
+          }
        }
       })
     },
@@ -327,7 +361,8 @@ export default {
                   title: '成功',
                   desc: res.data
                 })
-                this.validate_gen = !this.validate_gen
+                // this.validate_gen = !this.validate_gen
+                this.validate_gen = true
                 this.ClearForm()
               })
               .catch(error => {

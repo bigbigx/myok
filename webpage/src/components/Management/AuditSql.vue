@@ -56,6 +56,9 @@
       <FormItem label="工单说明:">
         <span>{{ formitem.text }}</span>
       </FormItem>
+      <FormItem label="备份SQL语句:">
+        <p v-for="j in backup_sql">{{ j }}</p>
+      </FormItem>
       <FormItem label="SQL语句:">
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>

@@ -6,6 +6,7 @@ from libs import util
 from libs import call_inception
 from libs import rollback
 from libs import exportexcel
+
 from rest_framework.response import Response
 from django.db.models import Count
 from django.http import HttpResponse
@@ -24,6 +25,7 @@ from libs.serializers import (
 
 conf = util.conf_path()
 addr_ip = conf.ipaddress
+
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 
@@ -129,9 +131,10 @@ class execute(baseview.Approverpermissions):
                                         'to_user':to_user,
                                         'addr': addr_ip,
                                         'type': "执行驳回",
+                                        'status':'run_back',
                                         'rejected': text}
                                     put_mess = send_email.send_email(to_addr=mail.email)
-                                    put_mess.send_mail(mail_data=mess_info,type=1)
+                                    put_mess.send_mail(mail_data=mess_info,type=4)
                             except:
                                 ret_info = '工单执行驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
                         return Response(ret_info)
@@ -143,36 +146,45 @@ class execute(baseview.Approverpermissions):
                 try:
                     from_user = request.data['from_user']
                     to_user = request.data['to_user']
-                    backup_sql=request.data['backup_sql']
+                    #backup_sql=request.data['backup_sql']
                     id = request.data['id']
                 except KeyError as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
                 else:
-                    SQL_LIST={}
-                    c={}
-                    try:
-                        SQL_LIST = DatabaseList.objects.filter(id=c.bundle_id).first()
-                        c = SqlOrder.objects.filter(id=id).first()
-                    except Exception as e:
-                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                        return HttpResponse(status=500)  #  获取数据库信息报错
-
                     try:# 备份sql语句
-                        cur_time=time.strftime('%Y-%m-%d_%H-%M-%S',time.localtime(time.time()))
-                        table_name=c.work_id
-                        outputpath=table_name+'-'+cur_time+'.cvs'
-                        backup_sql=SqlOrder.objects.filter(id=id).first()
-                        x = [x.rstrip(';') for x in backup_sql]
-                        sql = ';'.join(x)
-                        sql = sql.strip(' ').rstrip(';')
-                        exportExcel(SQL_LIST.ip, SQL_LIST.username, SQL_LIST.password, c.basename,SQL_LIST.port, sql,outputpath)
+                        c = SqlOrder.objects.filter(id=id).first()
+                        SQL_LIST = DatabaseList.objects.filter(id=c.bundle_id).first()
+
+                        sql_data=SqlOrder.objects.filter(id=id).first()
+                        bak_sql=sql_data.backup_sql
+                        file_path=[]
+                        #print(bak_sql)
+                        backup_status=''
+                        if bak_sql is not None:
+                            backup_status='备份成功'
+                            for x in bak_sql.split(';'):
+                                #print(x)
+                                if x.strip()=='':
+                                    print('pass')
+                                    continue
+                                else:
+                                    cur_time = time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime(time.time()))
+                                    work_id = c.work_id
+                                    outputpath = 'xls/' + work_id + '-' + cur_time + '.xls'
+                                    exportexcel.exportExcel(SQL_LIST.ip, SQL_LIST.username, SQL_LIST.password, c.basename,
+                                                        SQL_LIST.port, x, outputpath)
+                                    file_path.append(outputpath)
+                        else:
+                            print('pass-pass')
+                            pass
+
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)  #  备份失败退出
 
                     try:
-                        SqlOrder.objects.filter(id=id).update(status=4)
+                        #SqlOrder.objects.filter(id=id).update(status=4)   #  执行中
                         #c = SqlOrder.objects.filter(id=id).first()  # 前面已经执行
                         title = f'工单:{c.work_id}执行成功通知'
                         '''
@@ -192,16 +204,25 @@ class execute(baseview.Approverpermissions):
                             }
                         ) as f:
                             res = f.Execute(sql=c.sql, backup=c.backup)
-                            '''
+                            SqlOrder.objects.filter(id=id).update(status=4)
+
+
+                    except Exception as e:
+                            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                            SqlOrder.objects.filter(id=id).update(status=1)  # 状态回滚
+                            return HttpResponse(status=500)
+
+                    try:
+                        '''
                             修改该工单编号的state状态 ---修改为执行成功状态
                         '''
-                            SqlOrder.objects.filter(id=id).update(status=4)
-                            # 同时修改时间戳
-                            cur_time=int(time.time())
-                            '''
+
+                        # 同时修改时间戳
+                        cur_time=int(time.time())
+                        '''
                             遍历返回结果插入到执行记录表中
                         '''
-                            for i in res:
+                        for i in res:
                                 SqlRecord.objects.get_or_create(
                                     date=util.date(),
                                     state=i['stagestatus'],
@@ -225,7 +246,20 @@ class execute(baseview.Approverpermissions):
                         Usermessage.objects.get_or_create(
                             from_user=from_user, time=util.date(),
                             #title=title, content='该工单已执行成功!', to_user=to_user,
-                            title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=to_user,
+                            title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=c.username,
+                            state='unread'
+                        )
+
+                        Usermessage.objects.get_or_create(
+                            from_user=from_user, time=util.date(),
+                            #title=title, content='该工单已执行成功!', to_user=to_user,
+                            title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=to_user,  #发送给发起人
+                            state='unread'
+                        )
+                        Usermessage.objects.get_or_create(
+                            from_user=from_user, time=util.date(),
+                            #title=title, content='该工单已执行成功!', to_user=to_user,
+                            title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=from_user,  #发给审核人
                             state='unread'
                         )
 
@@ -235,6 +269,7 @@ class execute(baseview.Approverpermissions):
 
                         content = DatabaseList.objects.filter(id=c.bundle_id).first()
                         mail = Account.objects.filter(username=to_user).first()
+                        mail_approver = Account.objects.filter(username=from_user).first()
                         tag = globalpermissions.objects.filter(authorization='global').first()
                         ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
 
@@ -256,16 +291,24 @@ class execute(baseview.Approverpermissions):
                         else:
                             try:
                                 if mail.email:
+
                                     mess_info = {
                                         'workid':c.work_id,
                                         'to_user':c.username,
+                                        'approver': to_user,
                                         'addr': addr_ip,
-                                        'text':c.text,
-                                        'type': "执行成功",
-                                        'note': content.after}
+                                        'text': c.text,
+                                        'status': 'run',
+                                        'type':'执行成功',
+                                        'backup': backup_status,
+                                        'note': content.after,
+                                        'file': file_path}
                                     put_mess = send_email.send_email(to_addr=mail.email)
-                                    put_mess.send_mail(mail_data=mess_info,type=0)
-                            except:
+                                    put_mess.send_mail(mail_data=mess_info,type=3)
+                                    put_mess1 = send_email.send_email(to_addr=mail_approver.email)
+                                    put_mess1.send_mail(mail_data=mess_info,type=3)
+                            except Exception as e:
+                                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
                         return Response(ret_info)
                     except Exception as e:
@@ -280,7 +323,12 @@ class execute(baseview.Approverpermissions):
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
                 else:
+                    ddl_sql_list=[]
+                    backup_sql_list=[]
+                    res={'ddl_sql':ddl_sql_list,'backup_sql':backup_sql_list}
                     sql = SqlOrder.objects.filter(id=id).first()
+                    ddl_sql=sql.sql
+                    backup_sql=sql.backup_sql
                     data = DatabaseList.objects.filter(id=sql.bundle_id).first()
                     info = {
                         'host': data.ip,
@@ -291,7 +339,10 @@ class execute(baseview.Approverpermissions):
                     }
                     try:
                         with call_inception.Inception(LoginDic=info) as test:
-                            res = test.Check(sql=sql.sql)
+                            ddl_sql_list = test.Check(sql=ddl_sql)
+                            backup_sql_list = test.Check(sql=backup_sql)
+
+
                             return Response({'result': res, 'status': 200})
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

@@ -62,7 +62,10 @@
       <FormItem label="数据库库名:">
         <span>{{ formitem.basename }}</span>
       </FormItem>
-      <FormItem label="SQL语句:">
+      <FormItem label="备份SQL语句:">
+        <p v-for="j in backup_sql">{{ j }}</p>
+      </FormItem>
+      <FormItem label="ddl-dml-SQL语句:">
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
     </Form>
@@ -72,8 +75,7 @@
       <Button type="warning" @click.native="test_button()">检测sql</Button>
       <Button @click="cancel_button">取消</Button>
       <Button type="error" @click="out_button_1()" :enabled="summit">驳回</Button>
-      <Button type="error" @click="put_backup()" :disabled="summit">执行备份</Button>  //  如果存在备份语句，必须执行了此部后才能 让立即执行  按钮可用
-      <Button type="success" @click="put_button_exe()" :disabled="summit">立即执行</Button>
+      <Button type="success" @click="put_button_exe()" :enabled="summit">备份和执行</Button>
     </div>
   </Modal>
 

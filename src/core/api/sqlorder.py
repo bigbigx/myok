@@ -91,6 +91,12 @@ class sqlorder(baseview.BaseView):
                 x = [x.rstrip(';') for x in tmp]
                 sql = ';'.join(x)
                 sql = sql.strip(' ').rstrip(';')
+
+                k = [k.rstrip(';') for k in tmp_bak]
+                sql_bak = ';'.join(k)
+                sql_bak = sql_bak.strip(' ').rstrip(';')
+
+
                 workId = util.workId()
                 SqlOrder.objects.get_or_create(
                     username=user,
@@ -104,7 +110,7 @@ class sqlorder(baseview.BaseView):
                     backup=data['backup'],
                     bundle_id=id,
                     assigned=data['assigned'],
-                    backup_sql=tmp_bak
+                    backup_sql=sql_bak
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
@@ -121,7 +127,7 @@ class sqlorder(baseview.BaseView):
                                         %(workId,user,addr_ip,data['text'],content.before), url=content.url)
                         except:
                             #ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
-                            ret_info = '工单审核成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                            ret_info = '工单提交成功!但是钉钉推送失败,请查看错误日志排查错误.'
                 if tag is None or tag.email == 0:
                     pass
                 else:
@@ -133,13 +139,14 @@ class sqlorder(baseview.BaseView):
                             'addr': addr_ip,
                             'text': data['text'],
                             'type': "成功发起",
+                            'status':'apply',
                             'note': content.before}
                         try:
                             put_mess = send_email.send_email(to_addr=mail.email)
                             put_mess.send_mail(mail_data=mess_info, type=2)
                         except:
                             #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
-                            ret_info = '工单审核成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                            ret_info = '工单提交成功!但是邮箱推送失败,请查看错误日志排查错误.'
                 return Response(ret_info)
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
