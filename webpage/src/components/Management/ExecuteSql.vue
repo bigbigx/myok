@@ -250,6 +250,7 @@ export default {
       ],
       modal2: false,
       sql: null,
+      backup_sql: null,
       formitem: {
         workid: '',
         date: '',
@@ -315,13 +316,16 @@ export default {
         this.summit = false
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+        this.backup_sql = this.tmp[index].backup_sql.split(';')
       } else if (this.tmp[index].status === 6) {
         this.summit = false
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+        this.backup_sql = this.tmp[index].backup_sql.split(';')
       } else {
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+        this.backup_sql = this.tmp[index].backup_sql.split(';')
         this.summit = true
       }
     },

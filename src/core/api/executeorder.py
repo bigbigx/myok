@@ -186,7 +186,7 @@ class execute(baseview.Approverpermissions):
                         return HttpResponse(status=500)  #  备份失败退出
 
                     try:
-                        #SqlOrder.objects.filter(id=id).update(status=4)   #  执行中
+                        SqlOrder.objects.filter(id=id).update(status=5)   #  执行中
                         #c = SqlOrder.objects.filter(id=id).first()  # 前面已经执行
                         title = f'工单:{c.work_id}执行成功通知'
                         '''
@@ -196,17 +196,21 @@ class execute(baseview.Approverpermissions):
                         '''
                         发送sql语句到inception中执行
                      '''
-                        with call_inception.Inception(
-                            LoginDic={
-                                'host': SQL_LIST.ip,
-                                'user': SQL_LIST.username,
-                                'password': SQL_LIST.password,
-                                'db': c.basename,
-                                'port': SQL_LIST.port
-                            }
-                        ) as f:
-                            res = f.Execute(sql=c.sql, backup=c.backup)
-                            SqlOrder.objects.filter(id=id).update(status=4)
+                        res = []
+                        if c.sql:
+                            with call_inception.Inception(
+                                LoginDic={
+                                    'host': SQL_LIST.ip,
+                                    'user': SQL_LIST.username,
+                                    'password': SQL_LIST.password,
+                                    'db': c.basename,
+                                    'port': SQL_LIST.port
+                                }
+                            ) as f:
+                                res = f.Execute(sql=c.sql, backup=c.backup)
+                                SqlOrder.objects.filter(id=id).update(status=4)
+                        else:
+                            pass
 
 
                     except Exception as e:
