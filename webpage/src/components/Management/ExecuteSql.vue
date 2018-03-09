@@ -62,17 +62,17 @@
       <FormItem label="数据库库名:">
         <span>{{ formitem.basename }}</span>
       </FormItem>
-      <FormItem label="备份SQL语句:">
+      <FormItem label="备份SQL:">
         <p v-for="j in backup_sql">{{ j }}</p>
       </FormItem>
-      <FormItem label="ddl-dml-SQL语句:">
+      <FormItem label="执行SQL:">
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
     </Form>
     <p class="pa">SQL检查结果:</p>
     <Table :columns="columnsName" :data="dataId" stripe border></Table>
     <div slot="footer">
-      <Button type="warning" @click.native="test_button()">检测sql</Button>
+      <!-- <Button type="warning" @click.native="test_button()">检测sql</Button> -->
       <Button @click="cancel_button">取消</Button>
       <Button type="error" @click="out_button_1()" :enabled="summit">驳回</Button>
       <Button type="success" @click="put_button_exe()" :enabled="summit">备份和执行</Button>

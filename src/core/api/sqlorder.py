@@ -25,25 +25,29 @@ class sqlorder(baseview.BaseView):
     '''
     def put(self, request, args=None):
         if args == 'beautify':
+            #try:
+            #    data_select = request.data['data1']
+            #    data_ddl_dml = request.data['data2']
+            #except KeyError as e:
+            #    print("==============")
+            #    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+            #else:
             try:
-                data_select = request.data['data1']
-                print(data_select)
-                data_ddl_dml = request.data['data2']
-                print(data_ddl_dml)
-            except KeyError as e:
-                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-            else:
-                try:
+                    data_select = request.data['data1']
+                    data_ddl_dml = request.data['data2']
                     res={'select':'','dml_ddl':''}
-                    data1 = call_inception.Inception.BeautifySQL(sql=data_select)
-                    data2 = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
+                    data1=''
+                    data2=''
+                    if data_select !='':
+                        data1 = call_inception.Inception.BeautifySQL(sql=data_select)
+                    if data_ddl_dml !='':
+                        data2 = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
                     res['select']=data1
                     res['dml_ddl']=data2
-                    print(res)
                     res=json.dumps(res)
                     return HttpResponse(res)
 
-                except Exception as e:
+            except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
 
@@ -51,8 +55,15 @@ class sqlorder(baseview.BaseView):
             try:
                 id = request.data['id']
                 base = request.data['base']
-                sql = request.data['sql']
-                sql = str(sql).strip('\n').strip().rstrip(';')
+                tmp_sql = request.data['sql']
+                check_sql = request.data['check_sql']
+                sql_ddl = tmp_sql.split('&&&')[0]
+                sql_bak= tmp_sql.split('&&&')[1]
+                sql_ddl = str(sql_ddl).strip().rstrip(';')
+                sql_bak = str(sql_bak).strip().rstrip(';')
+                sql_ddl_1 = check_sql.split('&&&')[0]
+                sql_bak_1 = check_sql.split('&&&')[1]
+                #sql = str(sql).strip('\n').strip().rstrip(';')
                 data = DatabaseList.objects.filter(id=id).first()
                 info = {
                     'host': data.ip,
@@ -61,14 +72,43 @@ class sqlorder(baseview.BaseView):
                     'db': base,
                     'port': data.port
                     }
+                if sql_bak_1:
+                    myok=sql_bak_1.rstrip().rstrip("\n").rstrip("\r").rstrip("\t").rstrip(";").split(";")
+                    #print(myok)
+                    for select_sql in myok:
+
+                        tmp=str(select_sql.strip())
+                        print("备份语句: " + tmp)
+                        if (tmp.startswith('SELECT')):
+                            print("right select")
+                            pass
+                        else:
+                            check_info = "备份SQL语句编辑栏存在非select语句，请检查"
+                            return Response({'result': check_info, 'status': 202})
+                if sql_ddl_1:
+                    for ddl_sql in sql_ddl_1.rstrip().rstrip("\n").rstrip("\r").rstrip(";").split(";"):
+                        tmp1=str(ddl_sql.strip())
+                        print("执行语句: " + tmp1)
+                        if (tmp1.startswith('SELECT')):
+                            check_info = "执行SQL编辑栏存在select语句，请检查"
+                            return Response({'result': check_info,'status': 202})
+                        else:
+                            print("right  ddl")
+                            pass
+
+
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
                 try:
-                    with call_inception.Inception(LoginDic=info) as hello:
-                        res = hello.Check(sql=sql)
-                        print(res)
-                        return Response({'result': res, 'status': 200})
+                    with call_inception.Inception(LoginDic=info) as test:
+                        res_bak = []
+                        res_ddl = []
+                        if sql_ddl:
+                            res_ddl = test.Check(sql=sql_ddl)
+                        if sql_bak:
+                           res_bak = test.Check(sql=sql_bak)
+                        return Response({'result_ddl': res_ddl,'result_bak': res_bak, 'status': 200})
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return Response({'status': '500'})
@@ -76,8 +116,7 @@ class sqlorder(baseview.BaseView):
     def post(self, request, args=None):
         try:
             data = json.loads(request.data['data'])
-            tmp = json.loads(request.data['sql'])
-
+            tmp_sql = json.loads(request.data['sql'])
             tmp_bak = json.loads(request.data['backup_sql'])
             user = request.data['user']
             assigned_man=data['assigned']
@@ -88,13 +127,17 @@ class sqlorder(baseview.BaseView):
             return HttpResponse(status=500)
         else:
             try:
-                x = [x.rstrip(';') for x in tmp]
-                sql = ';'.join(x)
-                sql = sql.strip(' ').rstrip(';')
+                sql_1=''
+                sql_2=''
+                if tmp_sql:
+                    x = [x.rstrip(';') for x in tmp_sql]
+                    sql_1 = ';'.join(x)
+                    sql_1 = sql_1.strip(' ').rstrip(';')
+                if tmp_bak:
+                    k = [k.rstrip(';') for k in tmp_bak]
+                    sql_2 = ';'.join(k)
+                    sql_2 = sql_2.strip(' ').rstrip(';')
 
-                k = [k.rstrip(';') for k in tmp_bak]
-                sql_bak = ';'.join(k)
-                sql_bak = sql_bak.strip(' ').rstrip(';')
 
 
                 workId = util.workId()
@@ -104,13 +147,13 @@ class sqlorder(baseview.BaseView):
                     work_id=workId,
                     status=2,
                     basename=data['basename'],
-                    sql=sql,
+                    sql=sql_1,
                     type=type,
                     text=data['text'],
                     backup=data['backup'],
                     bundle_id=id,
                     assigned=data['assigned'],
-                    backup_sql=sql_bak
+                    backup_sql=sql_2
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
@@ -139,6 +182,8 @@ class sqlorder(baseview.BaseView):
                             'addr': addr_ip,
                             'text': data['text'],
                             'type': "成功发起",
+                            'run_sql':sql_1,
+                            'backup_sql':sql_2,
                             'status':'apply',
                             'note': content.before}
                         try:

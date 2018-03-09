@@ -106,6 +106,7 @@ class execute(baseview.Approverpermissions):
                             to_user=to_user,
                             state='unread'
                         )
+
                         content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
                         mail = Account.objects.filter(username=to_user).first()
                         tag = globalpermissions.objects.filter(authorization='global').first()
@@ -154,6 +155,7 @@ class execute(baseview.Approverpermissions):
                 else:
                     try:# 备份sql语句
                         c = SqlOrder.objects.filter(id=id).first()
+
                         SQL_LIST = DatabaseList.objects.filter(id=c.bundle_id).first()
 
                         sql_data=SqlOrder.objects.filter(id=id).first()
@@ -296,6 +298,8 @@ class execute(baseview.Approverpermissions):
                                         'workid':c.work_id,
                                         'to_user':c.username,
                                         'approver': to_user,
+                                        'run_sql':c.sql,
+                                        'backup_sql':bak_sql,
                                         'addr': addr_ip,
                                         'text': c.text,
                                         'status': 'run',

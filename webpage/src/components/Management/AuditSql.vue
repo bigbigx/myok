@@ -56,17 +56,17 @@
       <FormItem label="工单说明:">
         <span>{{ formitem.text }}</span>
       </FormItem>
-      <FormItem label="备份SQL语句:">
+      <FormItem label="备份SQL:">
         <p v-for="j in backup_sql">{{ j }}</p>
       </FormItem>
-      <FormItem label="SQL语句:">
+      <FormItem label="执行SQL:">
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
     </Form>
     <p class="pa">SQL检查结果:</p>
     <Table :columns="columnsName" :data="dataId" stripe border></Table>
     <div slot="footer">
-      <Button type="warning" @click.native="test_button()">检测sql</Button>
+      <!-- <Button type="warning" @click.native="test_button()">检测sql</Button> -->
       <Button @click="cancel_button">取消</Button>
       <Button type="error" @click="out_button()" :disabled="summit">驳回</Button>
       <Button type="success" @click="put_button()" :disabled="summit">同意</Button>
@@ -221,6 +221,7 @@ export default {
       ],
       modal2: false,
       sql: null,
+      backup_sql: null,
       formitem: {
         workid: '',
         date: '',
@@ -284,13 +285,16 @@ export default {
         this.summit = false
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+        this.backup_sql = this.tmp[index].backup_sql.split(';')
       } else if (this.tmp[index].status === 3) {
         this.summit = false
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+        this.backup_sql = this.tmp[index].backup_sql.split(';')
       } else {
         this.formitem = this.tmp[index]
         this.sql = this.tmp[index].sql.split(';')
+        this.backup_sql = this.tmp[index].backup_sql.split(';')
         this.summit = true
       }
     },

@@ -25,79 +25,91 @@ class send_email(object):
 
     def send_mail(self,mail_data=None,type=None):
         if type == 0: #含审核成功
-            text = '<html><body><h1>蜜罐运维-工单审核通过通知，请执行人尽快执行</h1>' \
+            text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
-                   '<br><p>工单备注: %s</p>' \
-                   '<br><p>状态: 同意</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>备份SQL: %s</p>' \
+                   '<br><p>状态: 审核通过/p>' \
                    '<br><p>备注: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '</body></html>' %(
+                mail_data['text'],
                 mail_data['workid'],
                 mail_data['to_user'],
-                mail_data['text'],
+                mail_data['run_sql'],
+                mail_data['backup_sql'],
                 mail_data['note'])
 
         elif type == 3: #执行成功
-            text = '<html><body><h1>蜜罐运维-工单执行成功通知，请发起人和审核人知悉</h1>' \
+            text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
-                   '<br><p>工单备注: %s</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>备份SQL: %s</p>' \
                    '<br><p>状态: %s %s</p>' \
                    '<br><p>备注: %s  </p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '</body></html>' %(
+                mail_data['text'],
                 mail_data['workid'],
                 mail_data['to_user'],
-                mail_data['text'],
+                mail_data['run_sql'],
+                mail_data['backup_sql'],
                 mail_data['backup'],
-                mail_data['status'],
+                mail_data['type'],
                 mail_data['note'])
 
 
         elif type == 1: #驳回，含审核驳回 和执行驳回
-            text = '<html><body><h1>蜜罐运维-工单审核驳回通知</h1>' \
+            text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
-                   '<br><p>工单备注: %s</p>' \
-                   '<br><p>状态: 驳回</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>备份SQL: %s</p>' \
+                   '<br><p>状态: 审核驳回</p>' \
                    '<br><p>驳回说明: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '</body></html>' % (
+                       mail_data['text'],
                        mail_data['workid'],
                        mail_data['to_user'],
-                       mail_data['text'],
+                       mail_data['run_sql'],
+                       mail_data['backup_sql'],
                        mail_data['rejected'])
         elif type == 4: #驳回
-            text = '<html><body><h1>蜜罐运维-工单执行驳回通知</h1>' \
+            text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 执行驳回</p>' \
                    '<br><p>驳回说明: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '</body></html>' % (
+                       mail_data['text'],
                        mail_data['workid'],
                        mail_data['to_user'],
-                       mail_data['text'],
                        mail_data['rejected'])
 
         else: # 提交成功 # '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
-            text = '<html><body><h1>蜜罐运维-工单成功发起通知</h1>' \
+            text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
-                   '<br><p>工单备注: %s</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>备份SQL: %s</p>' \
                    '<br><p>工单详情: &nbsp&nbsp<a href="">点击查看</a></p>' \
-                   '<br><p>状态: 已提交</p>' \
+                   '<br><p>状态: 成功发起</p>' \
                    '<br><p>备注: %s</p>' \
+                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: &nbsp&nbsp<a href="">审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
                    '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
+                       mail_data['text'],
                        mail_data['workid'],
                        mail_data['to_user'],
-                       mail_data['text'],
+                       mail_data['run_sql'],
+                       mail_data['backup_sql'],
                        #mail_data['addr'],
                        #mail_data['orderID'],
                        #mail_data['tokens'],

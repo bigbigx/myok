@@ -90,6 +90,7 @@ class audit(baseview.Approverpermissions):
                             to_user=to_user,
                             state='unread'
                         )
+                        data=SqlOrder.objects.filter(id=id).first()
                         content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
                         mail = Account.objects.filter(username=to_user).first()
                         tag = globalpermissions.objects.filter(authorization='global').first()
@@ -115,6 +116,8 @@ class audit(baseview.Approverpermissions):
                                         'addr': addr_ip,
                                         'type': "审核驳回",
                                         'status':'back',
+                                        'run_sql':data.sql,
+                                        'backup_sql':data.backup_sql,
                                         'rejected': text}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=1)
@@ -163,7 +166,7 @@ class audit(baseview.Approverpermissions):
                         Dingding
 
                         '''
-
+                        data=SqlOrder.objects.filter(id=id).first()
                         content = DatabaseList.objects.filter(id=c.bundle_id).first()
                         mail = Account.objects.filter(username=to_user).first()
                         mail_exe = Account.objects.filter(username=d.username).first()
@@ -195,6 +198,8 @@ class audit(baseview.Approverpermissions):
                                         'text': c.text,
                                         'type': "审核成功",
                                         'status':'approve',
+                                        'run_sql':data.sql,
+                                        'backup_sql':data.backup_sql,
                                         'note': content.after}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=0)
@@ -286,7 +291,7 @@ class orderdetail(baseview.BaseView):
                     data = SqlOrder.objects.filter(work_id=workid).first()
 
                     mylist=[{'sql': x} for x in data.sql.split(';')]
-                    mylist.append({'backup_sql': x} for x in data.backup_sql.split(';'))
+                    mylist.append({'backup_sql': y} for y in data.backup_sql.split(';'))
 
                     _in = {'data':mylist, 'type':type_id.type}
                     return Response(_in)

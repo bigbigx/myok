@@ -52,22 +52,16 @@
             </FormItem>
 
             <FormItem>
-              <Button type="info" icon="paintbucket" @click.native="beautify()">美化</Button>
-              <Button type="error" icon="trash-a" @click.native="ClearForm()" style="margin-left: 10%">清除</Button>
+              <Button type="default" icon="paintbucket" @click.native="beautify()">美化</Button>
+              <Button type="default" icon="trash-a" @click.native="ClearForm()" style="margin-left: 10%">清除</Button>
             </FormItem>
 
             <FormItem>
               <Button type="warning" icon="android-search" @click.native="test_sql()">检测</Button>
-              <Button type="warning" icon="android-search" style="margin-left: 10%" @click.native="sqladvisor()">优化</Button>
-            </FormItem>
-
-            <FormItem>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()"  :disabled="this.validate_gen">提交</Button>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">提交</Button>
             </FormItem>
 
           </Form>
-
-
           <Alert style="height: 145px">
             检测表字段提示信息
             <template slot="desc">
@@ -86,7 +80,7 @@
     <Card>
       <p slot="title">
         <Icon type="ios-crop-strong"></Icon>
-        填写数据库备份语句(select，注意务必不要加相关注释)
+        填写备份SQL语句 (备份SQL编辑框)
       </p>
       <Input v-model="formItem.textarea_backup" type="textarea" :autosize="{minRows: 10,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
       <br>
@@ -96,7 +90,7 @@
         <Card>
       <p slot="title">
         <Icon type="ios-crop-strong"></Icon>
-        填写sql语句(ddl,dml,非备份语句)
+        填写执行SQL语句 (执行SQL编辑框)
       </p>
       <Input v-model="formItem.textarea_ddl_dml" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
       <br>
@@ -209,13 +203,13 @@ export default {
   methods: {
     beautify () {
       axios.put(`${util.url}/sqlsyntax/beautify`, {
-          'data1': this.formItem.textarea_backup,
-          'data2': this.formItem.textarea_ddl_dml
+          'data1': this.formItem.textarea_backup || '',
+          'data2': this.formItem.textarea_ddl_dml || ''
         })
         .then(res => {
-          console.log(res)
-          console.log(res.data.select)
-          console.log(res.data.dml_ddl)
+          // console.log(res)
+          // console.log(res.data.select)
+          // console.log(res.data.dml_ddl)
           this.formItem.textarea_backup = res.data.select
           this.formItem.textarea_ddl_dml = res.data.dml_ddl
         })
@@ -267,69 +261,66 @@ export default {
     sqladvisor () {
 
     },
+    // 同时检查  备份栏只能是select语句，ddl栏只能是非select语句
     test_sql () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
-          if (this.formItem.textarea_ddl_dml) {
-            let tmp = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
+            let tmpddl2 = ''
+            let tmpddl = ''
+            let tmpbak = ''
+            let tmpbak2 = ''
+            if (this.formItem.textarea_backup) {
+                tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+                tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+                tmpbak = ''
+            }
+            if (this.formItem.textarea_ddl_dml) {
+                tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+                tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+                tmpddl = ''
+            }
             axios.put(`${util.url}/sqlsyntax/test`, {
                 'id': this.id[0].id,
                 'base': this.formItem.basename,
-                'sql': tmp
+                'sql': tmpddl + '&&&' + tmpbak,
+                'check_sql': tmpddl2 + '&&&' + tmpbak2
               })
               .then(res => {
                if (res.data.status === 200) {
-                 this.Testresults = res.data.result
+                 this.Testresults = res.data.result_ddl
+                 this.Testresults_backup = res.data.result_bak
                  let gen = 0
+                 let gen1 = 0
                  this.Testresults.forEach(vl => {
                    if (vl.errlevel !== 0) {
                      gen += 1
                    }
                  })
-                 if (gen === 0) {
+                 this.Testresults_backup.forEach(v2 => {
+                   if (v2.errlevel !== 0) {
+                     gen1 += 1
+                   }
+                 })
+                 if (gen === 0 && gen1 === 0) {
                    this.validate_gen = false
                  } else {
                    this.validate_gen = true
                  }
+               } else if (res.data.status === 202) {
+                 this.$Notice.error({
+                   title: '警告',
+                   desc: res.data.result
+                 })
+                 this.validate_gen = true
                } else {
                  this.$Notice.error({
                    title: '警告',
                    desc: 'ddl-dml-无法连接到Inception!'
                  })
-               }
-              })
-              .catch(error => {
-               util.ajanxerrorcode(this, error)
-              })
-          } else {
-            this.$Message.error('请填写sql语句后再测试!');
-          }
-          if (this.formItem.textarea_backup) {
-            let tmp1 = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            axios.put(`${util.url}/sqlsyntax/test`, {
-                'id': this.id[0].id,
-                'base': this.formItem.basename,
-                'sql': tmp1
-              })
-              .then(res => {
-               if (res.data.status === 200) {
-                 this.Testresults_backup = res.data.result
-                 let gen = 0
-                 this.Testresults_backup.forEach(vl => {
-                   if (vl.errlevel !== 0) {
-                     gen += 1
-                   }
-                 })
-                 if (gen === 0) {
-                   this.validate_gen = false
-                 } else {
-                   this.validate_gen = true
-                 }
-               } else {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: 'backup-无法连接到Inception!'
-                 })
+                 this.validate_gen = true
                }
               })
               .catch(error => {
@@ -344,10 +335,16 @@ export default {
     SubmitSQL () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
-          if (this.formItem.textarea_ddl_dml) {
+          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
             this.validate_gen = true
-            this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            this.datalist.sqllist_backup = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
+            this.datalist.sqllist_ddl = ''
+            this.datalist.sqllist_backup = ''
+            if (this.formItem.textarea_ddl_dml) {
+                this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
+            }
+            if (this.formItem.textarea_backup) {
+                this.datalist.sqllist_backup = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
+            }
             axios.post(`${util.url}/sqlsyntax/`, {
                 'data': JSON.stringify(this.formItem),
                 'sql': JSON.stringify(this.datalist.sqllist_ddl),
@@ -379,7 +376,9 @@ export default {
     ClearForm () {
       this.$refs['formItem'].resetFields();
       this.formItem.textarea_ddl_dml = '';
-      this.formItem.textarea_backup = ''
+      this.formItem.textarea_backup = '';
+      this.Testresults = '';
+      this.Testresults_backup = ''
     }
   },
   mounted () {
