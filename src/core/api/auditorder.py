@@ -200,6 +200,8 @@ class audit(baseview.Approverpermissions):
                                         'status':'approve',
                                         'run_sql':data.sql,
                                         'backup_sql':data.backup_sql,
+                                        'token':util.generateTokens(),
+                                        'myself':from_user,
                                         'note': content.after}
                                     put_mess = send_email.send_email(to_addr=mail.email)
                                     put_mess.send_mail(mail_data=mess_info,type=0)

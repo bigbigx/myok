@@ -31,10 +31,12 @@ from core.api.managerdb import (
 )
 from core.api.auditorder import (
     orderdetail,
-    audit
+    audit,
+    authtoken
 )
 from core.api.executeorder import (
-    execute
+    execute,
+    exetoken
 )
 
 from core.api.record import recordorder
@@ -64,5 +66,7 @@ urlpatterns = [
     url(r'^api/v1/globalpermissions', pushpermissions.as_view()),
     url(r'^api/v1/download', downloadFile),
     url(r'^api-token-auth/', login_auth.as_view()),
+    url(r'^api/v1/audit_token',authtoken.as_view()),
+    url(r'^api/v1/exe_token',exetoken.as_view())
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

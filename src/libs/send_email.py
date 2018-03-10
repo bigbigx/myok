@@ -24,7 +24,7 @@ class send_email(object):
         return formataddr((Header(name, 'utf-8').encode(), addr))
 
     def send_mail(self,mail_data=None,type=None):
-        if type == 0: #含审核成功
+        if type == 0: #含审核成功，工单发送到工单发起人和工单审核人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -41,7 +41,7 @@ class send_email(object):
                 mail_data['backup_sql'],
                 mail_data['note'])
 
-        elif type == 3: #执行成功
+        elif type == 3: #执行成功，邮件发送到工单发起人和工单审核人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -61,7 +61,7 @@ class send_email(object):
                 mail_data['note'])
 
 
-        elif type == 1: #驳回，含审核驳回 和执行驳回
+        elif type == 1: #审核驳回，邮件发送到工单发起人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -77,11 +77,10 @@ class send_email(object):
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
                        mail_data['rejected'])
-        elif type == 4: #驳回
+        elif type == 4: #执行驳回 邮件发送到工单审核人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
-                   '<br><p>工单备注: %s</p>' \
                    '<br><p>状态: 执行驳回</p>' \
                    '<br><p>驳回说明: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
@@ -91,7 +90,7 @@ class send_email(object):
                        mail_data['to_user'],
                        mail_data['rejected'])
 
-        else: # 提交成功 # '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
+        else: # 提交成功，邮件发送到审核人  # '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
@@ -101,7 +100,10 @@ class send_email(object):
                    '<br><p>状态: 成功发起</p>' \
                    '<br><p>备注: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
-                   '<br><p>请审核人操作: &nbsp&nbsp<a href="">审核通过</a> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <a href=''>审核驳回</a></p>' \
+                   '<br><p>请审核人操作: &nbsp&nbsp' \
+                   '<a href="http://my:88/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&token=%s">审核通过</a> ' \
+                   '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
+                   '<a href="http://my:88/api/v1/audit_token?&type=0&to_user=%s&username=%s&workid=%s&token=%s">审核驳回</a></p>' \
                    '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
@@ -113,7 +115,16 @@ class send_email(object):
                        #mail_data['addr'],
                        #mail_data['orderID'],
                        #mail_data['tokens'],
-                       mail_data['note'])
+                       mail_data['note'],
+                       mail_data['to_user'],
+                       mail_data['myself'],
+                       mail_data['workid'],
+                       mail_data['token_pass'],
+                       mail_data['to_user'],
+                       mail_data['myself'],
+                       mail_data['workid'],
+                       mail_data['token_back']
+            )
         _attachments = []
         msg = MIMEMultipart('alternative')
         contents = MIMEText(text, 'html', 'utf-8')

@@ -303,6 +303,7 @@ class login_auth(baseview.AnyLogin):
             permissions = authenticate(username=user, password=password)
             if permissions is not None and permissions.is_active:
                 token = jwt_encode_handler(jwt_payload_handler(permissions))
+                #insert db proccess
                 return Response({'token': token, 'res': '', 'permissions': permissions.group})
             else:
                 return HttpResponse(status=400)

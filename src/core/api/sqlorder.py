@@ -79,17 +79,17 @@ class sqlorder(baseview.BaseView):
 
                         tmp=str(select_sql.strip())
                         print("备份语句: " + tmp)
-                        if (tmp.startswith('SELECT')):
+                        if (tmp.startswith('SELECT') or tmp.startswith('select')):
                             print("right select")
                             pass
                         else:
-                            check_info = "备份SQL语句编辑栏存在非select语句，请检查"
+                            check_info = "备份SQL语句编辑栏存在非select语句，请注意只能是select 或者SELECT的关键字"
                             return Response({'result': check_info, 'status': 202})
                 if sql_ddl_1:
                     for ddl_sql in sql_ddl_1.rstrip().rstrip("\n").rstrip("\r").rstrip(";").split(";"):
                         tmp1=str(ddl_sql.strip())
                         print("执行语句: " + tmp1)
-                        if (tmp1.startswith('SELECT')):
+                        if (tmp1.startswith('SELECT') or tmp.startswith('select')):
                             check_info = "执行SQL编辑栏存在select语句，请检查"
                             return Response({'result': check_info,'status': 202})
                         else:

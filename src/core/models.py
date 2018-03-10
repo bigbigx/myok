@@ -57,9 +57,10 @@ class SqlOrder(models.Model):
     date = models.CharField(max_length=100, blank=True) # 提交日期
     basename = models.CharField(max_length=50, blank=True) #数据库名
     sql = models.TextField(blank=True) #sql语句
-    text = models.CharField(max_length=100) # 工单备注
+    text = models.CharField(max_length=300) # 工单备注
     assigned = models.CharField(max_length=50, blank=True)# 工单审核人
     backup_sql=models.TextField(blank=True) #s备份ql语句
+
 
 
 class DatabaseList(models.Model):

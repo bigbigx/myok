@@ -190,8 +190,8 @@ export default {
           },
           {
             type: 'string',
-            max: 20,
-            message: '最多20个字',
+            max: 150,
+            message: '最多150个字',
             trigger: 'blur'
           }
         ]
