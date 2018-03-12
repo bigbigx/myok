@@ -101,9 +101,9 @@ class send_email(object):
                    '<br><p>备注: %s</p>' \
                    '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: &nbsp&nbsp' \
-                   '<a href="http://my:88/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&token=%s">审核通过</a> ' \
+                   '<a href="http://ops.51dinghuo.cc/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">审核通过</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
-                   '<a href="http://my:88/api/v1/audit_token?&type=0&to_user=%s&username=%s&workid=%s&token=%s">审核驳回</a></p>' \
+                   '<a href="http://ops.51dinghuo.cc/api/v1/audit_token?&type=0&to_user=%s&username=%s&workid=%s&mytoken=%s">审核驳回</a></p>' \
                    '<br><p>使用说明：只要您点击了通过或者驳回，输入您的登录密码即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
@@ -117,13 +117,13 @@ class send_email(object):
                        #mail_data['tokens'],
                        mail_data['note'],
                        mail_data['to_user'],
-                       mail_data['myself'],
+                       mail_data['assigned'],
                        mail_data['workid'],
                        mail_data['token_pass'],
                        mail_data['to_user'],
-                       mail_data['myself'],
+                       mail_data['assigned'],
                        mail_data['workid'],
-                       mail_data['token_back']
+                       mail_data['token_reject']
             )
         _attachments = []
         msg = MIMEMultipart('alternative')

@@ -4,6 +4,7 @@ from libs import send_email
 from libs import baseview
 from libs import call_inception
 from libs import util
+from libs import conn_sqlite
 from rest_framework.response import Response
 from django.http import HttpResponse
 from core.models import (
@@ -141,7 +142,7 @@ class sqlorder(baseview.BaseView):
 
 
                 workId = util.workId()
-                SqlOrder.objects.get_or_create(
+                SqlOrder.objects.get_or_create(  #发送站内短信
                     username=user,
                     date=util.date(),
                     work_id=workId,
@@ -153,14 +154,15 @@ class sqlorder(baseview.BaseView):
                     backup=data['backup'],
                     bundle_id=id,
                     assigned=data['assigned'],
-                    backup_sql=sql_2
+                    backup_sql=sql_2,
+
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
                 mail = Account.objects.filter(username=data['assigned']).first()
                 tag = globalpermissions.objects.filter(authorization='global').first()
                 ret_info = '已提交，请等待管理员审核!'
-                if tag is None or tag.dingding == 0:
+                if tag is None or tag.dingding == 0:  #  发送町町
                     pass
                 else:
                     if content.url:
@@ -184,14 +186,28 @@ class sqlorder(baseview.BaseView):
                             'type': "成功发起",
                             'run_sql':sql_1,
                             'backup_sql':sql_2,
-                            'status':'apply',
-                            'note': content.before}
+                            'status': 'apply',
+                            'assigned': assigned_man,
+                            'token_pass': util.generateTokens(32),    # 定义审核通过URL 的token
+                            'token_reject': util.generateTokens(32),  #定义审核驳回URL 的token
+                            'note':content.before}
                         try:
                             put_mess = send_email.send_email(to_addr=mail.email)
                             put_mess.send_mail(mail_data=mess_info, type=2)
                         except:
                             #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
                             ret_info = '工单提交成功!但是邮箱推送失败,请查看错误日志排查错误.'
+
+                # 保存token
+                try:
+
+                    token = util.generateTokens(32)
+                    value = [(assigned_man, workId, token)]
+                    conn_sqlite.add_one(value)
+                    print("保存token 的时候报错")
+                except Exception as e:
+                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                    return HttpResponse(status=500)
                 return Response(ret_info)
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

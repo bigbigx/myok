@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from core.models import (
     SqlOrder,
     Usermessage,
-    DatabaseList,,
+    DatabaseList,
     Account,
     globalpermissions
 )
@@ -17,7 +17,7 @@ conf = util.conf_path()
 addr_ip = conf.ipaddress
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
-class audit(baseview.Approverpermissions):
+class exetoken(baseview.AnyLogin):
     '''
     SQL 执行通过或者执行驳回的方法，通过按钮的URL传参过来
     '''
@@ -174,3 +174,9 @@ class audit(baseview.Approverpermissions):
 
                     else:
                         pass
+
+        def put(self, request, args=None):
+            pass
+
+        def post(self, request, args: str = None):
+            pass

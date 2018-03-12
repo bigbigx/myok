@@ -5,6 +5,7 @@ from libs import baseview
 from libs import util
 from libs import call_inception
 from libs import rollback
+from libs import conn_sqlite
 from rest_framework.response import Response
 from django.db.models import Count
 from django.http import HttpResponse
@@ -74,6 +75,14 @@ class audit(baseview.Approverpermissions):
                     return HttpResponse(status=500)
                 else:
                     try:
+                        data = SqlOrder.objects.filter(id=id).first()
+                        try:
+                            conn = conn_sqlite.query(from_user, data.workid)
+                        except Exception as e:
+                            print(e)
+                            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                            ret_info = "sqlite数据库后台异常，请联系系统管理员"
+                            return HttpResponse(ret_info)
                         SqlOrder.objects.filter(id=id).update(status=0)
                         _tmpData = SqlOrder.objects.filter(id=id).values(
                             'work_id',
@@ -90,7 +99,7 @@ class audit(baseview.Approverpermissions):
                             to_user=to_user,
                             state='unread'
                         )
-                        data=SqlOrder.objects.filter(id=id).first()
+
                         content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
                         mail = Account.objects.filter(username=to_user).first()
                         tag = globalpermissions.objects.filter(authorization='global').first()
