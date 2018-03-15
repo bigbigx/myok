@@ -177,8 +177,15 @@ export default {
         })
     },
     _Refresh () {
-      this.$router.reload()
-    }
+    axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
+      .then(res => {
+        this.applytable = res.data.data
+        this.pagenumber = res.data.page.alter_number
+      })
+      .catch(error => {
+        util.ajanxerrorcode(this, error)
+      })
+  }
   },
 
   mounted () {

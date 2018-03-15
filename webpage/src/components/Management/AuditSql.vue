@@ -306,6 +306,9 @@ export default {
     cancel_button () {
       this.modal2 = false
     },
+    _Refresh () {
+      this.mou_data()
+    },
     put_button () {
       this.modal2 = false
       this.tmp[this.togoing].status = 5

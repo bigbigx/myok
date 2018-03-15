@@ -377,6 +377,9 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
+    _Refresh () {
+      this.mou_data()
+    },
     test_button () {
       //  ddl& dml语句检测显示
       axios.put(`${util.url}/execute_sql`, {
