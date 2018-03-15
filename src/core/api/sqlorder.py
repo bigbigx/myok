@@ -84,7 +84,6 @@ class sqlorder(baseview.BaseView):
                     for select_sql in myok:
 
                         tmp=str(select_sql.strip())
-                        print("备份语句: " + tmp)
                         if tmp =="":
                             pass
                         else:
@@ -98,7 +97,6 @@ class sqlorder(baseview.BaseView):
                 if sql_ddl_1:
                     for ddl_sql in sql_ddl_1.rstrip().rstrip("\n").rstrip("\r").rstrip(";").split(";"):
                         tmp1=str(ddl_sql.strip())
-                        print("执行语句: " + tmp1)
                         if tmp1=="":
                             pass
 
