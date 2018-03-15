@@ -138,7 +138,6 @@ class execute(baseview.Approverpermissions):
                             try:
 
                                 conn_sqlite.delete(to_user, data.work_id)
-                                print("删除成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -360,9 +359,7 @@ class execute(baseview.Approverpermissions):
 
                             #删除执行人的token
                             try:
-                                print("准备去删除执行人token记录")
                                 conn_sqlite.delete('dba', workid)
-                                print("删除执行人token记录成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

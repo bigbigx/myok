@@ -89,7 +89,6 @@ class exetoken(baseview.AnyLogin):
                             try:
 
                                 conn_sqlite.deleteByToken(token)
-                                print("删除token成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -321,7 +320,6 @@ class exetoken(baseview.AnyLogin):
                                 try:
 
                                     conn_sqlite.delete(to_user, workid)
-                                    print("删除成功")
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

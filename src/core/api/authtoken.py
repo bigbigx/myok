@@ -75,9 +75,7 @@ class authtoken(baseview.AnyLogin):
                             content = DatabaseList.objects.filter(id=data.bundle_id).first()
                             SqlOrder.objects.filter(work_id=workid).update(reject=reject_remark)
                             try:
-                                print("准备去删除token记录")
                                 conn_sqlite.deleteByToken(token)
-                                print("删除token记录成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -169,9 +167,7 @@ class authtoken(baseview.AnyLogin):
 
                                 # ----删除token
                                 try:
-                                    print("准备去删除token记录")
                                     conn_sqlite.delete(username, workid)
-                                    print("删除token记录成功")
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -180,11 +176,9 @@ class authtoken(baseview.AnyLogin):
 
                                 # -----增加执行的todken
                                 try:
-                                    print("准备去增加执行token记录")
 
                                     conn_sqlite.add_one('dba', data.work_id, newtoken)
 
-                                    print("增加执行token记录成功")
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
