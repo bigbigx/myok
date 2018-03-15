@@ -377,16 +377,6 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh_3 (vl = 1) {
-      axios.get(`${util.url}/execute_sql?page=${vl}&username=${Cookies.get('user')}`)
-        .then(res => {
-          this.tmp = res.data.data
-          this.pagenumber = res.data.page.alter_number
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
-    },
     test_button () {
       //  ddl& dml语句检测显示
       axios.put(`${util.url}/execute_sql`, {
@@ -420,6 +410,9 @@ export default {
         .catch(error => {
           util.ajanxerrorcode(this, error)
         })
+    },
+    _Refresh_3 () {
+      this.mou_data()
     },
     delrecordList (vl) {
       this.delrecord = vl

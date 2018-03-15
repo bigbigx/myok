@@ -370,16 +370,6 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh_2 (vl = 1) {
-      axios.get(`${util.url}/audit_sql?page=${vl}&username=${Cookies.get('user')}`)
-        .then(res => {
-          this.tmp = res.data.data
-          this.pagenumber = res.data.page.alter_number
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
-    },
     splicpage (page) {
       this.mou_data(page)
     },
@@ -392,6 +382,9 @@ export default {
         .catch(error => {
           util.ajanxerrorcode(this, error)
         })
+    },
+    _Refresh_2 () {
+      this.mou_data()
     },
     delrecordList (vl) {
       this.delrecord = vl
