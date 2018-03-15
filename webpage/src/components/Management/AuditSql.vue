@@ -370,7 +370,7 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh_2 () {
+    _Refresh_2 (vl = 1) {
       axios.get(`${util.url}/audit_sql?page=${vl}&username=${Cookies.get('user')}`)
         .then(res => {
           this.tmp = res.data.data
@@ -379,7 +379,6 @@ export default {
         .catch(error => {
           util.ajanxerrorcode(this, error)
         })
-
     },
     splicpage (page) {
       this.mou_data(page)

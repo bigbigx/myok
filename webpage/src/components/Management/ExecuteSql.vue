@@ -377,7 +377,7 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh_3 () {
+    _Refresh_3 (vl = 1) {
       axios.get(`${util.url}/execute_sql?page=${vl}&username=${Cookies.get('user')}`)
         .then(res => {
           this.tmp = res.data.data
