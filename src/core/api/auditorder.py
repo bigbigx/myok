@@ -1,7 +1,6 @@
 # -*- coding=utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
+sys.setdefaultencoding('UTF-8') 
 import logging
 import json
 from libs import send_email
