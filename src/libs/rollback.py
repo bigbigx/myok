@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 from libs import con_database
 from libs import util
 

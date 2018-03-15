@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 import logging
 from libs import baseview
 from rest_framework.response import Response
