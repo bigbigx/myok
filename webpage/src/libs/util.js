@@ -7,12 +7,17 @@ util.title = function (title) {
   window.document.title = title;
 };
 
-// util.url = 'http://' + document.domain + ':8000/api/v1'
+
 util.url = 'http://' + document.domain + '/api/v1'
 // util.url = '/api/v1'
 
 // util.auth = '/api-token-auth/'
-util.auth = 'http://' + document.domain + '/api-token-auth/'
+
+util.url = 'http://' + document.domain + ':8000/api/v1'
+
+util.auth = 'http://' + document.domain + ':8000/api-token-auth/'
+
+
 util.computer_room = ['AWS', 'Aliyun', 'Own', 'Other']
 
 util.ajanxerrorcode = function (vm, error) {
