@@ -412,14 +412,6 @@ export default {
         })
     },
     _Refresh_3 () {
-      axios.get(`${util.url}/execute_sql?page=1&username=${Cookies.get('user')}`)
-        .then(res => {
-          this.tmp = res.data.data
-          this.pagenumber = res.data.page.alter_number
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
     },
     delrecordList (vl) {
       this.delrecord = vl
