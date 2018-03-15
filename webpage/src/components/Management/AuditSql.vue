@@ -9,7 +9,7 @@
       <p slot="title">
         <Icon type="person"></Icon>
         审核工单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_2">刷新</Button>
       </p>
       <Row>
         <Col span="24">
@@ -369,6 +369,17 @@ export default {
         .catch(error => {
           util.ajanxerrorcode(this, error)
         })
+    },
+    _Refresh_2 () {
+      axios.get(`${util.url}/audit_sql?page=${vl}&username=${Cookies.get('user')}`)
+        .then(res => {
+          this.tmp = res.data.data
+          this.pagenumber = res.data.page.alter_number
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
+
     },
     splicpage (page) {
       this.mou_data(page)

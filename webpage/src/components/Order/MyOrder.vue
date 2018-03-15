@@ -9,7 +9,7 @@
       <p slot="title">
         <Icon type="person"></Icon>
         我的工单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_1">刷新</Button>
 
       </p>
 
@@ -176,8 +176,15 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh () {
-      this.$router.reload()
+    _Refresh_1 () {
+      axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
+        .then(res => {
+          this.applytable = res.data.data
+          this.pagenumber = res.data.page.alter_number
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
     }
   },
 

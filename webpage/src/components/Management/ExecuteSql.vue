@@ -9,7 +9,7 @@
       <p slot="title">
         <Icon type="person"></Icon>
         执行工单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_3">刷新</Button>
       </p>
       <Row>
         <Col span="24">
@@ -372,6 +372,16 @@ export default {
           })
           this.mou_data()
           this.$refs.page.currentPage = 1
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
+    },
+    _Refresh_3 () {
+      axios.get(`${util.url}/execute_sql?page=${vl}&username=${Cookies.get('user')}`)
+        .then(res => {
+          this.tmp = res.data.data
+          this.pagenumber = res.data.page.alter_number
         })
         .catch(error => {
           util.ajanxerrorcode(this, error)
