@@ -7,7 +7,9 @@ import hashlib
 import socket
 import threading
 import paramiko
-import simplejson
+#import simplejson
+
+from  assets.assets_controler  import ControlerCenter
 
 
 def get_ssh(ip, user, pwd):
@@ -99,7 +101,7 @@ def handshake(conn, address, thread_name):
     str_handshake = HANDSHAKE_STRING.replace('{1}', res_key).replace('{2}', headers['Origin']).replace('{3}',
                                                                                                        headers['Host'])
     conn.send(str_handshake)
-    print ('%s : Socket handshaken with %s:%s success' % (thread_name, address[0], address[1]))
+    print('%s : Socket handshaken with %s:%s success' % (thread_name, address[0], address[1]))
     print('Start transmitting data...')
     print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
     return True
