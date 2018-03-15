@@ -6,7 +6,7 @@ util.title = function (title) {
   title = title || '蜜罐运维平台';
   window.document.title = title;
 };
-#util.url = 'http://' + document.domain + '/api/v1'
+// util.url = 'http://' + document.domain + '/api/v1'
 // util.url = '/api/v1'
 // util.auth = '/api-token-auth/'
 util.url = 'http://' + document.domain + ':8000/api/v1'
