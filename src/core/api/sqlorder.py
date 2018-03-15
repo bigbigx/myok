@@ -54,6 +54,7 @@ class sqlorder(baseview.BaseView):
 
         elif args == 'test':
             try:
+                type = int(request.data['type'])
                 id = request.data['id']
                 base = request.data['base']
                 tmp_sql = request.data['sql']
@@ -65,7 +66,11 @@ class sqlorder(baseview.BaseView):
                 sql_ddl_1 = check_sql.split('&&&')[0]
                 sql_bak_1 = check_sql.split('&&&')[1]
                 #sql = str(sql).strip('\n').strip().rstrip(';')
-                data = DatabaseList.objects.filter(id=id).first()
+                if type == 1:
+                    data = DatabaseList.objects.filter(id=id).first()
+                else:
+                    base_id = request.data['base_id']
+                    data = DatabaseList.objects.filter(id=base_id).first()
                 info = {
                     'host': data.ip,
                     'user': data.username,
@@ -75,27 +80,34 @@ class sqlorder(baseview.BaseView):
                     }
                 if sql_bak_1:
                     myok=sql_bak_1.rstrip().rstrip("\n").rstrip("\r").rstrip("\t").rstrip(";").split(";")
-                    #print(myok)
                     for select_sql in myok:
 
                         tmp=str(select_sql.strip())
                         print("备份语句: " + tmp)
-                        if (tmp.startswith('SELECT') or tmp.startswith('select')):
-                            print("right select")
+                        if tmp =="":
                             pass
                         else:
-                            check_info = "备份SQL语句编辑栏存在非select语句，请注意只能是select 或者SELECT的关键字"
-                            return Response({'result': check_info, 'status': 202})
+                            if (tmp.startswith('SELECT') or tmp.startswith('select')):
+                                print("right select")
+                                pass
+                            else:
+                                check_info = "备份SQL语句编辑栏存在非select语句，请注意只能是select 或者SELECT的关键字"
+                                return Response({'result': check_info, 'status': 202})
+
                 if sql_ddl_1:
                     for ddl_sql in sql_ddl_1.rstrip().rstrip("\n").rstrip("\r").rstrip(";").split(";"):
                         tmp1=str(ddl_sql.strip())
                         print("执行语句: " + tmp1)
-                        if (tmp1.startswith('SELECT') or tmp.startswith('select')):
-                            check_info = "执行SQL编辑栏存在select语句，请检查"
-                            return Response({'result': check_info,'status': 202})
-                        else:
-                            print("right  ddl")
+                        if tmp1=="":
                             pass
+
+                        else:
+                            if (tmp1.startswith('SELECT') or tmp1.startswith('select')):
+                                check_info = "执行SQL编辑栏存在select语句，请检查"
+                                return Response({'result': check_info,'status': 202})
+                            else:
+                                print("right  ddl")
+                                pass
 
 
             except KeyError as e:
@@ -139,10 +151,9 @@ class sqlorder(baseview.BaseView):
                     sql_2 = ';'.join(k)
                     sql_2 = sql_2.strip(' ').rstrip(';')
 
-
-
+                token = util.generateTokens(32)
                 workId = util.workId()
-                SqlOrder.objects.get_or_create(  #发送站内短信
+                SqlOrder.objects.get_or_create(
                     username=user,
                     date=util.date(),
                     work_id=workId,
@@ -155,6 +166,7 @@ class sqlorder(baseview.BaseView):
                     bundle_id=id,
                     assigned=data['assigned'],
                     backup_sql=sql_2,
+                    base_id=id
 
                     )
 #
@@ -173,6 +185,15 @@ class sqlorder(baseview.BaseView):
                         except:
                             #ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
                             ret_info = '工单提交成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                # 保存token
+                try:
+                    #value = [(assigned_man, workId, token)]
+                    conn_sqlite.add_one(assigned_man, workId, token)
+                except Exception as e:
+                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                    return HttpResponse(status=500)
+
+
                 if tag is None or tag.email == 0:
                     pass
                 else:
@@ -188,26 +209,19 @@ class sqlorder(baseview.BaseView):
                             'backup_sql':sql_2,
                             'status': 'apply',
                             'assigned': assigned_man,
-                            'token_pass': util.generateTokens(32),    # 定义审核通过URL 的token
-                            'token_reject': util.generateTokens(32),  #定义审核驳回URL 的token
+                            'token_pass': token,    # 定义审核通过URL 的token
+                            'token_reject': token,  #定义审核驳回URL 的token
                             'note':content.before}
                         try:
                             put_mess = send_email.send_email(to_addr=mail.email)
                             put_mess.send_mail(mail_data=mess_info, type=2)
-                        except:
+                        except Exception as e :
                             #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                             ret_info = '工单提交成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                            return HttpResponse(ret_info)
 
-                # 保存token
-                try:
 
-                    token = util.generateTokens(32)
-                    value = [(assigned_man, workId, token)]
-                    conn_sqlite.add_one(value)
-                    print("保存token 的时候报错")
-                except Exception as e:
-                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                    return HttpResponse(status=500)
                 return Response(ret_info)
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

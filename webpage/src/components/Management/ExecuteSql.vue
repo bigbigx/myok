@@ -9,6 +9,7 @@
       <p slot="title">
         <Icon type="person"></Icon>
         执行工单
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
       </p>
       <Row>
         <Col span="24">
@@ -69,12 +70,11 @@
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
     </Form>
-    <p class="pa">SQL检查结果:</p>
-    <Table :columns="columnsName" :data="dataId" stripe border></Table>
+
     <div slot="footer">
-      <!-- <Button type="warning" @click.native="test_button()">检测sql</Button> -->
+
       <Button @click="cancel_button">取消</Button>
-      <Button type="error" @click="out_button_1()" :enabled="summit">驳回</Button>
+      <!-- <Button type="error" @click="out_button_1()" :enabled="summit">驳回</Button> -->
       <Button type="success" @click="put_button_exe()" :enabled="summit">备份和执行</Button>
     </div>
   </Modal>
@@ -111,7 +111,7 @@ export default {
           width: 250
         },
         {
-          title: '工单说明:',
+          title: '工单标题:',
           key: 'text'
         },
         {
@@ -153,19 +153,13 @@ export default {
               text = '待审核'
             } else if (row.status === 0) {
               color = 'red'
-              text = '审核驳回'
+              text = '已驳回'
             } else if (row.status === 1) {
               color = 'orange'
-              text = '审核同意'
-            } else if (row.status === 3) {
-              color = 'black'
-              text = '执行驳回'
+              text = '已同意'
             } else if (row.status === 4) {
               color = 'green'
-              text = '执行成功'
-            } else if (row.status === 6) {
-              color = 'yellow'
-              text = '备份中'
+              text = '已执行'
             } else {
               color = 'yellow'
               text = '进行中'
@@ -227,6 +221,10 @@ export default {
           }
         },
         {
+          title: '审核备注',
+          key: 'action'
+        },
+        {
           title: '操作',
           key: 'action',
           width: 100,
@@ -243,7 +241,7 @@ export default {
                     this.edit_tab(params.index)
                   }
                 }
-              }, '立即执行')
+              }, '执行SQL')
             ])
           }
         }

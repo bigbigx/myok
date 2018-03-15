@@ -9,7 +9,10 @@
       <p slot="title">
         <Icon type="person"></Icon>
         我的工单
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
+
       </p>
+
       <Row>
         <Col span="24">
         <Table border :columns="columns6" :data="applytable" stripe size="small"></Table>
@@ -36,6 +39,10 @@ export default {
           sortable: true
         },
         {
+          title: '工单标题:',
+          key: 'text'
+        },
+        {
           title: '提交时间:',
           key: 'date',
           sortable: true
@@ -43,6 +50,11 @@ export default {
         {
           title: '提交人',
           key: 'username',
+          sortable: true
+        },
+        {
+          title: '指派审核人',
+          key: 'assigned',
           sortable: true
         },
         {
@@ -57,16 +69,13 @@ export default {
               text = '待审核'
             } else if (row.status === 0) {
               color = 'red'
-              text = '审核拒绝'
+              text = '被驳回'
             } else if (row.status === 1) {
               color = 'orange'
-              text = '审核同意'
-            } else if (row.status === 3) {
-              color = 'gray'
-              text = '执行驳回'
+              text = '已同意'
             } else if (row.status === 4) {
               color = 'green'
-              text = '执行成功'
+              text = '已执行'
             } else {
               color = 'yellow'
               text = '进行中'
@@ -81,11 +90,11 @@ export default {
           },
           sortable: true,
           filters: [{
-              label: '审核同意',
+              label: '已同意',
               value: 1
             },
             {
-              label: '审核拒绝',
+              label: '已驳回',
               value: 0
             },
             {
@@ -93,11 +102,7 @@ export default {
               value: 2
             },
             {
-              label: '执行驳回',
-              value: 3
-            },
-            {
-              label: '执行成功',
+              label: '已执行',
               value: 4
             },
 
@@ -124,6 +129,10 @@ export default {
           }
         },
         {
+          title: '审核备注',
+          key: 'reject'
+        },
+        {
           title: '操作',
           key: 'action',
           align: 'center',
@@ -142,7 +151,7 @@ export default {
                     })
                   }
                 }
-              }, '详细信息')
+              }, '查看SQL')
             ])
           }
         }
@@ -166,8 +175,12 @@ export default {
         .catch(error => {
           util.ajanxerrorcode(this, error)
         })
+    },
+    _Refresh () {
+      this.$router.reload()
     }
   },
+
   mounted () {
     axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
       .then(res => {

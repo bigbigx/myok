@@ -9,6 +9,7 @@
       <p slot="title">
         <Icon type="person"></Icon>
         审核工单
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
       </p>
       <Row>
         <Col span="24">
@@ -17,7 +18,7 @@
           title="您确认删除这些工单信息吗?"
           @on-ok="delrecordData"
           >
-        <Button type="text" style="margin-left: -1%">删除记录</Button>
+        <Button type="primary" icon="trash-a"style="margin-left: -1%">删除记录</Button>
         </Poptip>
         <Table border :columns="columns6" :data="tmp" stripe ref="selection" @on-selection-change="delrecordList"></Table>
         <br>
@@ -63,10 +64,7 @@
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
     </Form>
-    <p class="pa">SQL检查结果:</p>
-    <Table :columns="columnsName" :data="dataId" stripe border></Table>
     <div slot="footer">
-      <!-- <Button type="warning" @click.native="test_button()">检测sql</Button> -->
       <Button @click="cancel_button">取消</Button>
       <Button type="error" @click="out_button()" :disabled="summit">驳回</Button>
       <Button type="success" @click="put_button()" :disabled="summit">同意</Button>
@@ -101,10 +99,10 @@ export default {
           key: 'work_id',
           sortable: true,
           sortType: 'desc',
-          width: 250
+          width: 200
         },
         {
-          title: '工单说明:',
+          title: '工单标题:',
           key: 'text'
         },
         {
@@ -116,6 +114,12 @@ export default {
         {
           title: '提交人',
           key: 'username',
+          sortable: true,
+          width: 150
+        },
+        {
+          title: '指派审核人',
+          key: 'assigned',
           sortable: true,
           width: 150
         },
@@ -132,16 +136,13 @@ export default {
               text = '待审核'
             } else if (row.status === 0) {
               color = 'red'
-              text = '审核驳回'
+              text = '已驳回'
             } else if (row.status === 1) {
               color = 'orange'
-              text = '审核同意'
-            } else if (row.status === 3) {
-              color = 'black'
-              text = '执行驳回'
+              text = '已同意'
             } else if (row.status === 4) {
               color = 'green'
-              text = '执行成功'
+              text = '已执行'
             } else {
               color = 'yellow'
               text = '进行中'
@@ -198,6 +199,10 @@ export default {
           }
         },
         {
+          title: '审核备注',
+          key: 'reject'
+        },
+        {
           title: '操作',
           key: 'action',
           width: 100,
@@ -214,7 +219,7 @@ export default {
                     this.edit_tab(params.index)
                   }
                 }
-              }, '查看')
+              }, '查看SQL')
             ])
           }
         }

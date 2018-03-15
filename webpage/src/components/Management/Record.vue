@@ -31,8 +31,12 @@ export default {
     return {
       tabcolumns: [
         {
-          title: '工单',
+          title: '工单编号',
           key: 'workid'
+        },
+        {
+          title: '工单标题',
+          key: 'text'
         },
         {
           title: '执行时间',

@@ -66,8 +66,8 @@ class audit(baseview.Approverpermissions):
         else:
             if type == 0:  #审核驳回
                 try:
-                    from_user = request.data['from_user']
-                    to_user = request.data['to_user']
+                    from_user = str(request.data['from_user'])
+                    to_user11 = str(request.data['to_user'])
                     text = request.data['text']
                     id = request.data['id']
                 except KeyError as e:
@@ -77,62 +77,91 @@ class audit(baseview.Approverpermissions):
                     try:
                         data = SqlOrder.objects.filter(id=id).first()
                         try:
-                            conn = conn_sqlite.query(from_user, data.workid)
+                            conn = conn_sqlite.query(from_user, data.work_id)
                         except Exception as e:
                             print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                             ret_info = "sqlite数据库后台异常，请联系系统管理员"
-                            return HttpResponse(ret_info)
-                        SqlOrder.objects.filter(id=id).update(status=0)
-                        _tmpData = SqlOrder.objects.filter(id=id).values(
-                            'work_id',
-                            'bundle_id',
-                            'text',
-                        ).first()
-                        title = '工单:' + _tmpData['work_id'] + '审核驳回通知'
-                        msg_content='工单详情是：'+ _tmpData['text']+  '\r\n 驳回意见是： '+ text
-                        Usermessage.objects.get_or_create(
-                            from_user=from_user,
-                            time=util.date(),
-                            title=title,
-                            content=msg_content,
-                            to_user=to_user,
-                            state='unread'
-                        )
+                            return Response(status=500)
+                        if conn:  # 如果存在该token，下一步就是直接执行，执行完后还要删除此条数据库token 数据
+                            # 执行审核驳回的业务
+                                SqlOrder.objects.filter(id=id).update(status=0)
+                                _tmpData = SqlOrder.objects.filter(id=id).values(
+                                    'work_id',
+                                    'bundle_id',
+                                    'text',
+                                ).first()
+                                title = '工单:' + _tmpData['work_id'] + '审核驳回通知'
+                                msg_content='工单详情是：' + _tmpData['text'] + '\r\n 驳回意见是： ' + text
+                                Usermessage.objects.get_or_create(
+                                    from_user=from_user,
+                                    time=util.date(),
+                                    title=title,
+                                    content=msg_content,
+                                    to_user=to_user11,
+                                    state='unread'
+                                )
 
-                        content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
-                        mail = Account.objects.filter(username=to_user).first()
-                        tag = globalpermissions.objects.filter(authorization='global').first()
-                        ret_info = '操作成功，该请求已驳回！'
-                        if tag is None or tag.dingding == 0:
-                            pass
+                                content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
+                                mail = Account.objects.filter(username=to_user11).first()
+                                tag = globalpermissions.objects.filter(authorization='global').first()
+                                ret_info = '操作成功，该请求已驳回！'
+                                SqlOrder.objects.filter(id=id).update(reject=text)
+
+                                try:
+                                    print("准备去删除token记录")
+                                    conn_sqlite.delete(to_user11, data.work_id)
+                                    print("删除token记录成功")
+                                except Exception as e:
+                                    print(e)
+                                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                                    ret_info = "sqlite数据库后台异常，请联系系统管理员"
+                                    return HttpResponse(ret_info)
+
+
+                                if tag is None or tag.dingding == 0:
+                                    pass
+                                else:
+                                    try:
+                                        if content.url:
+                                            util.dingding(
+                                                content='工单审核驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
+                                                %(_tmpData['work_id'],to_user11,addr_ip,text), url=content.url)
+                                    except:
+                                        ret_info = '工单审核驳回成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                                if tag is None or tag.email == 0:
+                                    pass
+                                else:
+                                    try:
+                                        if mail.email:
+                                            mess_info = {
+                                                'workid':_tmpData['work_id'],
+                                                'to_user': to_user11,
+                                                'addr': addr_ip,
+                                                'type': "审核驳回",
+                                                'status':'back',
+                                                'text': _tmpData['text'],
+                                                'run_sql':data.sql,
+                                                'backup_sql':data.backup_sql,
+                                                'rejected': text}
+                                            put_mess = send_email.send_email(to_addr=mail.email)
+                                            put_mess.send_mail(mail_data=mess_info,type=1)
+                                    except:
+                                        ret_info = '工单审核驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                                # ----删除token
+                                try:
+                                    print("准备去删除token记录")
+                                    conn_sqlite.delete(from_user, data.work_id)
+                                    print("删除token记录成功")
+                                except Exception as e:
+                                    print(e)
+                                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                                    ret_info="sqlite数据库后台异常，请联系系统管理员"
+                                    return HttpResponse(ret_info)
+                                return Response(ret_info)
                         else:
-                            try:
-                                if content.url:
-                                    util.dingding(
-                                        content='工单审核驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
-                                        %(_tmpData['work_id'],to_user,addr_ip,text), url=content.url)
-                            except:
-                                ret_info = '工单审核驳回成功!但是钉钉推送失败,请查看错误日志排查错误.'
-                        if tag is None or tag.email == 0:
-                            pass
-                        else:
-                            try:
-                                if mail.email:
-                                    mess_info = {
-                                        'workid':_tmpData['work_id'],
-                                        'to_user':to_user,
-                                        'addr': addr_ip,
-                                        'type': "审核驳回",
-                                        'status':'back',
-                                        'run_sql':data.sql,
-                                        'backup_sql':data.backup_sql,
-                                        'rejected': text}
-                                    put_mess = send_email.send_email(to_addr=mail.email)
-                                    put_mess.send_mail(mail_data=mess_info,type=1)
-                            except:
-                                ret_info = '工单审核驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
-                        return Response(ret_info)
+                            ret_info = '<h1>您已成功进行审核驳回，无需进行二次操作</h1>'
+                            return HttpResponse(ret_info)
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
@@ -140,86 +169,118 @@ class audit(baseview.Approverpermissions):
             elif type == 1:  #审核通过
                 try:
                     from_user = request.data['from_user']
-                    to_user = request.data['to_user']
+                    to_apply = request.data['to_user']
+                    to_executer = 'dba'
+
                     id = request.data['id']
                 except KeyError as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
                 else:
                     try:
-                       # SqlOrder.objects.filter(id=id).update(status=3)
+                        newtoken = util.generateTokens(32)
                         c = SqlOrder.objects.filter(id=id).first()
-                        d = Account.objects.filter(group='executer').first()
-                        title = f'工单:{c.work_id}审核通过通知'
-                        #修改审核状态
+                        workid = c.work_id
+                        try:
+                            conn = conn_sqlite.query(from_user, workid)
+                        except Exception as e:
+                            print(e)
+                            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                            ret_info = "sqlite数据库后台异常，请联系系统管理员"
+                            return Response(status=500)
+                        if conn :
+                           # SqlOrder.objects.filter(id=id).update(status=3)
 
-                        #############################################
-                        SqlOrder.objects.filter(id=id).update(status=1)
-                        '''
-                        通知消息
+                            d = Account.objects.filter(group='executer').first()
+                            title = f'工单:{c.work_id}审核通过通知'
+                            #修改审核状态
 
-                        '''
-                        Usermessage.objects.get_or_create(
-                            from_user=from_user, time=util.date(),
-                            title=title, content=f'该工单已审核通过!       \r\n 工单说明是: {c.text}', to_user=to_user,
-                            state='unread'
-                        )
-                        Usermessage.objects.get_or_create(
-                            from_user=from_user, time=util.date(),
-                            title=title, content=f'有最新的工单已审核，请执行人执行!       \r\n 工单说明是: {d.username}', to_user=to_user,
-                            state='unread'
-                        )
+                            #############################################
+                            SqlOrder.objects.filter(id=id).update(status=1)
+                            '''
+                            通知消息
+    
+                            '''
+                            Usermessage.objects.get_or_create(
+                                from_user=from_user, time=util.date(),
+                                title=title, content=f'该工单已审核通过!       \r\n 工单说明是: {c.text}', to_user=to_apply,
+                                state='unread'
+                            )
+                            Usermessage.objects.get_or_create(
+                                from_user=from_user, time=util.date(),
+                                title=title, content=f'有最新的工单已审核，请执行人执行!       \r\n 工单说明是: {d.username}', to_user=to_apply,
+                                state='unread'
+                            )
 
-                        '''
+                            '''
+    
+                            Dingding
+    
+                            '''
+                            data=SqlOrder.objects.filter(id=id).first()
+                            content = DatabaseList.objects.filter(id=c.bundle_id).first()
+                            mail = Account.objects.filter(username=to_executer).first()
+                            mail_exe = Account.objects.filter(username=to_apply).first()
+                            tag = globalpermissions.objects.filter(authorization='global').first()
+                            #ret_info = '操作成功，该请求已同意!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
+                            ret_info = '该工单已审核通过!'
 
-                        Dingding
-
-                        '''
-                        data=SqlOrder.objects.filter(id=id).first()
-                        content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                        mail = Account.objects.filter(username=to_user).first()
-                        mail_exe = Account.objects.filter(username=d.username).first()
-                        tag = globalpermissions.objects.filter(authorization='global').first()
-                        #ret_info = '操作成功，该请求已同意!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
-                        ret_info = '该工单已审核通过!'
-
-                        if tag is None or tag.dingding == 0:
-                            pass
-                        else:
+                               # ----删除审核的token
                             try:
-                                if content.url:
-                                    util.dingding(
-                                        content='工单审核通过通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单备注:%s\n状态:同意\n备注:%s'
-                                                          %(c.work_id,c.username,addr_ip,c.text,content.after), url=content.url)
-                            except:
-                                ret_info = '工单审核通过!但是钉钉推送失败,请查看错误日志排查错误.'
+                                print("准备去删除token记录")
+                                conn_sqlite.delete(from_user, data.work_id)
+                                print("删除token记录成功")
+                            except Exception as e:
+                                print(e)
+                                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                                ret_info = "sqlite数据库后台异常，请联系系统管理员"
+                                return HttpResponse(ret_info)
 
-                        if tag is None or tag.email == 0:
-                            pass
-                        else:
+                                # -----增加执行的todken
                             try:
-                                if mail.email:
-                                    mess_info = {
-                                        'workid':c.work_id,
-                                        'to_user':c.username,
-                                        'to_executor':d.username,
-                                        'addr': addr_ip,
-                                        'text': c.text,
-                                        'type': "审核成功",
-                                        'status':'approve',
-                                        'run_sql':data.sql,
-                                        'backup_sql':data.backup_sql,
-                                        'token':util.generateTokens(),
-                                        'myself':from_user,
-                                        'note': content.after}
-                                    put_mess = send_email.send_email(to_addr=mail.email)
-                                    put_mess.send_mail(mail_data=mess_info,type=0)
-                                    put_mess1 = send_email.send_email(to_addr=mail_exe.email)
-                                    put_mess1.send_mail(mail_data=mess_info, type=0)
-                            except:
-                                #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
-                                ret_info = '工单审核通过!但是邮箱推送失败,请查看错误日志排查错误.'
-                        return Response(ret_info)
+                                print("准备去增加执行token记录")
+
+                                conn_sqlite.add_one('dba', data.work_id, newtoken)
+
+                                print("增加执行token记录成功")
+                            except Exception as e:
+                                print(e)
+                                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                                ret_info = "sqlite数据库后台异常，请联系系统管理员"
+                                return HttpResponse(ret_info)
+
+                            if tag is None or tag.email == 0:
+                                pass
+                            else:
+
+                                try:
+                                    if mail.email:
+                                        mess_info = {
+                                            'workid': workid,
+                                            'to_user': 'dba',
+                                            #'to_executor': d.username,
+                                            'addr': addr_ip,
+                                            'text': c.text,
+                                            'type': "审核成功",
+                                            'status':'approve',
+                                            'run_sql':data.sql,
+                                            'backup_sql':data.backup_sql,
+                                            'token_pass':newtoken,
+                                            'myself':from_user,
+                                            'note': content.after}
+                                        put_mess = send_email.send_email(to_addr=mail.email)
+                                        put_mess.send_mail(mail_data=mess_info,type=0)
+                                        #put_mess1 = send_email.send_email(to_addr=mail_exe.email)
+                                        #put_mess1.send_mail(mail_data=mess_info, type=0)
+                                except:
+                                    #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                                    ret_info = '工单审核通过!但是邮箱推送失败,请查看错误日志排查错误.'
+                                    return HttpResponse(ret_info)
+
+                            return Response(ret_info)
+                        else:
+                            ret_info = '<h1>您已成功进行审核通过，无需进行二次操作</h1>'
+                            return HttpResponse(ret_info)
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
@@ -278,8 +339,17 @@ class orderdetail(baseview.BaseView):
     '''
     # 删除工单
     def delelte(self, request, args=None):
-        pass
-
+        try:
+            dataid = request.data['id']
+        except KeyError as e:
+            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+        else:
+            try:
+                SqlOrder.objects.filter(id=dataid).delete()
+                return Response('工单数据删除成功!')
+            except Exception as e:
+                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                return HttpResponse(status=500)
 
     #def get(self, request, args: str = None):
     def get(self, request, args=None):
@@ -300,17 +370,21 @@ class orderdetail(baseview.BaseView):
                     return Response({'data':_serializers.data, 'type':type_id.type})
                 else:
                     data = SqlOrder.objects.filter(work_id=workid).first()
-
+                    print("=====")
+                    print(data.backup_sql)
                     mylist=[{'sql': x} for x in data.sql.split(';')]
-                    mylist.append({'backup_sql': y} for y in data.backup_sql.split(';'))
+                    my_bak_list=[{'backup_sql': y} for y in data.backup_sql.split(';')]
+                    print(mylist+my_bak_list)
 
-                    _in = {'data':mylist, 'type':type_id.type}
+                    _in = {'data': mylist+my_bak_list, 'type': type_id.type}
+                    print("+++++")
+                    print(_in)
                     return Response(_in)
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__} : {e}')
                 return HttpResponse(status=500)
 
-    #def put(self, request, args: str = None):
+    #def put(self, request, args: str = None):  #  点击进入修改工单SQL
     def put(self, request, args=None):
         try:
             id = request.data['id']
@@ -326,10 +400,14 @@ class orderdetail(baseview.BaseView):
                     %id)
                 data = util.ser(info)
                 sql = data[0]['sql'].split(';')
+                backup_sql = data[0]['backup_sql'].split(';')
                 _tmp = ''
+                _tmp_1 = ''
                 for i in sql:
                     _tmp += i + ";\n"
-                return Response({'data':data[0], 'sql':_tmp.strip('\n'), 'type': 0})
+                for j in backup_sql:
+                    _tmp_1 += j + ";\n"
+                return Response({'data':data[0], 'sql':_tmp.strip('\n'), 'backup_sql':_tmp_1.strip('\n'),'type': 0})
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)

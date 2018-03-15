@@ -285,6 +285,7 @@ export default {
             axios.put(`${util.url}/sqlsyntax/test`, {
                 'id': this.id[0].id,
                 'base': this.formItem.basename,
+                'type': 1,
                 'sql': tmpddl + '&&&' + tmpbak,
                 'check_sql': tmpddl2 + '&&&' + tmpbak2
               })

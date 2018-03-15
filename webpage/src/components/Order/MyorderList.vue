@@ -17,10 +17,9 @@
           <Icon type="android-send"></Icon>
           工单{{ this.$route.query.workid }}详细信息
           <br>
-          <Button type="text" v-if="this.$route.query.status === 4" @click.native="_RollBack()">查看回滚语句</Button>
-          <Button type="text" v-else-if="this.$route.query.status === 0 && this.$route.query.type === 1" @click.native="PutData()">重新提交</Button>
-          <Button type="text" v-else-if="this.$route.query.status === 0 && this.$route.query.type === 1" @click.native="DelOrder()">工单撤销</Button>
-          <Button type="text" v-if="this.$route.query.status === 2" @click.native="delorder()">工单撤销</Button>
+          <Button type="text" v-if="this.$route.query.status === 0 && this.$route.query.type === 1" @click.native="PutData()">修改工单SQL</Button>
+          <Button type="text" v-if="this.$route.query.status === 0" @click.native="delorder()">工单撤销</Button>
+          <Button type="text" v-if="this.$route.query.status === 2" @click.native="delorder()">撤销</Button>
           <Button type="text"  @click.native="$router.go(-1)">返回</Button>
         </p>
         <Row>
@@ -34,14 +33,17 @@
       <div class="top">返回顶端</div>
     </BackTop>
 
-    <Modal v-model="reloadsql"  :ok-text="'提交工单'" width="800" @on-ok="_Putorder">
+    <Modal v-model="reloadsql" width="800">
       <Row>
         <Card>
           <div class="step-header-con">
             <h3 style="margin-left: 35%">蜜罐运维平台SQL审核工单</h3>
           </div>
           <p class="step-content"></p>
-          <Form class="step-form" :label-width="100">
+          <Form  ref="formItem" :model="formItem" class="step-form" :label-width="100">
+            <FormItem label="工单ID:">
+              <p>{{formItem.id}}</p>
+            </FormItem>
             <FormItem label="用户名:">
               <p>{{formItem.username}}</p>
             </FormItem>
@@ -54,12 +56,23 @@
             <FormItem label="数据库库名:">
               <p>{{formItem.basename}}</p>
             </FormItem>
+            <FormItem label="数据库编号:">
+              <p>{{formItem.base_id}}</p>
+            </FormItem>
             <FormItem label="执行SQL:">
               <template v-if="sqltype===0">
               <Input v-model="sql" type="textarea" :rows="8"></Input>
               </template>
               <template v-else>
                 <p v-for="i in ddlsql">{{i}}</p>
+              </template>
+            </FormItem>
+            <FormItem label="备份SQL:">
+              <template v-if="sqltype===0">
+              <Input v-model="backup_sql" type="textarea" :rows="8"></Input>
+              </template>
+              <template v-else>
+                <p v-for="j in baksql">{{j}}</p>
               </template>
             </FormItem>
             <FormItem label="工单提交说明:">
@@ -74,6 +87,28 @@
           </Form>
         </Card>
       </Row>
+      <div>
+         <p align:center>执行SQL检测结果</p>
+         <Table :columns="columnsName" :data="Testresults_ddl" highlight-row></Table>
+      </div>
+      <div>
+         <p align:center>备份SQL检测结果</p>
+         <Table :columns="columnsName" :data="Testresults_backup" highlight-row></Table>
+      </div>
+      <div slot="footer">
+         <Row>
+            <Col span="12" style="text-align: left;">
+                 <Button type="default" @click="cancel_button">取消</Button>
+            </Col>
+            <Col span="12">
+                <Button type="default" icon="trash-a" @click.native="_Beauty" style="margin-left: 10%">美化</Button>
+                <Button type="warning" icon="android-search" @click.native="_Test" style="margin-left: 10%">检测</Button>
+                <Button type="success" icon="ios-redo" @click.native="_Putorder" style="margin-left: 10%"  :disabled="this.validate_gen_new">提交</Button>
+            </Col>
+         </Row>
+       </div>
+
+
     </Modal>
   </div>
 </template>
@@ -86,29 +121,22 @@ export default {
   name: 'myorder-list',
   data () {
     return {
+      validate_gen: true,
       tabcolumns: [
         {
           title: 'sql语句',
-          key: 'sql'
+          key: 'sql',
+          width: 550
         },
         {
-          title: '状态',
-          key: 'state',
-          width: 250
-        },
-        {
-          title: '错误信息',
-          key: 'error',
-          width: 400
-        },
-        {
-          title: '影响行数',
-          key: 'affectrow',
-          width: 100
+          title: '备份语句',
+          key: 'backup_sql',
+          width: 550
         }
       ],
       TableDataNew: [],
       sql: '',
+      backup_sql: '',
       openswitch: false,
       single: false,
       reloadsql: false,
@@ -119,46 +147,51 @@ export default {
         username: '',
         bundle_id: null
       },
+      columnsName: [
+        {
+          title: 'ID',
+          key: 'ID',
+          width: '50'
+        },
+        {
+          title: '阶段',
+          key: 'stage',
+          width: '100'
+        },
+        {
+          title: '错误等级',
+          key: 'errlevel',
+          width: '100'
+        },
+        {
+          title: '阶段状态',
+          key: 'stagestatus',
+          width: '150'
+        },
+        {
+          title: '错误信息',
+          key: 'errormessage'
+        },
+        {
+          title: '当前检查的sql',
+          key: 'sql'
+        },
+        {
+          title: '预计影响的SQL',
+          key: 'affected_rows',
+          width: '130'
+        }
+      ],
+      Testresults: [],
+      Testresults_backup: [],
       ddlsql: [],
+      baksql: [],
       sqltype: null,
       dmlorddl: null
     }
   },
   methods: {
-    _RollBack () {
-      // if (this.TableDataNew[0].state.length === 40) {
-      if (this.TableDataNew[0].sql.length === 47) {
-        this.openswitch = true
-        console.log(this.TableDataNew, '...........1')
-        console.log(this.TableDataNew[0], '...........2')
-        alert(this.TableDataNew)
-        // let opid = this.TableDataNew.map(item => item.sequence)  // 问题点
-        let opid = this.TableDataNew.map(function (item) {
-          console.log(item, '.........3')
-          console.log(item.sql, '.........4')
-          return item.sql
-        });
-        alert(opid)  // 这里显示为空
-        opid.splice(0, 1)
-        // axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
-        axios.post(`${util.url}/detail/`, {'opid': JSON.stringify(opid), 'id': this.$route.query.id})
-        .then(res => {
-          this.formItem = res.data.data
-          this.ddlsql = res.data.sql
-          this.sqltype = res.data.type
-          this.reloadsql = true
-        })
-        .catch(() => {
-          this.$Notice.error({
-            title: '警告',
-            desc: 'Inception连接失败,请检查Inception是否已启动'
-          })
-        })
-      } else {
-        this.$Message.error('此工单没有备份或语句执行失败!')
-      }
-    },
-    DelOrder () { // 删除已经被驳回的工单
+     DelOrder () { // 删除已经被驳回的工单
       axios.delelte(`${util.url}/detail`, {'id': this.$route.query.id})
         .then(res => {
             this.$Notice.info({
@@ -170,13 +203,104 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
+    cancel_button () {
+      this.reloadsql = false
+    },
+    _Beauty () {
+      axios.put(`${util.url}/sqlsyntax/beautify`, {
+          'data1': this.sql || '',
+          'data2': this.backup_sql || ''
+        })
+        .then(res => {
+          this.sql = res.data.select
+          this.backup_sql = res.data.dml_ddl
+        })
+        .catch(error => {
+          this.$Notice.error({
+            title: '警告',
+            desc: error
+          })
+        })
+    },
+    _Test () {
+          if (this.sql || this.backup_sql) {
+            console.log(this.validate_gen_new, '...')
+            let tmpddl2 = ''
+            let tmpddl = ''
+            let tmpbak = ''
+            let tmpbak2 = ''
+            if (this.backup_sql) {
+                tmpbak2 = this.backup_sql.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+                tmpbak = this.backup_sql.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+                tmpbak = ''
+            }
+            if (this.sql) {
+                tmpddl2 = this.sql.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+                tmpddl = this.sql.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+                tmpddl = ''
+            }
+            axios.put(`${util.url}/sqlsyntax/test`, {
+                'id': this.formItem.id,
+                'base': this.formItem.basename,
+                'type': 2,
+                'base_id': this.formItem.base_id,
+                'sql': tmpddl + '&&&' + tmpbak,
+                'check_sql': tmpddl2 + '&&&' + tmpbak2
+              })
+              .then(res => {
+               if (res.data.status === 200) {
+                 this.Testresults_ddl = res.data.result_ddl
+                 this.Testresults_backup = res.data.result_bak
+                 let gen1 = 0
+                 let gen11 = 0
+                 this.Testresults_ddl.forEach(vl => {
+                   if (vl.errlevel !== 0) {
+                     gen1 += 1
+                   }
+                 })
+                 this.Testresults_backup.forEach(v2 => {
+                   if (v2.errlevel !== 0) {
+                     gen11 += 1
+                   }
+                 })
+                 if (gen1 === 0 && gen11 === 0) {
+                   this.validate_gen_new = false
+                 } else {
+                   this.validate_gen_new = true
+                 }
+               } else if (res.data.status === 202) {
+                 this.$Notice.error({
+                   title: '警告',
+                   desc: res.data.result
+                 })
+                 this.validate_gen_new = true
+               } else {
+                 this.$Notice.error({
+                   title: '警告',
+                   desc: 'ddl-dml-无法连接到Inception!'
+                 })
+                 this.validate_gen_new = true
+               }
+              })
+              .catch(error => {
+               util.ajanxerrorcode(this, error)
+              })
+          } else {
+            this.$Message.error('请填写sql语句后再测试!');
+          }
+          console.log(this.validate_gen_new, '...22222')
+    },
     PutData () {
+      this.validate_gen_new = true
       axios.put(`${util.url}/detail`, {
        'id': this.$route.query.id
        })
         .then(res => {
           this.formItem = res.data.data
           this.sql = res.data.sql
+          this.backup_sql = res.data.backup_sql
           this.sqltype = res.data.type
         })
         .catch(error => {
@@ -187,9 +311,11 @@ export default {
     _Putorder () {
       if (this.sqltype === 0) {
         let _tmpsql = this.sql.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
+        let _tmpsqlbak = this.backup_sql.replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
         axios.post(`${util.url}/sqlsyntax/`, {
           'data': JSON.stringify(this.formItem),
           'sql': JSON.stringify(_tmpsql),
+          'backup_sql': JSON.stringify(_tmpsqlbak),
           'user': Cookies.get('user'),
           'type': this.dmlorddl,
           'id': this.formItem.bundle_id
@@ -203,10 +329,13 @@ export default {
           .catch(error => {
             util.ajanxerrorcode(this, error)
           })
+          this.delorder()
+          this.reloadsql = false
       } else {
         axios.post(`${util.url}/sqlsyntax/`, {
           'data': JSON.stringify(this.formItem),
           'sql': JSON.stringify(this.ddlsql),
+          'backup_sql': JSON.stringify(this.baksql),
           'user': Cookies.get('user'),
           'type': this.dmlorddl,
           'id': this.formItem.bundle_id
@@ -220,6 +349,8 @@ export default {
           .catch(error => {
             util.ajanxerrorcode(this, error)
           })
+          this.delorder()
+          this.reloadsql = false
       }
     },
     delorder () {

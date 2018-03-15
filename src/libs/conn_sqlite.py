@@ -12,12 +12,13 @@ def create_table(sql):
 
 
 
-def add_one(value):
+def add_one(username,workid,token):
     conn = sqlite3.connect('d:\\token.db')
     cursor = conn.cursor()
     try:
         insert_sql ="insert into token_db_new values(?, ?, ?) "
-        cursor.executemany(insert_sql, value)
+        param = (username,workid,token)
+        cursor.execute(insert_sql,param)
         conn.commit()
     except Exception as e:
         print(e)
@@ -41,6 +42,18 @@ def add_many(value : [],table_namme):
     conn.close()
 
 
+def deleteByToken(token):
+    conn = sqlite3.connect('d:\\token.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("delete from token_db_new where token ='%s' " % (token))
+        conn.commit()
+    except Exception as e:
+        print(e)
+        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+        conn.rollback()
+    cursor.close()
+    conn.close()
 
 def delete(username, workid):
     conn = sqlite3.connect('d:\\token.db')
@@ -54,6 +67,21 @@ def delete(username, workid):
         conn.rollback()
     cursor.close()
     conn.close()
+
+def queryByToken(token):
+    conn = sqlite3.connect('d:\\token.db')
+    cursor = conn.cursor()
+    query_sql = "select token from  token_db_new where token='%s'" % (token)
+    # 执行语句
+    result = False
+    results = cursor.execute(query_sql)
+    # 遍历打印输出
+    hello = results.fetchall()
+    if hello:
+        result = True
+    print(result)
+    return result
+
 
 def query(username,workid):
 

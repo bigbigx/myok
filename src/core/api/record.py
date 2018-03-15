@@ -42,7 +42,9 @@ class recordorder(baseview.Approverpermissions):
                                  'base': dataset[0].base,
                                  'name': dataset[0].name,
                                  'reviewer': dataset[0].reviewer,
-                                 'id': buld_id.id
+                                 'id': buld_id.id,
+                                 'text': buld_id.text,
+                                 'backup_sql': buld_id.backup_sql,
                                 })
                 return Response({'data': info, 'page': len(pagenumber)})
             except Exception as e:
