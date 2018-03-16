@@ -32,7 +32,7 @@ class send_email(object):
                    '<br><p>备份SQL: %s</p>' \
                    '<br><p>状态: 审核通过 </p>' \
                    '<br><p>备注: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p><p></p>' \
+                   '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p><p></p>' \
                    '<a href="http://pingtou.51dinghuo.cc:88/api/v1/exe_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">执行SQL</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
                    '<br><p>使用说明：只要您点击了 "执行SQL" ，即可直接审核工单，而不再需要继续登录平台操作；' \
@@ -57,7 +57,7 @@ class send_email(object):
                    '<br><p>备份SQL: %s</p>' \
                    '<br><p>状态: %s %s</p>' \
                    '<br><p>备注: %s  </p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
                    '</body></html>' %(
                 mail_data['text'],
                 mail_data['workid'],
@@ -77,7 +77,7 @@ class send_email(object):
                    '<br><p>备份SQL: %s</p>' \
                    '<br><p>状态: 审核驳回 (注意：请登录平台进行sql调整)</p>' \
                    '<br><p>驳回说明: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
@@ -91,7 +91,7 @@ class send_email(object):
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>状态: 执行驳回</p>' \
                    '<br><p>驳回说明: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
@@ -106,7 +106,7 @@ class send_email(object):
                    '<br><p>备份SQL: %s</p>' \
                    '<br><p>状态: 成功发起</p>' \
                    '<br><p>备注: %s</p>' \
-                   '<br><p>登录平台: <a href="http://101.236.41.66"  target="_blank">点击登录</a></p>' \
+                   '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: &nbsp&nbsp' \
                    '<a href="http://pingtou.51dinghuo.cc:88/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">审核通过</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
