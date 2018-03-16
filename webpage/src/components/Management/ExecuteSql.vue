@@ -36,10 +36,10 @@
       <FormItem label="id:">
         <span>{{ formitem.id }}</span>
       </FormItem>
-      <FormItem label="工单编号:">
+      <FormItem label="工单编号">
         <span>{{ formitem.work_id }}</span>
       </FormItem>
-      <FormItem label="工单说明:">
+      <FormItem label="工单说明">
         <span>{{ formitem.text }}</span>
       </FormItem>
       <FormItem label="提交时间:">
@@ -108,11 +108,12 @@ export default {
           key: 'work_id',
           sortable: true,
           sortType: 'desc',
-          width: 250
+          width: 150
         },
         {
           title: '工单标题:',
-          key: 'text'
+          key: 'text',
+          width: 200
         },
         {
           title: '提交时间:',
