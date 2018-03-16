@@ -26,8 +26,8 @@ def get_ssh(ip, user, pwd):
 def recv_data(conn): # 服务器解析浏览器发送的信息
   try:
     all_data = conn.recv(1024)
-    print  "start next"
-    print all_data
+    print("start next")
+    print（all_data）
     if not len(all_data):
         return False
     #dic = simplejson.loads(all_data)
@@ -122,10 +122,9 @@ def  get_username_and_password(IP):
 def dojob(conn, address, thread_name):
   goahead=handshake(conn, address, thread_name)# 握手
   if goahead is not True:
-      print("无法握手成功")
       sys.exit(1)
   else:
-       print("握手成功 ")
+      pass
 
   #print conn
   #print goahead
@@ -162,7 +161,6 @@ def dojob(conn, address, thread_name):
       cnum =  ''.join(msg_list[3].split(':')[1:])
 
       if  ip =="" or ip is None:
-          print("IP地址为空")
           send_data(conn, '抱歉！  IP 地址没有传递过来！')
       #if get_username_and_password(ip)["status"] == 0:
       #   print "没有找到此IP对应的主机用户和密码信息"
@@ -175,13 +173,11 @@ def dojob(conn, address, thread_name):
       #user="root"
       #password="q9mQ7axgjPaY"
     else:
-      print("==============  clientdata 为空")
       send_data(conn, ' -_-  抱歉，服务端没有接收到信息！')
       break
 
 
     ssh = get_ssh(ip,user,password)# 连接远程服务器
-    print("重新连接ssh成功")
     show_str='''
            接的IP为:%s , 文件路径为:%s , 搜索关键字为:%s, grep上下行数为:%s 
           正在获取日志信息，请稍等。。。。。请不要着急！  如果比较急的话，建议提前启动日志窗口！
@@ -199,7 +195,6 @@ def dojob(conn, address, thread_name):
         if cnum is None or cnum.strip()=="":
             cmd='tailf %s' % (path)
         else:
-            print("使用grep -C参数前，请配置搜索关键字keyword")
             break
     else:
         if cnum is None or cnum.strip()=="":
@@ -208,7 +203,6 @@ def dojob(conn, address, thread_name):
         else:
             cmd='tailf %s |grep -C%s  %s' % (path,cnum,keyword)
 
-    print("准备执行命令: %s" % (cmd))
     chan.exec_command(cmd)
 
     while True:
