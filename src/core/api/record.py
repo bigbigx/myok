@@ -11,7 +11,7 @@ from core.models import (
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 
-class recordorder(baseview.SuperUserpermissions):
+class recordorder(baseview.AnyLogin):
 
     '''
     审核记录相关
@@ -51,4 +51,3 @@ class recordorder(baseview.SuperUserpermissions):
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
-            
