@@ -80,6 +80,43 @@ class DatabaseList(models.Model):
     url = models.TextField(blank=True)    #钉钉webhook url地址
 
 
+class ServerConf(models.Model):
+    '''
+    服务器配置信息表
+    '''
+    sudo_choices = (("Y", "使用sudo登陆"), ("N", "普通登陆"))
+    su_choices = (("Y", "su - root 登陆"), ("N", "普通登陆"))
+    login_type = (("KEY", "使用PublickKey登陆"), ("PASSWORD", "使用密码登陆"))
+    IP = models.CharField(max_length=200)
+    HostName = models.CharField(max_length=100, null=False, blank=False)
+    Port = models.IntegerField(max_length=5)
+    Group = models.CharField(max_length=200, null=False, verbose_name="主机组")
+    Username = models.CharField(max_length=200, null=False)
+    Password = models.CharField(('password'), max_length=128)
+    KeyFile = models.CharField(max_length=100, default="N")
+    Sudo = models.CharField(max_length=1, choices=sudo_choices, default="N")
+    SudoPassword = models.CharField(max_length=2000, null=True, blank=True)
+    Su = models.CharField(max_length=1, choices=su_choices, null=True, blank=True, default="N")
+    SuPassword = models.CharField(max_length=2000, null=True, blank=True, default="N")
+    LoginMethod = models.CharField(max_length=10, choices=login_type, null=True, blank=True, default="N")
+
+class ServerInfo(models.Model):
+    IP = models.OneToOneField(ServerConf,on_delete=models.CASCADE,)
+    Position = models.TextField(null=True, blank=True)
+    Description = models.TextField(null=True, blank=True, default="请在这里写一个对服务器的描述")
+    CPU = models.CharField(max_length=20, default="暂无", null=True, blank=True)
+    CPU_process_must = models.CharField(max_length=10, default="暂无", null=True, blank=True)
+    MEM_process_must = models.CharField(max_length=10, default="暂无", null=True, blank=True)
+    Use_CPU = models.CharField(max_length=20, default="暂无", null=True, blank=True)
+    uSE_MEM = models.CharField(max_length=20, default="暂无", null=True, blank=True)
+    MEM = models.CharField(max_length=20, default="暂无", null=True, blank=True)
+    IO = models.CharField(max_length=200, default="暂无", null=True, blank=True)
+    Platform = models.CharField(max_length=200, default="暂无", blank=True)
+    System = models.CharField(max_length=200, default="暂无", blank=True)
+    InBankWidth = models.IntegerField(max_length=20, null=True, blank=True)
+    OutBankWidth = models.IntegerField(max_length=20, null=True, blank=True)
+    CurrentUser = models.IntegerField(max_length=10, null=True, blank=True)
+
 class SqlRecord(models.Model):
     '''
     工单执行记录表
