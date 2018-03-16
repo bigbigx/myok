@@ -335,7 +335,7 @@ class execute(baseview.Approverpermissions):
                                 pass
                             else:
                                 try:
-                                    if mail.email:
+                                    if mail_apply.email:
 
                                         mess_info = {
                                             'workid':c.work_id,
@@ -352,14 +352,51 @@ class execute(baseview.Approverpermissions):
                                             'file': file_path}
                                         put_mess = send_email.send_email(to_addr=mail_apply.email)  #发功给申请人
                                         put_mess.send_mail(mail_data=mess_info,type=3)
-                                        put_mess1 = send_email.send_email(to_addr=mail_approver.email)  #发送给审核人
-                                        put_mess1.send_mail(mail_data=mess_info,type=3)
-                                        put_mess1 = send_email.send_email(to_addr=mail_executer.email)  #发送执行人
-                                        put_mess1.send_mail(mail_data=mess_info,type=3)
                                 except Exception as e:
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                                    ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
+                                    ret_info = '工单执行成功!但是邮箱推送给工单发起人 { c.username  }失败,请查看错误日志排查错误.'
+                                try:
+                                    if mail_approver.email:
+                                        mess_info = {
+                                            'workid': c.work_id,
+                                            'to_user': c.username,
+                                            'approver': to_user,
+                                            'run_sql': c.sql,
+                                            'backup_sql': bak_sql,
+                                            'addr': addr_ip,
+                                            'text': c.text,
+                                            'status': 'run',
+                                            'type': '执行成功',
+                                            'backup': backup_status,
+                                            'note': content.after,
+                                            'file': file_path}
 
+                                        put_mess1 = send_email.send_email(to_addr=mail_approver.email)  # 发送给审核人
+                                        put_mess1.send_mail(mail_data=mess_info, type=3)
+                                except Exception as e:
+                                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                                    ret_info = '工单执行成功!但是邮箱推送给工单审核人 { to_user  }失败,请查看错误日志排查错误.'
+                                try:
+                                    if mail_executer.email:
+                                        mess_info = {
+                                            'workid': c.work_id,
+                                            'to_user': c.username,
+                                            'approver': to_user,
+                                            'run_sql': c.sql,
+                                            'backup_sql': bak_sql,
+                                            'addr': addr_ip,
+                                            'text': c.text,
+                                            'status': 'run',
+                                            'type': '执行成功',
+                                            'backup': backup_status,
+                                            'note': content.after,
+                                            'file': file_path}
+
+                                        put_mess1 = send_email.send_email(to_addr=mail_executer.email)  # 发送给审核人
+                                        put_mess1.send_mail(mail_data=mess_info, type=3)
+                                except Exception as e:
+                                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                                    ret_info = '工单执行成功!但是邮箱推送给工单执行人 { from_user  }失败,请查看错误日志排查错误.'
 
                             #删除执行人的token
                             try:
