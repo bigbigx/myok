@@ -173,7 +173,7 @@ class execute(baseview.Approverpermissions):
                 try:
                     from_user = request.data['from_user']
                     to_user = request.data['to_user']
-                    apply_man = request.data['apply_man']
+                    #username = request.data['username']
                     #token=request.data['token']
                     #backup_sql=request.data['backup_sql']
                     id = request.data['id']
@@ -312,7 +312,7 @@ class execute(baseview.Approverpermissions):
                             '''
 
                             content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                            mail_apply = Account.objects.filter(username=apply_man).first() # 工单发起人
+                            mail_apply = Account.objects.filter(username=c.username).first() # 工单发起人
                             mail_approver = Account.objects.filter(username=to_user).first()#  指派人，即审核人
                             mail_executer = Account.objects.filter(username=from_user).first() # 执行人
                             tag = globalpermissions.objects.filter(authorization='global').first()
