@@ -11,7 +11,7 @@ from core.models import (
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 
-class recordorder(baseview.Approverpermissions):
+class recordorder(baseview.SuperUserpermissions):
 
     '''
     审核记录相关
