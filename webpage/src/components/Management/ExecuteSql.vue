@@ -340,6 +340,7 @@ export default {
           'type': 1,
           'from_user': Cookies.get('user'),
           'to_user': this.formitem.assigned,
+          'apply_man': this.formitem.username,
           'id': this.formitem.id
         })
         .then(res => {

@@ -173,6 +173,7 @@ class execute(baseview.Approverpermissions):
                 try:
                     from_user = request.data['from_user']
                     to_user = request.data['to_user']
+                    apply_man = request.data['apply_man']
                     #token=request.data['token']
                     #backup_sql=request.data['backup_sql']
                     id = request.data['id']
@@ -311,8 +312,9 @@ class execute(baseview.Approverpermissions):
                             '''
 
                             content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                            mail = Account.objects.filter(username=to_user).first()
-                            mail_approver = Account.objects.filter(username=from_user).first()
+                            mail_apply = Account.objects.filter(username=apply_man).first() # 工单发起人
+                            mail_approver = Account.objects.filter(username=to_user).first()#  指派人，即审核人
+                            mail_executer = Account.objects.filter(username=from_user).first() # 执行人
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
 
@@ -348,9 +350,11 @@ class execute(baseview.Approverpermissions):
                                             'backup': backup_status,
                                             'note': content.after,
                                             'file': file_path}
-                                        put_mess = send_email.send_email(to_addr=mail.email)
+                                        put_mess = send_email.send_email(to_addr=mail_apply.email)  #发功给申请人
                                         put_mess.send_mail(mail_data=mess_info,type=3)
-                                        put_mess1 = send_email.send_email(to_addr=mail_approver.email)
+                                        put_mess1 = send_email.send_email(to_addr=mail_approver.email)  #发送给审核人
+                                        put_mess1.send_mail(mail_data=mess_info,type=3)
+                                        put_mess1 = send_email.send_email(to_addr=mail_executer.email)  #发送执行人
                                         put_mess1.send_mail(mail_data=mess_info,type=3)
                                 except Exception as e:
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
