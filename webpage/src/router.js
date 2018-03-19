@@ -118,7 +118,7 @@ export const appRouter = [
     children: [
       {
         path: 'management-audit',
-        name: 'managerment-audit-approver',
+        name: 'management-audit-approver',
         title: '审核',
         'icon': 'edit',
         component: resolve => {
@@ -136,7 +136,7 @@ export const appRouter = [
     children: [
       {
         path: 'management-execute',
-        name: 'managerment-execute-man',
+        name: 'management-execute-man',
         title: '执行',
         'icon': 'edit',
         component: resolve => {
@@ -178,7 +178,7 @@ export const appRouter = [
         }
       }, {
         path: 'management-audit',
-        name: 'managerment-audit',
+        name: 'management-audit',
         title: '审核',
         'icon': 'edit',
         component: resolve => {
@@ -186,7 +186,7 @@ export const appRouter = [
         }
       }, {
         path: 'management-execute',
-        name: 'managerment-execute',
+        name: 'management-execute',
         title: '执行',
         'icon': 'edit',
         component: resolve => {
@@ -249,16 +249,34 @@ export const appRouter = [
     path: '/logger',
     icon: 'social-buffer',
     name: 'logger',
-    title: '日志查看',
+    title: '日志服务',
     component: Index,
     children: [
       {
         path: 'logger-view',
+        name: 'logger-mywork',
+        title: '日志工单',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Logger/MyLogOrder.vue'], resolve)
+        }
+      },
+      {
+        path: 'logger-view',
         name: 'logger-view',
-        title: '我的日志',
+        title: '实时日志显示',
         'icon': 'edit',
         component: resolve => {
           require(['./components/Logger/LoggerView.vue'], resolve)
+        }
+      },
+      {
+        path: 'logger-view',
+        name: 'logger-view-full',
+        title: '查看文件内容',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Logger/LoggerViewFull.vue'], resolve)
         }
       }
     ]
@@ -273,12 +291,75 @@ export const appRouter = [
       {
         path: 'logger-manager',
         name: 'logger-manager',
-        title: '日志管理',
+        title: '日志配置',
         'icon': 'edit',
         component: resolve => {
           require(['./components/Logger/LoggerManager.vue'], resolve)
         }
       }
+    ]
+  }, {
+    path: '/mycommand',
+    icon: 'social-buffer',
+    name: 'my-command',
+    title: '检查命令',
+    access: 0,
+    component: Index,
+    children: [
+      {
+        path: 'my-command',
+        name: 'my-command-index',
+        title: '服务器检查',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/MyCommand/MyCommand.vue'], resolve)
+        }
+      }
+    ]
+  }, {
+    path: '/asset',
+    icon: 'social-buffer',
+    name: 'asset-manager',
+    title: '资产管理',
+    access: 0,
+    component: Index,
+    children: [
+        {
+        path: 'asset-manage',
+        name: 'asset-manage-add',
+        title: '添加资产',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Asset/AssetManager.vue'], resolve)
+          }
+        },
+        {
+        path: 'asset-list',
+        name: 'asset-manage-list',
+        title: '资产清单',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Asset/AssetList.vue'], resolve)
+          }
+        },
+        {
+        path: 'host-manage',
+        name: 'host-manage-add',
+        title: '添加主机',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Asset/HostManager.vue'], resolve)
+          }
+        },
+        {
+        path: 'host-list',
+        name: 'host-manage-list',
+        title: '主机清单',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Asset/HostList.vue'], resolve)
+          }
+        }
     ]
   }
 ]

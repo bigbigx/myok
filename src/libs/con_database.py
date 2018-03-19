@@ -164,3 +164,6 @@ class SQLgo(object):
             result = cursor.fetchall()
             data = [c for i in result for c in i]
             return data
+
+
+

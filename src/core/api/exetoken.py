@@ -25,7 +25,7 @@ conf = util.conf_path()
 addr_ip = conf.ipaddress
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
-class exetoken(baseview.AnyLogin):
+class exetoken(baseview.Approverpermissions):
     '''
     SQL 执行通过或者执行驳回的方法，通过按钮的URL传参过来
     '''
@@ -88,7 +88,6 @@ class exetoken(baseview.AnyLogin):
                             try:
 
                                 conn_sqlite.deleteByToken(token)
-                                print("删除token成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -320,7 +319,6 @@ class exetoken(baseview.AnyLogin):
                                 try:
 
                                     conn_sqlite.delete(to_user, workid)
-                                    print("删除成功")
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

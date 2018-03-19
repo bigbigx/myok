@@ -20,6 +20,9 @@ from core.api.user import (
     ldapauth,
     login_auth
 )
+from core.api.log.filecontent import (
+    filecontent
+)
 from core.api.other import (
     maindata,
     messages,
@@ -74,6 +77,7 @@ urlpatterns = [
     url(r'^api/v1/download', downloadFile),
     url(r'^api-token-auth/', login_auth.as_view()),
     url(r'^api/v1/audit_token', authtoken.as_view()),
-    url(r'^api/v1/exe_token', exetoken.as_view())
+    url(r'^api/v1/exe_token', exetoken.as_view()),
+    url(r'^api/v1/filecontent', filecontent.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -8,8 +8,8 @@
     <Card>
       <p slot="title">
         <Icon type="person"></Icon>
-        我的实时日志清单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_log">刷新</Button>
+        我的查看文件清单
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_log_full">刷新</Button>
       </p>
 
       <Row>
@@ -134,7 +134,7 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh () {
+    _Refresh_full () {
     axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
       .then(res => {
         this.applytable = res.data.data

@@ -109,9 +109,7 @@ class audit(baseview.Approverpermissions):
                                 SqlOrder.objects.filter(id=id).update(reject=text)
 
                                 try:
-                                    print("准备去删除token记录")
                                     conn_sqlite.delete(to_user11, data.work_id)
-                                    print("删除token记录成功")
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -150,9 +148,7 @@ class audit(baseview.Approverpermissions):
                                         ret_info = '工单审核驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
                                 # ----删除token
                                 try:
-                                    print("准备去删除token记录")
                                     conn_sqlite.delete(from_user, data.work_id)
-                                    print("删除token记录成功")
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -227,9 +223,8 @@ class audit(baseview.Approverpermissions):
 
                                # ----删除审核的token
                             try:
-                                print("准备去删除token记录")
+
                                 conn_sqlite.delete(from_user, data.work_id)
-                                print("删除token记录成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -238,11 +233,9 @@ class audit(baseview.Approverpermissions):
 
                                 # -----增加执行的todken
                             try:
-                                print("准备去增加执行token记录")
 
                                 conn_sqlite.add_one('dba', data.work_id, newtoken)
 
-                                print("增加执行token记录成功")
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

@@ -79,6 +79,27 @@ class DatabaseList(models.Model):
     after = models.TextField(null=True)  #工单执行成功后 钉钉webhook发送内容
     url = models.TextField(blank=True)    #钉钉webhook url地址
 
+class AssetType(models.Model):
+    '''
+    资产的各种型号
+
+    '''
+    name
+    parent_type = models.IntegerField(max_length=20, null=True, blank=True)
+    child_type_1 = models.IntegerField(max_length=20, null=True, blank=True)
+    child_type_2 = models.IntegerField(max_length=20, null=True, blank=True)
+    child_type_3 = models.IntegerField(max_length=20, null=True, blank=True)
+
+
+class AssetTypeDetail(models.Model):
+    '''
+    资产型号明细表
+
+    '''
+    type_id = models.IntegerField(max_length=20, null=True, blank=True)
+    type_name = models.CharField(max_length=20, default="暂无", null=True, blank=True)
+
+
 
 class ServerConf(models.Model):
     '''
