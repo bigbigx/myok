@@ -24,7 +24,7 @@
 
             <FormItem label="所在局域:" prop="connection_name">
               <Select v-model="formItem.connection_name"  filterable>
-              <Option v-for="i in datalist.connection_name_list" :value="i.connection_name" :key="i.connection_name">{{ i.connection_name }}</Option>
+              <Option v-for="i in datalist.area_list" :value="i.connection_name" :key="i.connection_name">{{ i.connection_name }}</Option>
             </Select>
             </FormItem>
 

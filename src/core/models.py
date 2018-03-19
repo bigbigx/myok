@@ -15,7 +15,7 @@ class Account(AbstractUser):
     department = models.CharField(max_length=40) #部门
 
 
-class SqlDictionary(models.Model):   
+class SqlDictionary(models.Model):
     '''
     数据库字典表
     '''
@@ -80,22 +80,21 @@ class DatabaseList(models.Model):
     url = models.TextField(blank=True)    #钉钉webhook url地址
 
 class AssetType(models.Model):
-    '''
+    """
     资产的各种型号
+    """
 
-    '''
-    name
     parent_type = models.IntegerField(max_length=20, null=True, blank=True)
     child_type_1 = models.IntegerField(max_length=20, null=True, blank=True)
     child_type_2 = models.IntegerField(max_length=20, null=True, blank=True)
     child_type_3 = models.IntegerField(max_length=20, null=True, blank=True)
-
+    cab_type = models.CharField(max_length=20, default="暂无", null=True, blank=True)
 
 class AssetTypeDetail(models.Model):
     '''
     资产型号明细表
-
     '''
+    cab_type = models.CharField(max_length=20, default="暂无", null=True, blank=True)  # own,aliyun,other,aws等四个机房
     type_id = models.IntegerField(max_length=20, null=True, blank=True)
     type_name = models.CharField(max_length=20, default="暂无", null=True, blank=True)
 
