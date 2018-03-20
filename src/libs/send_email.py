@@ -33,7 +33,7 @@ class send_email(object):
                    '<br><p>状态: 审核通过 </p>' \
                    '<br><p>备注: %s</p>' \
                    '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p><p></p>' \
-                   '<a href="http://pingtou.51dinghuo.cc:88/api/v1/exe_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">执行SQL</a> ' \
+                   '<a href="http://ops.51dinghuo.cc/api/v1/exe_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">执行SQL</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
                    '<br><p>使用说明：只要您点击了 "执行SQL" ，即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
@@ -108,9 +108,9 @@ class send_email(object):
                    '<br><p>备注: %s</p>' \
                    '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: &nbsp&nbsp' \
-                   '<a href="http://pingtou.51dinghuo.cc:88/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">审核通过</a> ' \
+                   '<a href="http://ops.51dinghuo.cc/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">审核通过</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
-                   '<a href="http://pingtou.51dinghuo.cc:88/api/v1/audit_token?&type=0&to_user=%s&username=%s&workid=%s&mytoken=%s">审核驳回</a></p>' \
+                   '<a href="http://ops.51dinghuo.cc/api/v1/audit_token?&type=0&to_user=%s&username=%s&workid=%s&mytoken=%s">审核驳回</a></p>' \
                    '<br><p>使用说明：只要您点击了 "审核通过" 或者 "审核驳回" ，即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
