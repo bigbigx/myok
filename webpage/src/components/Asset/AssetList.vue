@@ -309,78 +309,26 @@ export default {
     _Refresh () {
       this.mou_data()
     },
-    put_button () {
-      this.modal2 = false
-      this.tmp[this.togoing].status = 5
-      axios.put(`${util.url}/audit_sql`, {
-          'type': 1,
-          'from_user': Cookies.get('user'),
-          'to_user': this.formitem.username,
-          'id': this.formitem.id
-        })
-        .then(res => {
-          this.$Notice.success({
-            title: '审核成功',
-            desc: res.data
-          })
-          this.mou_data()
-          this.$refs.page.currentPage = 1
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
-    },
     out_button () {
       this.modal2 = false
       this.reject.reje = true
-    },
-    rejecttext () {
-      axios.put(`${util.url}/audit_sql`, {
-          'type': 0,
-          'from_user': Cookies.get('user'),
-          'text': this.reject.textarea,
-          'to_user': this.formitem.username,
-          'id': this.formitem.id
-        })
-        .then(res => {
-          this.$Notice.warning({
-            title: res.data
-          })
-          this.mou_data()
-          this.$refs.page.currentPage = 1
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
-    },
-    test_button () {
-      axios.put(`${util.url}/audit_sql`, {
-          'type': 'test',
-          'base': this.formitem.basename,
-          'id': this.formitem.id
-        })
-        .then(res => {
-          if (res.data.status === 200) {
-            this.dataId = res.data.result
-          } else {
-            this.$Notice.error({
-              title: '警告',
-              desc: '无法连接到Inception!'
-            })
-          }
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
     },
     splicpage (page) {
       this.mou_data(page)
     },
     mou_data (vl = 1) {
-      axios.get(`${util.url}/audit_sql?page=${vl}&username=${Cookies.get('user')}`)
+      axios.get(`${util.url}/assets?page=${vl}&username=${Cookies.get('user')}`)
         .then(res => {
-          this.tmp = res.data.data
-          this.pagenumber = res.data.page.alter_number
+          if (res.data.status === 200) {
+
+
+          } else {
+            this.$Notice.error({
+                   title: '警告',
+                   desc: '获取资产清单报错'
+                 })
+                 this.validate_gen_new = true
+          }
         })
         .catch(error => {
           util.ajanxerrorcode(this, error)

@@ -120,6 +120,17 @@ class ServerConf(models.Model):
     SuPassword = models.CharField(max_length=2000, null=True, blank=True, default="N")
     LoginMethod = models.CharField(max_length=10, choices=login_type, null=True, blank=True, default="N")
 
+class AssetBasic(models.Model):
+    '''
+    美团云，阿里云，独立机房和区域信息
+    '''
+    room_type = models.IntegerField(max_length=5)
+    room_name = models.CharField(max_length=2000, null=True, blank=True, default="N")
+    room_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
+    area_name = models.CharField(max_length=2000, null=True, blank=True, default="N")
+    area_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
+
+
 class ServerInfo(models.Model):
     IP = models.OneToOneField(ServerConf,on_delete=models.CASCADE,)
     Position = models.TextField(null=True, blank=True)

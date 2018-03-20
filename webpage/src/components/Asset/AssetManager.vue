@@ -23,37 +23,59 @@
             </FormItem>
 
             <FormItem label="所在局域:" prop="connection_name">
-              <Select v-model="formItem.connection_name"  filterable>
-              <Option v-for="i in datalist.area_list" :value="i.connection_name" :key="i.connection_name">{{ i.connection_name }}</Option>
+              <Select v-model="formItem.area_name"  filterable>
+              <Option v-for="i in datalist.area_list" :value="i.area_name" :key="i.area_name">{{ i.area_name }}</Option>
             </Select>
             </FormItem>
 
+            <FormItem label="设备类型:" prop="device_type">
+              <Select v-model="formItem.device_type"  filterable>
+              <Option v-for="i in datalist.area_list" :value="i.device_type" :key="i.device_type">{{ i.device_type }}</Option>
+            </Select>
+            </FormItem>
+
+
             <FormItem>
-              <Button type="warning" icon="android-search" @click.native="Onekey_search()">一键搜索</Button>
+              <Button type="warning" icon="android-search" @click.native="alive_check">检测</Button>
               <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">添加</Button>
             </FormItem>
 
           </Form>
-          <Alert style="height: 145px">
-            检测提示信息
+          <Alert style="height: 90px">
+            "添加" 按钮
             <template slot="desc">
-                <p>1.错误等级 0正常,1警告,2错误。</p>
+                <p>1、在填写完整信息后此按钮才可用</p>
+
                 <p></p>
               </template>
           </Alert>
+          <Alert style="height: 130px">
+            "自动搜索" 按钮
+            <template slot="desc">
+                <p>1、自动检查存活而且没有添加的服务器</p>
+                <p>2、点击按钮前请选择机房和区域</p>
+                <p>3、点击按钮后在右边会出现搜索到的服务器</p>
+                <p></p>
+              </template>
+          </Alert>
+          <Form ref="formItem" :model="formItem" :rules="ruleValidate" :label-width="80">
+          <FormItem>
+            <Button type="warning" icon="android-search" @click.native="Onekey_search()">自动搜索</Button>
+          </FormItem>
+          </Form>
         </div>
       </div>
     </Card>
     </Col>
-    <Col span="18" class="padding-left-10">
+    <Col span="18" id="aws" class="padding-left-10" v-if="this.formItem.computer_room==='AWS'">
     <Card>
       <p slot="title">
         <Icon type="ios-crop-strong"></Icon>
-        具体配置
+        细节配置--美团云机房
       </p>
        <div class="edittable-test-con" >
-        <div id="show_Aliyun" class="margin-bottom-10"  v-if="type==='A'">
-          <Form ref="formItem_ali" :model="formItem_ali"  :label-width="80">
+        <div id="show_AWS" class="margin-bottom-10" >
+          <Form ref="formItem_aws" :model="formItem_ali"  :label-width="80">
             <FormItem label="CPU型号:" prop="computer_room">
               <Select v-model="formItem.computer_room">
               <Option v-for="i in datalist.cpu_version" :key="i" :value="i" >{{i}}</Option>
@@ -74,82 +96,138 @@
             </FormItem>
           </Form>
          </div>
-
-         <div id="show_Own" class="margin-bottom-10" v-else-if="type==='B'">
-                <Form ref="formItem_own" :model="formItem_own"  :label-width="80">
-            <FormItem label="CPU型号:" prop="computer_room">
-              <Select v-model="formItem.computer_room" >
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem label="内存:" prop="computer_room">
-              <Select v-model="formItem.computer_room" >
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-
-            <FormItem label="硬盘:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-         </Form>
-         </div>
-
-
-         <div id="show_Meituanyun" class="margin-bottom-10" v-else-if="type==='C'">
-                <Form ref="formItem_own" :model="formItem_own"  :label-width="80">
-            <FormItem label="CPU型号:" prop="computer_room">
-              <Select v-model="formItem.computer_room" >
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem label="内存:" prop="computer_room">
-              <Select v-model="formItem.computer_room" >
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-
-            <FormItem label="硬盘:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-          </Form>
-          </div>
-
-          <div id="show_Other" class="margin-bottom-10" v-else>
-                <Form ref="formItem_own" :model="formItem_own"  :label-width="80">
-            <FormItem label="CPU型号:" prop="computer_room">
-              <Select v-model="formItem.computer_room" >
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem label="内存:" prop="computer_room">
-              <Select v-model="formItem.computer_room" >
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-
-            <FormItem label="硬盘:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-          </Form>
-          </div>
-
-      </div>
-
+       </div>
       </Card>
-
     </Col>
+
+    <Col span="18" id="aliyun" class="padding-left-10"  v-else-if="this.formItem.computer_room==='Aliyun'">
+    <Card>
+      <p slot="title">
+        <Icon type="ios-crop-strong"></Icon>
+        细节配置--阿里云机房
+      </p>
+       <div class="edittable-test-con">
+        <div id="show_Aliyun" class="margin-bottom-10" >
+          <Form ref="formItem_ali" :model="formItem_ali"  :label-width="80">
+
+            <FormItem label="资产名称:" prop="computer_room">
+              <Select v-model="formItem.computer_room">
+              <Option v-for="i in datalist.cpu_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+            <FormItem label="CPU型号:" prop="computer_room">
+              <Select v-model="formItem.computer_room">
+              <Option v-for="i in datalist.cpu_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+            <FormItem label="内存:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.mem_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+
+            <FormItem label="硬盘:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.disk_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+            <FormItem label="硬盘11:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.disk_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+          </Form>
+         </div>
+      </div>
+      </Card>
+    </Col>
+
+    <Col span="18"  class="padding-left-10"  v-else-if="this.formItem.computer_room==='Own'">
+    <Card>
+      <p slot="title">
+        <Icon type="ios-crop-strong"></Icon>
+        细节配置--独立机房
+      </p>
+       <div class="edittable-test-con">
+        <div id="show_Own" class="margin-bottom-10" >
+          <Form ref="formItem_own" :model="formItem_own"  :label-width="80">
+
+            <FormItem label="资产名称:" prop="asset_name">
+              <Input v-model="formItem.text" placeholder="请输入"></Input>
+            </FormItem>
+
+            <FormItem label="CPU型号:" prop="computer_room">
+              <Select v-model="formItem.computer_room">
+              <Option v-for="i in datalist.cpu_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+            <FormItem label="内存:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.mem_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+
+            <FormItem label="硬盘:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.disk_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+            <FormItem label="硬盘11:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.disk_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+          </Form>
+         </div>
+      </div>
+      </Card>
+    </Col>
+
+
+
+    <Col span="18"  class="padding-left-10"  v-else-if="this.formItem.computer_room==='Other'">
+    <Card>
+      <p slot="title">
+        <Icon type="ios-crop-strong"></Icon>
+        细节配置--其他机房
+      </p>
+       <div class="edittable-test-con">
+        <div id="show_Other" class="margin-bottom-10" >
+          <Form ref="formItem_ali" :model="formItem_ali"  :label-width="80">
+            <FormItem label="CPU型号:" prop="computer_room">
+              <Select v-model="formItem.computer_room">
+              <Option v-for="i in datalist.cpu_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+            <FormItem label="内存:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.mem_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+
+
+            <FormItem label="硬盘:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.disk_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+            <FormItem label="硬盘11:" prop="computer_room">
+              <Select v-model="formItem.computer_room" >
+              <Option v-for="i in datalist.disk_version" :key="i" :value="i" >{{i}}</Option>
+            </Select>
+            </FormItem>
+          </Form>
+         </div>
+      </div>
+      </Card>
+      </Col>
+
   </Row>
 </div>
 </template>
@@ -169,11 +247,9 @@ export default {
       formItem: {
         textarea: '',
         computer_room: '',
-        connection_name: '',
-        basename: '',
-        text: '',
-        backup: 0,
-        assigned: ''
+        area_name: '',
+        device_type: '',
+        text: ''
       },
       columnsName: [
         {
@@ -215,8 +291,8 @@ export default {
       item: {},
       datalist: {
         connection_name_list: [],
-        basenamelist: [],
-        sqllist: [],
+        area_list: [],
+        device_type: [],
         computer_roomlist: util.computer_room
       },
       ruleValidate: {
@@ -225,14 +301,19 @@ export default {
           message: '机房地址不得为空',
           trigger: 'change'
         }],
-        connection_name: [{
+        area_name: [{
           required: true,
-          message: '连接名不得为空',
+          message: '所属区域不得为空',
           trigger: 'change'
         }],
-        basename: [{
+        device_type: [{
           required: true,
-          message: '数据库名不得为空',
+          message: '设备类型不得为空',
+          trigger: 'change'
+        }],
+        asset_name: [{
+          required: true,
+          message: '资产名称不得为空',
           trigger: 'change'
         }],
         text: [{
@@ -256,7 +337,6 @@ export default {
     show_tab_and_quyu (val) {
       if (val) {
         this.ScreenConnection(val)
-
         return
       }
     },
@@ -292,92 +372,12 @@ export default {
     sqladvisor () {
 
     },
-    // 同时检查  备份栏只能是select语句，ddl栏只能是非select语句
-    test_sql () {
-      this.$refs['formItem'].validate((valid) => {
-        if (valid) {
-          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            let tmpddl2 = ''
-            let tmpddl = ''
-            let tmpbak = ''
-            let tmpbak2 = ''
-            if (this.formItem.textarea_backup) {
-                tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-                tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            } else {
-                tmpbak = ''
-            }
-            if (this.formItem.textarea_ddl_dml) {
-                tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-                tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            } else {
-                tmpddl = ''
-            }
-            axios.put(`${util.url}/sqlsyntax/test`, {
-                'id': this.id[0].id,
-                'base': this.formItem.basename,
-                'type': 1,
-                'sql': tmpddl + '&&&' + tmpbak,
-                'check_sql': tmpddl2 + '&&&' + tmpbak2
-              })
-              .then(res => {
-               if (res.data.status === 200) {
-                 this.Testresults = res.data.result_ddl
-                 this.Testresults_backup = res.data.result_bak
-                 let gen = 0
-                 let gen1 = 0
-                 this.Testresults.forEach(vl => {
-                   if (vl.errlevel !== 0) {
-                     gen += 1
-                   }
-                 })
-                 this.Testresults_backup.forEach(v2 => {
-                   if (v2.errlevel !== 0) {
-                     gen1 += 1
-                   }
-                 })
-                 if (gen === 0 && gen1 === 0) {
-                   this.validate_gen = false
-                 } else {
-                   this.validate_gen = true
-                 }
-               } else if (res.data.status === 202) {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: res.data.result
-                 })
-                 this.validate_gen = true
-               } else {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: 'ddl-dml-无法连接到Inception!'
-                 })
-                 this.validate_gen = true
-               }
-              })
-              .catch(error => {
-               util.ajanxerrorcode(this, error)
-              })
-          } else {
-            this.$Message.error('请填写sql语句后再测试!');
-          }
-       }
-      })
-    },
     SubmitSQL () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
           if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
             this.validate_gen = true
-            this.datalist.sqllist_ddl = ''
-            this.datalist.sqllist_backup = ''
-            if (this.formItem.textarea_ddl_dml) {
-                this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            }
-            if (this.formItem.textarea_backup) {
-                this.datalist.sqllist_backup = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            }
-            axios.post(`${util.url}/sqlsyntax/`, {
+            axios.post(`${util.url}/assets/add`, {
                 'data': JSON.stringify(this.formItem),
                 'sql': JSON.stringify(this.datalist.sqllist_ddl),
                 'backup_sql': JSON.stringify(this.datalist.sqllist_backup),
@@ -414,7 +414,7 @@ export default {
     }
   },
   mounted () {
-    axios.put(`${util.url}/workorder/connection`)
+    axios.put(`${util.url}/assets/area`)
       .then(res => {
         this.item = res.data['connection']
         this.assigned = res.data['person']

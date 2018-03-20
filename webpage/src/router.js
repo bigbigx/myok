@@ -361,6 +361,33 @@ export const appRouter = [
           }
         }
     ]
+  }, {
+    path: '/online',
+    icon: 'social-buffer',
+    name: 'online-project-manager',
+    title: '应用管理',
+    access: 0,
+    component: Index,
+    children: [
+        {
+        path: 'online-manager',
+        name: 'online-project-manager-add',
+        title: '添加应用',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Online/OnlineManager.vue'], resolve)
+          }
+        },
+        {
+        path: 'online-list',
+        name: 'online-project-manager-list',
+        title: '应用清单',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Online/OnlineList.vue'], resolve)
+          }
+        }
+    ]
   }
 ]
 

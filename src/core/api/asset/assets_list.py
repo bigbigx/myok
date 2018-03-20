@@ -1,30 +1,27 @@
+from libs import util
+from rest_framework.response import Response
+from django.http import HttpResponse
+from core.models import (
+    ServerInfo,
+    ServerConf,
+    AssetBasic
+)
 
-assets_conf={
-                                "disk_number":{
-                                                        "name":"硬盘(个)",
-                                                        "command":{
-                                                                        "CentOS/RedHat5":"""mount -l|grep -Eo '^/dev/[a-zA-Z]+'|sort|uniq|wc -l""",
-                                                                        "CentOS/RedHat6":"""mount -l|grep -Eo '^/dev/[a-zA-Z]+'|sort|uniq|wc -l""",
-                                                                        "CentOS/RedHat7":"""mount -l|grep -Eo '^/dev/[a-zA-Z]+'|sort|uniq|wc -l""",
-                                                                        "Ubuntu":"""mount -l|grep -Eo '^/dev/[a-zA-Z]+'|sort|uniq|wc -l""",
-                                                                        "Aix":"""mount |grep   '/dev/'|sort|uniq|wc -l""",
-                                                                        "Solaris":"""mount -l|grep -Eo '^/dev/[a-zA-Z]+'|sort|uniq|wc -l""",
-                                                                },
-                                                        "type":"number",
-                                                        "show":True,
-                                                },
-                                "system_version":{
-                                                        "name":"系统版本",
-                                                        "command":{
-                                                                "CentOS/RedHat5":"""echo  'import platform;print platform.dist()[1]'|python""",
-                                                                "CentOS/RedHat6":"""echo  'import platform;print platform.dist()[1]'|python""",
-                                                                "CentOS/RedHat7":"""echo  'import platform;print platform.dist()[1]'|python""",
-                                                                "Ubuntu":"""echo  'import platform;print platform.dist()[1]'|python""",
-                                                                "Aix":"""uname -a""",
-                                                                "Solaris":""" """,
-                                                        },
-                                                        "type":"number",
-                                                        "show":True,
-                                        }
+CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
+class assets_list(baseview.BaseView):
+    '''
+    获取资产清单
+    '''
+    def get(self, request, args=None):
+        try:
+            page = request.GET.get('page')
+            username = request.GET.get('username')
+        except KeyError as e:
+            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+            return HttpResponse(status=500)
+        else:
+            try:
+                pass
 
-        }
+            except Exception as e:
+                print(e)

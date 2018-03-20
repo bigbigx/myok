@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from core.models import (
     ServerInfo,
-    ServerConf
+    ServerConf,
+    AssetBasic
 )
 
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
@@ -26,13 +27,16 @@ class assets(baseview.BaseView):
     def get(self, request, args=None):
         try:
             page = request.GET.get('page')
-            username = request.GET.get('username')
+            #username = request.GET.get('username')
+
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             return HttpResponse(status=500)
         else:
             try:
-                pass
+                asset_list={}
+
+                return Response(res=asset_list,status=200)
 
             except Exception as e:
                 print(e)
@@ -41,27 +45,46 @@ class assets(baseview.BaseView):
     '''
 
     def post(self, request, args=None):
-        try:
-            asset_name = request.GET.get('name') #资产名称
-            position = request.GET.get('position')  #机房
-            descript = request.GET.get('descript')  #描述
-            CPU = request.GET.get('CPU')   #CPU型号
-            MEM = request.GET.get('MEM')   # 内存大小
-            flatform = request.GET.get('MEM')   #  平台
-            os = request.GET.get('MEM')  #操作系统
-            InBankWidth = request.GET.get('InBankWidth')
-            OutBankWidth = request.GET.get('OutBankWidth')
-
-
-        except KeyError as e:
-            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-            return HttpResponse(status=500)
-        else:
+        # 添加新的资产
+        if args == 'add':
             try:
-                pass
+                asset_name = request.GET.get('name') #资产名称
+                position = request.GET.get('position')  #机房
+                descript = request.GET.get('descript')  #描述
+                CPU = request.GET.get('CPU')   #CPU型号
+                MEM = request.GET.get('MEM')   # 内存大小
+                flatform = request.GET.get('MEM')   #  平台
+                os = request.GET.get('MEM')  #操作系统
+                InBankWidth = request.GET.get('InBankWidth')
+                OutBankWidth = request.GET.get('OutBankWidth')
+                AssetBasic.object.filter(id=id).first()
+            except KeyError as e:
+                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                return HttpResponse(status=500)
+            else:
+                try:
+                    pass
 
-            except Exception as e:
-                print(e)
+                except Exception as e:
+                    print(e)
+
+        # 获取机房的区域信息
+        elif args == "area":
+            try:
+                asset_name = request.GET.get('name') #资产名称
+                room = request.GET.get('room')  #机房
+
+                AssetBasic.object.filter(id=id).first()
+            except KeyError as e:
+                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                return HttpResponse(status=500)
+            else:
+                try:
+                    pass
+
+                except Exception as e:
+                    print(e)
+
 
 
     '''
