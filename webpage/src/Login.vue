@@ -18,7 +18,7 @@
   <div class="div-a">
     <div style='margin-left: 10%'>
       <Icon type="cube" size="60" style="margin-top:5%"></Icon>
-      <p style="margin-left: 20%;margin-top: -10%;font-size: 20px">蜜罐 Ratel 运维</p>
+      <p style="margin-left: 20%;margin-top: -10%;font-size: 20px">SQL发布平台</p>
     </div>
     <br>
     <Card>
@@ -39,23 +39,6 @@
           <p style="margin-left: 5%;">2018 Welcome</p>
         </Form-item>
       </Form>
-        </TabPane>
-        <TabPane label="LDAP登陆" name="ldap">
-          <Form ref="formInline" :model="formInline" :rules="ruleInline" inline>
-            <Form-item prop="user" style="width: 100%">
-              <Input v-model="formInline.user" placeholder="ldap_Username">
-              </Input>
-            </Form-item>
-            <Form-item prop="password" style="width: 100%">
-              <Input type="password" v-model="formInline.password" placeholder="ldap_Password" @on-keyup.enter="authdata()">
-              </Input>
-            </Form-item>
-            <Form-item style="width: 100%">
-              <Button type="primary" @click="ldap_login()" style="width: 100%" size="large">登录</Button>
-              <p style="margin-left: 22%;margin-top: 2%">如需注册账号请联系平台管理员</p>
-              <p style="margin-left: 5%;">2018 Welcome</p>
-            </Form-item>
-          </Form>
         </TabPane>
       </Tabs>
     </Card>
