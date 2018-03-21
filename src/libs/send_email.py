@@ -158,7 +158,6 @@ class send_email(object):
         server = smtplib.SMTP_SSL(smtp_server,port=465)
         server.set_debuglevel(1)
         server.login(from_addr, password)
-        self.to_addr = self.to_addr+'liaojun@zskuaixiao.com'
         server.sendmail(from_addr, [self.to_addr], msg.as_string())
         server.quit()
 
