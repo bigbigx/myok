@@ -8,76 +8,20 @@
     <Card>
       <p slot="title">
         <Icon type="person"></Icon>
-        资产情况
+        我的资产清单
         <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
+
       </p>
+
       <Row>
         <Col span="24">
-        <Poptip
-          confirm
-          title="您确认删除这些工单信息吗?"
-          @on-ok="delrecordData"
-          >
-        <Button type="primary" icon="trash-a"style="margin-left: -1%">删除记录</Button>
-        </Poptip>
-        <Table border :columns="columns6" :data="tmp" stripe ref="selection" @on-selection-change="delrecordList"></Table>
-        <br>
-        <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="20" ref="page"></Page>
+        <Table border :columns="columns6" :data="assettable" stripe size="small"></Table>
         </Col>
       </Row>
+      <br>
+      <Page :total="pagenumber" show-elevator @on-change="currentpage" :page-size="20"></Page>
     </Card>
   </Row>
-  <Modal v-model="modal2" width="800">
-    <p slot="header" style="color:#f60;font-size: 16px">
-      <Icon type="information-circled"></Icon>
-      <span>资产详细信息</span>
-    </p>
-    <Form label-position="right">
-      <FormItem label="id:">
-        <span>{{ formitem.id }}</span>
-      </FormItem>
-      <FormItem label="工单编号:">
-        <span>{{ formitem.work_id }}</span>
-      </FormItem>
-      <FormItem label="提交时间:">
-        <span>{{ formitem.date }}</span>
-      </FormItem>
-      <FormItem label="提交人:">
-        <span>{{ formitem.username }}</span>
-      </FormItem>
-      <FormItem label="机房:">
-        <span>{{ formitem.computer_room }}</span>
-      </FormItem>
-      <FormItem label="连接名称:">
-        <span>{{ formitem.connection_name }}</span>
-      </FormItem>
-      <FormItem label="数据库库名:">
-        <span>{{ formitem.basename }}</span>
-      </FormItem>
-      <FormItem label="工单说明:">
-        <span>{{ formitem.text }}</span>
-      </FormItem>
-      <FormItem label="备份SQL:">
-        <p v-for="j in backup_sql">{{ j }}</p>
-      </FormItem>
-      <FormItem label="执行SQL:">
-        <p v-for="i in sql">{{ i }}</p>
-      </FormItem>
-    </Form>
-    <div slot="footer">
-      <Button @click="cancel_button">取消</Button>
-      <Button type="error" @click="out_button()" :disabled="summit">驳回</Button>
-      <Button type="success" @click="put_button()" :disabled="summit">同意</Button>
-    </div>
-  </Modal>
-
-  <Modal v-model="reject.reje" @on-ok="rejecttext">
-    <p slot="header" style="color:#f60;font-size: 16px">
-      <Icon type="information-circled"></Icon>
-      <span>SQL工单驳回理由说明</span>
-    </p>
-    <Input v-model="reject.textarea" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写驳回说明"></Input>
-  </Modal>
 </div>
 </template>
 <script>
@@ -320,8 +264,7 @@ export default {
       axios.get(`${util.url}/assets?page=${vl}&username=${Cookies.get('user')}`)
         .then(res => {
           if (res.data.status === 200) {
-
-
+            this.assettable = res.data.data
           } else {
             this.$Notice.error({
                    title: '警告',

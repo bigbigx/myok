@@ -35,8 +35,10 @@ class assets(baseview.BaseView):
         else:
             try:
                 asset_list={}
+                AssetBasic.object.filter().all
 
-                return Response(res=asset_list,status=200)
+
+                return Response(data=asset_list,status=200)
 
             except Exception as e:
                 print(e)

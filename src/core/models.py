@@ -120,6 +120,15 @@ class ServerConf(models.Model):
     SuPassword = models.CharField(max_length=2000, null=True, blank=True, default="N")
     LoginMethod = models.CharField(max_length=10, choices=login_type, null=True, blank=True, default="N")
 
+class AssetClass(models.Model):
+    '''
+    设备分类，网络设备，服务器设备，防火墙设备，其他检测入侵设备等
+    '''
+    class_id = models.IntegerField(max_length=5) # 分类编号
+    class_name = models.CharField(max_length=50) # 分类名称
+    subclass = models.CharField(max_length=50) # 子分类名称
+    introduction = models.TextField(null=True, blank=True)  # 子分类说明
+
 class AssetBasic(models.Model):
     '''
     美团云，阿里云，独立机房和区域信息
@@ -129,6 +138,32 @@ class AssetBasic(models.Model):
     room_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
     area_name = models.CharField(max_length=2000, null=True, blank=True, default="N")
     area_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
+
+class AssetLifeCycle():
+    '''
+    设备的生命周期，即设备的历史使用情况
+    '''
+    time = models.CharField(max_length=50) # 使用时间
+    content = models.TextField(null=True, blank=True) # 使用内容
+    cur_status = models.CharField(max_length=50)  #使用时的状态 ，即每一次的设备的变更，含添加硬件等
+
+
+
+class Asset(models.Model):  #特别是针对独立机房
+    asset_class = models.CharField(max_length=50)  # 设备分类，网络设备，服务器设备，防火墙设备，其他检测入侵设备等
+    asset_name = models.CharField(max_length=50)  # 设备名称
+    Description = models.TextField(null=True, blank=True) # 设备描述
+    positon = models.CharField(max_length=50)  # 设备所属位置
+    isbn = models.CharField(max_length=50)   #设备ISBN号
+    CPU = models.CharField(max_length=20, default="暂无", null=True, blank=True)   #设备CPU 信息
+    Mem = models.CharField(max_length=20, default="暂无", null=True, blank=True)  #设备内存
+    IO = models.CharField(max_length=20, default="暂无", null=True, blank=True) # 设备IO
+    manufacturer = models.CharField(max_length=50)   #产商
+    status = models.IntegerField(max_length=5) #设备的使用状态 0 - 计划购买 1--已购买  2- 已上架,未开机 3-- 运行中  4--已下架  5--已
+    lifecycle_id = models.IntegerField(max_length=5) # 设备生命周期编号
+    contract_id = models.CharField(max_length=50) # 设备的合同编号
+    invoices = models.CharField(max_length=50) # 设备的发票编号
+
 
 
 class ServerInfo(models.Model):
