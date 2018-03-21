@@ -139,31 +139,57 @@ class AssetBasic(models.Model):
     area_name = models.CharField(max_length=2000, null=True, blank=True, default="N")
     area_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
 
-class AssetLifeCycle():
+class AssetLifeCycle(models.Model):
     '''
     设备的生命周期，即设备的历史使用情况
     '''
     time = models.CharField(max_length=50) # 使用时间
-    content = models.TextField(null=True, blank=True) # 使用内容
+    content = models.TextField(null=True, blank=True) # 生命期间的使用情况和变更情况，不含部署应用的情况，值包含硬件设备的，以及网络端口连线情况
     cur_status = models.CharField(max_length=50)  #使用时的状态 ，即每一次的设备的变更，含添加硬件等
+    cur_person = models.CharField(max_length=300) # 每次变更的操作人，可以是多人，都好分隔
+
+class AssetNet(models.Model):
+    '''
+    设备的网路接口：
+    '''
+    name = models.CharField(max_length=50)  #接口名称,
+    remark = models.CharField(max_length=300) #此接口介入说明
+    status = models.IntegerField(max_length=5)  # 端口的使用状态 1--在使用  2--规划中  3--
+    net_id = models.CharField(max_length=50) #网络设备接口编号，含交换机，路由器，防火墙，入侵检测等
+
+class AssetOtherMark(models.Model):
+    '''
+    设备的其他标识
+    '''
+    asset_id = models.CharField(max_length=50) #此设备的编号
 
 
-
-class Asset(models.Model):  #特别是针对独立机房
+class Asset(models.Model):  #特别是针对独立机房、阿里云机房
+    '''
+    硬件设备主表：
+    '''
+    asset_id = models.CharField(max_length=50) #此设备的编号，通过随机数据构成，
+    parent_asset_id = models.CharField(max_length=50) # 父设备的编号，即此设备被组装到一个大设备里面，default 为空，默认为单独的设备
     asset_class = models.CharField(max_length=50)  # 设备分类，网络设备，服务器设备，防火墙设备，其他检测入侵设备等
     asset_name = models.CharField(max_length=50)  # 设备名称
-    Description = models.TextField(null=True, blank=True) # 设备描述
+    description = models.TextField(null=True, blank=True) # 设备描述
     positon = models.CharField(max_length=50)  # 设备所属位置
     isbn = models.CharField(max_length=50)   #设备ISBN号
     CPU = models.CharField(max_length=20, default="暂无", null=True, blank=True)   #设备CPU 信息
     Mem = models.CharField(max_length=20, default="暂无", null=True, blank=True)  #设备内存
     IO = models.CharField(max_length=20, default="暂无", null=True, blank=True) # 设备IO
+    other_identify = #设备的其他标识
+    Network_id = models.CharField(max_length=50)  #设备的网络接口
     manufacturer = models.CharField(max_length=50)   #产商
+    manufacturer_contact = models.CharField(max_length=50)  # 厂商联系人
+    manufacturer_fixline = models.CharField(max_length=50)  # 厂商联系官方电话
+    manufacturer_mobile = models.CharField(max_length=50)  # 厂商联系电话
+    manufacturer_other_contact = models.CharField(max_length=50)  # 厂商其他联系电话
     status = models.IntegerField(max_length=5) #设备的使用状态 0 - 计划购买 1--已购买  2- 已上架,未开机 3-- 运行中  4--已下架  5--已
     lifecycle_id = models.IntegerField(max_length=5) # 设备生命周期编号
     contract_id = models.CharField(max_length=50) # 设备的合同编号
     invoices = models.CharField(max_length=50) # 设备的发票编号
-
+    program_id = models.CharField(max_length=50)  #设备里面的程序清单
 
 
 class ServerInfo(models.Model):
