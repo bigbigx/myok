@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email import encoders
 from email.utils import parseaddr, formataddr
 import smtplib
+from libs.readfile import readfile
 
 conf = util.conf_path()
 from_addr = conf.mail_user
@@ -24,6 +25,14 @@ class send_email(object):
         return formataddr((Header(name, 'utf-8').encode(), addr))
 
     def send_mail(self,mail_data=None,type=None):
+        cc_list = readfile()
+        _attachments = []
+        msg = MIMEMultipart('alternative')
+        msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
+        msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
+        msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
+        msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
+
         if type == 0: #含审核通过，工单发送到工单发起人和工单审核人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
@@ -48,6 +57,7 @@ class send_email(object):
                 mail_data['myself'],
                 mail_data['workid'],
                 mail_data['token_pass'])
+            msg['Subject'] = Header('蜜罐运维工单状态反馈---审核通过', 'utf-8').encode()
 
         elif type == 3: #执行成功，邮件发送到工单发起人和工单审核
             text = '<html><body><h1>工单标题：%s</h1>' \
@@ -67,6 +77,7 @@ class send_email(object):
                 mail_data['backup'],
                 mail_data['type'],
                 mail_data['note'])
+            msg['Subject'] = Header('蜜罐运维工单状态反馈---执行完成', 'utf-8').encode()
 
 
         elif type == 1: #审核驳回，邮件发送到工单发起人，而且不允许邮件再次发起，必须通过平台重新发起
@@ -85,6 +96,7 @@ class send_email(object):
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
                        mail_data['rejected'])
+            msg['Subject'] = Header('蜜罐运维工单状态反馈---审核驳回', 'utf-8').encode()
         elif type == 4: #执行驳回 邮件发送到工单审核人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
@@ -97,6 +109,7 @@ class send_email(object):
                        mail_data['workid'],
                        mail_data['to_user'],
                        mail_data['rejected'])
+            msg['Subject'] = Header('蜜罐运维工单状态反馈---执行驳回', 'utf-8').encode()
 
         else: # 提交成功，邮件发送到审核人  # '<br><p>请审核人操作: <a href="%s/#/management/management-audit/confirm?id=%s&tokens=%s">同意</a> <br> <a href=''>驳回</a></p>' \
             text = '<html><body><h1>工单标题：%s</h1>' \
@@ -130,15 +143,12 @@ class send_email(object):
                        mail_data['to_user'],
                        mail_data['assigned'],
                        mail_data['workid'],
-                       mail_data['token_reject']
-            )
-        _attachments = []
-        msg = MIMEMultipart('alternative')
+                       mail_data['token_reject'])
+            msg['Subject'] = Header('蜜罐运维工单状态反馈---成功发起', 'utf-8').encode()
+
+
         contents = MIMEText(text, 'html', 'utf-8')
-        msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
-        msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
-        msg['Cc'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
-        msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
+
 
 
         if (mail_data['status'] == 'run'):
@@ -158,7 +168,7 @@ class send_email(object):
         server = smtplib.SMTP_SSL(smtp_server,port=465)
         server.set_debuglevel(1)
         server.login(from_addr, password)
-        server.sendmail(from_addr, [self.to_addr, 'liaojun@zskuaxiao.com'], msg.as_string())
+        server.sendmail(from_addr, [self.to_addr]+cc_list, msg.as_string())
         server.quit()
 
         
