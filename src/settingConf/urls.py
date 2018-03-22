@@ -48,7 +48,6 @@ from core.api.authtoken import (
 from core.api.exetoken import (
     exetoken
 )
-
 from core.api.asset.assets import (
     assets
 )

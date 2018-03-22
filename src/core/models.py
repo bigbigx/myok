@@ -84,10 +84,10 @@ class AssetType(models.Model):
     资产的各种型号
     """
 
-    parent_type = models.IntegerField(max_length=20, null=True, blank=True)
-    child_type_1 = models.IntegerField(max_length=20, null=True, blank=True)
-    child_type_2 = models.IntegerField(max_length=20, null=True, blank=True)
-    child_type_3 = models.IntegerField(max_length=20, null=True, blank=True)
+    parent_type = models.IntegerField(null=True, blank=True)
+    child_type_1 = models.IntegerField(null=True, blank=True)
+    child_type_2 = models.IntegerField(null=True, blank=True)
+    child_type_3 = models.IntegerField(null=True, blank=True)
     cab_type = models.CharField(max_length=20, default="暂无", null=True, blank=True)
 
 class AssetTypeDetail(models.Model):
@@ -109,7 +109,7 @@ class ServerConf(models.Model):
     login_type = (("KEY", "使用PublickKey登陆"), ("PASSWORD", "使用密码登陆"))
     IP = models.CharField(max_length=200)
     HostName = models.CharField(max_length=100, null=False, blank=False)
-    Port = models.IntegerField(max_length=5)
+    Port = models.IntegerField()
     Group = models.CharField(max_length=200, null=False, verbose_name="主机组")
     Username = models.CharField(max_length=200, null=False)
     Password = models.CharField(('password'), max_length=128)
@@ -124,20 +124,29 @@ class AssetClass(models.Model):
     '''
     设备分类，网络设备，服务器设备，防火墙设备，其他检测入侵设备等
     '''
-    class_id = models.IntegerField(max_length=5) # 分类编号
+    class_id = models.IntegerField() # 分类编号
     class_name = models.CharField(max_length=50) # 分类名称
     subclass = models.CharField(max_length=50) # 子分类名称
     introduction = models.TextField(null=True, blank=True)  # 子分类说明
 
-class AssetBasic(models.Model):
+class AssetRoom(models.Model):
     '''
-    美团云，阿里云，独立机房和区域信息
+    美团云，阿里云，独立机房和区域信息，1--AWS 2- Aliyun  3--Own 4--Other
     '''
-    room_type = models.IntegerField(max_length=5)
-    room_name = models.CharField(max_length=2000, null=True, blank=True, default="N")
-    room_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
-    area_name = models.CharField(max_length=2000, null=True, blank=True, default="N")
-    area_remark = models.CharField(max_length=2000, null=True, blank=True, default="N")
+    room_type = models.IntegerField()
+    room_id = models.CharField(max_length=200)
+    room_name = models.CharField(max_length=200)
+    room_remark = models.CharField(max_length=200)
+
+class AssetArea(models.Model):
+    '''
+    区域信息： 华南区、华北区、等等
+    '''
+    asset_room_id = models.CharField(max_length=50) #机房编号  0---代表
+    status = models.IntegerField()  #使用状态 0--disable  1--enable
+    area_id = models.CharField(max_length=50) #区域编号
+    area_name = models.CharField(max_length=40) #区域名称
+    area_remark = models.CharField(max_length=300) #区域说明
 
 class AssetLifeCycle(models.Model):
     '''
@@ -154,21 +163,25 @@ class AssetNet(models.Model):
     '''
     name = models.CharField(max_length=50)  #接口名称,
     remark = models.CharField(max_length=300) #此接口介入说明
-    status = models.IntegerField(max_length=5)  # 端口的使用状态 1--在使用  2--规划中  3--
+    status = models.IntegerField()  # 端口的使用状态 1--在使用  2--规划中  3--
     net_id = models.CharField(max_length=50) #网络设备接口编号，含交换机，路由器，防火墙，入侵检测等
 
 class AssetOtherMark(models.Model):
     '''
     设备的其他标识
     '''
-    asset_id = models.CharField(max_length=50) #此设备的编号
-
+    other_identify_id = models.CharField(max_length=50) # 此设备其他标识的编号
+    asset_id = models.CharField(max_length=50) #父设备的编号
+    mark_name = models.CharField(max_length=50)
+    mark_value = models.CharField(max_length=50) # 此设备的值
 
 class Asset(models.Model):  #特别是针对独立机房、阿里云机房
     '''
     硬件设备主表：
     '''
     asset_id = models.CharField(max_length=50) #此设备的编号，通过随机数据构成，
+    asset_room = models.CharField(max_length=50) # 此设备所属环境，独立机房，阿里云，美团云，还是其他环境
+    asset_area = models.CharField(max_length=50) # 此设备所属区域，如： 广州、华南、北京、等等自定义的属性环境
     parent_asset_id = models.CharField(max_length=50) # 父设备的编号，即此设备被组装到一个大设备里面，default 为空，默认为单独的设备
     asset_class = models.CharField(max_length=50)  # 设备分类，网络设备，服务器设备，防火墙设备，其他检测入侵设备等
     asset_name = models.CharField(max_length=50)  # 设备名称
@@ -178,15 +191,15 @@ class Asset(models.Model):  #特别是针对独立机房、阿里云机房
     CPU = models.CharField(max_length=20, default="暂无", null=True, blank=True)   #设备CPU 信息
     Mem = models.CharField(max_length=20, default="暂无", null=True, blank=True)  #设备内存
     IO = models.CharField(max_length=20, default="暂无", null=True, blank=True) # 设备IO
-    other_identify = #设备的其他标识
+    other_identify = models.CharField(max_length=50)#设备的其他标识
     Network_id = models.CharField(max_length=50)  #设备的网络接口
     manufacturer = models.CharField(max_length=50)   #产商
     manufacturer_contact = models.CharField(max_length=50)  # 厂商联系人
     manufacturer_fixline = models.CharField(max_length=50)  # 厂商联系官方电话
     manufacturer_mobile = models.CharField(max_length=50)  # 厂商联系电话
     manufacturer_other_contact = models.CharField(max_length=50)  # 厂商其他联系电话
-    status = models.IntegerField(max_length=5) #设备的使用状态 0 - 计划购买 1--已购买  2- 已上架,未开机 3-- 运行中  4--已下架  5--已
-    lifecycle_id = models.IntegerField(max_length=5) # 设备生命周期编号
+    status = models.IntegerField() #设备的使用状态 0 - 计划购买 1--已购买  2- 已上架,未开机 3-- 运行中  4--已下架  5--已废弃
+    lifecycle_id = models.IntegerField() # 设备生命周期编号
     contract_id = models.CharField(max_length=50) # 设备的合同编号
     invoices = models.CharField(max_length=50) # 设备的发票编号
     program_id = models.CharField(max_length=50)  #设备里面的程序清单
@@ -205,9 +218,9 @@ class ServerInfo(models.Model):
     IO = models.CharField(max_length=200, default="暂无", null=True, blank=True)
     Platform = models.CharField(max_length=200, default="暂无", blank=True)
     System = models.CharField(max_length=200, default="暂无", blank=True)
-    InBankWidth = models.IntegerField(max_length=20, null=True, blank=True)
-    OutBankWidth = models.IntegerField(max_length=20, null=True, blank=True)
-    CurrentUser = models.IntegerField(max_length=10, null=True, blank=True)
+    InBankWidth = models.IntegerField(null=True, blank=True)
+    OutBankWidth = models.IntegerField(null=True, blank=True)
+    CurrentUser = models.IntegerField(null=True, blank=True)
 
 class SqlRecord(models.Model):
     '''
