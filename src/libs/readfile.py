@@ -4,7 +4,7 @@
 '''
 
 def readfile():
-        filename ='business.txt'
+        filename ='/root/myok/src/libs/business.txt'
         exmail_addr = []
         user_name = []
         with open(filename, 'r',encoding='utf8') as file_to_read:
