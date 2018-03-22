@@ -57,7 +57,7 @@
 
             <FormItem>
               <Button type="warning" icon="android-search" @click.native="test_sql()">检测</Button>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">提交</Button>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :enabled="this.validate_gen">提交</Button>
             </FormItem>
 
           </Form>
@@ -304,12 +304,11 @@ export default {
                      gen1 += 1
                    }
                  })
-                 this.validate_gen = false
-                 // if (gen === 0 && gen1 === 0) {
-                 //   this.validate_gen = false
-                 // } else {
-                 //   this.validate_gen = true
-                 // }
+                 if (gen === 0 && gen1 === 0) {
+                   this.validate_gen = false
+                 } else {
+                   this.validate_gen = true
+                 }
                } else if (res.data.status === 202) {
                  this.$Notice.error({
                    title: '警告',
