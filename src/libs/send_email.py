@@ -30,7 +30,7 @@ class send_email(object):
         msg = MIMEMultipart('alternative')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
         msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
-        #msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
+        msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
         msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
 
         if type == 0: #含审核通过，工单发送到工单发起人和工单审核人
@@ -168,7 +168,7 @@ class send_email(object):
         server = smtplib.SMTP_SSL(smtp_server,port=465)
         server.set_debuglevel(1)
         server.login(from_addr, password)
-        #server.sendmail(from_addr, [self.to_addr] + cc_list, msg.as_string())
+        server.sendmail(from_addr, [self.to_addr] + cc_list, msg.as_string())
         server.sendmail(from_addr, [self.to_addr], msg.as_string())
         server.quit()
 
