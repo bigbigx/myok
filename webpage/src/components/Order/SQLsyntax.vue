@@ -53,7 +53,6 @@
 
             <FormItem>
               <Button type="default" icon="paintbucket" @click.native="beautify()">美化</Button>
-              <Button type="default" icon="trash-a" @click.native="ClearForm()" style="margin-left: 10%">清除</Button>
             </FormItem>
 
             <FormItem>
@@ -305,11 +304,12 @@ export default {
                      gen1 += 1
                    }
                  })
-                 if (gen === 0 && gen1 === 0) {
-                   this.validate_gen = false
-                 } else {
-                   this.validate_gen = true
-                 }
+                 this.validate_gen = false
+                 // if (gen === 0 && gen1 === 0) {
+                 //   this.validate_gen = false
+                 // } else {
+                 //   this.validate_gen = true
+                 // }
                } else if (res.data.status === 202) {
                  this.$Notice.error({
                    title: '警告',
