@@ -52,13 +52,22 @@
             </FormItem>
 
             <FormItem>
-              <Button type="default" icon="paintbucket" @click.native="beautify()">美化</Button>
+              <Button type="default" icon="paintbucket" @click.native="beautify()">美化SQL</Button>
             </FormItem>
 
             <FormItem>
-              <Button type="warning" icon="android-search" @click.native="test_sql()">检测</Button>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :enabled="this.validate_gen">提交</Button>
+              <Button type="warning" icon="android-search" @click.native="test_sql()">语法检测</Button>
             </FormItem>
+
+
+            <FormItem>
+              <Button type="warning" icon="android-search" @click.native="explain_test()">执行explain</Button>
+            </FormItem>
+
+            <FormItem>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :enabled="this.validate_gen">工单提交</Button>
+            </FormItem>
+
 
           </Form>
           <Alert style="height: 145px">
@@ -260,6 +269,57 @@ export default {
     sqladvisor () {
 
     },
+    //  sql 的explain执行输出
+    explain_test () {
+        this.$refs['formItem'].validate((valid) => {
+        if (valid) {
+          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
+            let tmpddl2 = ''
+            let tmpddl = ''
+            let tmpbak = ''
+            let tmpbak2 = ''
+            if (this.formItem.textarea_backup) {
+                tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+                tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+                tmpbak = ''
+            }
+            if (this.formItem.textarea_ddl_dml) {
+                tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+                tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+                tmpddl = ''
+            }
+            axios.put(`${util.url}/sqlsyntax/explain`, {
+                'id': this.id[0].id,
+                'base': this.formItem.basename,
+                'type': 1,
+                'sql': tmpddl + '&&&' + tmpbak,
+                'check_sql': tmpddl2 + '&&&' + tmpbak2
+              })
+              .then(res => {
+               if (res.data.status === 200) {
+                 this.Testresults = res.data.result_ddl_explain
+                 this.Testresults_backup = res.data.result_bak_explain
+               } else {
+                 this.$Notice.error({
+                   title: '警告',
+                   desc: '无法连接数据库: ' +this.formItem.basename
+                 })
+                 // this.validate_gen = true
+               }
+              })
+              .catch(error => {
+               util.ajanxerrorcode(this, error)
+              })
+          } else {
+            this.$Message.error('请填写sql语句后再测试!');
+          }
+       }
+      })
+
+
+    }
     // 同时检查  备份栏只能是select语句，ddl栏只能是非select语句
     test_sql () {
       this.$refs['formItem'].validate((valid) => {

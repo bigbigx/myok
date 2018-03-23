@@ -6,6 +6,7 @@ from libs import baseview
 from libs import call_inception
 from libs import util
 from libs import conn_sqlite
+from libs import call_explain
 from rest_framework.response import Response
 from django.http import HttpResponse
 from core.models import (
@@ -124,6 +125,40 @@ class sqlorder(baseview.BaseView):
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return Response({'status': '500'})
+        elif args == 'explain':  # explain检测，将explain的检测发送到前端
+            try:
+                type = int(request.data['type'])
+                id = request.data['id']
+                base = request.data['base']
+                tmp_sql = request.data['sql']
+                check_sql = request.data['check_sql']
+                sql_ddl = tmp_sql.split('&&&')[0]
+                sql_bak= tmp_sql.split('&&&')[1]
+                sql_ddl = str(sql_ddl).strip().rstrip(';')
+                sql_bak = str(sql_bak).strip().rstrip(';')
+                sql_ddl_1 = check_sql.split('&&&')[0]
+                sql_bak_1 = check_sql.split('&&&')[1]
+                base_id = request.data['base_id']
+                data = DatabaseList.objects.filter(id=base_id).first()
+                info = {
+                    'host': data.ip,
+                    'user': data.username,
+                    'password': data.password,
+                    'db': base,
+                    'port': data.port
+                    }
+            except KeyError as e:
+                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+            else:
+                try:
+                    with call_explain.Explain(LoginDic=info) as test:
+                        res_ddl = test.ShowExplain(sql_ddl)
+                        res_bak = test.ShowExplain(sql_bak)
+                        return Response({'result_ddl_explain': res_ddl,'result_bak_explain': res_bak, 'status': 200})
+                except Exception as e:
+                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                    return Response({'status': '500'})
+
 
     def post(self, request, args=None):
         try:
