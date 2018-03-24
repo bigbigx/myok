@@ -137,7 +137,6 @@ class send_email(object):
         contents = MIMEText(text, 'html', 'utf-8')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
         msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
-        msg['Cc'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
         msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
 
 
@@ -158,7 +157,7 @@ class send_email(object):
         server = smtplib.SMTP_SSL(smtp_server,port=465)
         server.set_debuglevel(1)
         server.login(from_addr, password)
-        server.sendmail(from_addr, [self.to_addr, 'liaojun@zskuaxiao.com'], msg.as_string())
+        server.sendmail(from_addr, [self.to_addr], msg.as_string())
         server.quit()
 
         
