@@ -17,27 +17,17 @@ class Explain(object):
         self.con = object
 
     def __enter__(self, LoginDic=None):
-        self.con = pymysql.connect(host=LoginDic['host'],
-                                   user=LoginDic['user'],
-                                   passwd=LoginDic['password'],
-                                   port=int(LoginDic['port']),
-                                   db=LoginDic['db'],
+        #print(self.__dict__)
+        self.con = pymysql.connect(host=self.__dict__['host'],
+                                   user=self.__dict__['user'],
+                                   passwd=self.__dict__['password'],
+                                   port=int(self.__dict__['port']),
+                                   db=self.__dict__['db'],
                                    charset="utf8")
         return self
 
-    def ShowExplain(self, sql):
-        # select_type = ''
-        # table = ''
-        # type = ''
-        # possible_keys = ''
-        # key = ''
-        # key_len = ''
-        # rows = ''
-        # ref = ''
-        # extra = ''
-        # #result = {'select_type': select_type, 'table': table, 'type': type, 'possible_keys': possible_keys, 'key': key,
-        # #          'key_len': key_len, 'ref': ref, 'rows': rows, 'extra': extra}
-        # #tmp = Conn2DbDirect.execute("explain %s" % sql)
+    def ShowExplain(self, sql=None):
+        sql=''' explain  ''' + sql
         with self.con.cursor() as cursor:
             cursor.execute(sql)
             result = cursor.fetchall()

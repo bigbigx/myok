@@ -89,7 +89,6 @@ class sqlorder(baseview.BaseView):
                             pass
                         else:
                             if (tmp.startswith('SELECT') or tmp.startswith('select')):
-                                print("right select")
                                 pass
                             else:
                                 check_info = "备份SQL语句编辑栏存在非select语句，请注意只能是select 或者SELECT的关键字"
@@ -106,7 +105,6 @@ class sqlorder(baseview.BaseView):
                                 check_info = "执行SQL编辑栏存在select语句，请检查"
                                 return Response({'result': check_info,'status': 202})
                             else:
-                                print("right  ddl")
                                 pass
 
 
@@ -121,6 +119,9 @@ class sqlorder(baseview.BaseView):
                             res_ddl = test.Check(sql=sql_ddl)
                         if sql_bak:
                            res_bak = test.Check(sql=sql_bak)
+                        print("=====")
+                        print(res_ddl)
+                        print(res_bak)
                         return Response({'result_ddl': res_ddl,'result_bak': res_bak, 'status': 200})
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -138,8 +139,8 @@ class sqlorder(baseview.BaseView):
                 sql_bak = str(sql_bak).strip().rstrip(';')
                 sql_ddl_1 = check_sql.split('&&&')[0]
                 sql_bak_1 = check_sql.split('&&&')[1]
-                base_id = request.data['base_id']
-                data = DatabaseList.objects.filter(id=base_id).first()
+                #base_id = request.data['base_id']
+                data = DatabaseList.objects.filter(id=id).first()
                 info = {
                     'host': data.ip,
                     'user': data.username,
@@ -150,14 +151,36 @@ class sqlorder(baseview.BaseView):
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
-                try:
-                    with call_explain.Explain(LoginDic=info) as test:
-                        res_ddl = test.ShowExplain(sql_ddl)
-                        res_bak = test.ShowExplain(sql_bak)
-                        return Response({'result_ddl_explain': res_ddl,'result_bak_explain': res_bak, 'status': 200})
-                except Exception as e:
-                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                    return Response({'status': '500'})
+                res_ddl_list = []
+                res_bak_list = []
+                with call_explain.Explain(LoginDic=info) as test:
+                    try:
+
+                            for one_ddl in sql_ddl.split(";"):
+                                if one_ddl:
+                                    res_ddl = test.ShowExplain(sql=one_ddl)
+                                    res_ddl_list=res_ddl_list+res_ddl
+                                else:
+                                    continue
+                    except Exception as e:
+                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                        #err_msg = f'{e.__class__.__name__}: {e}'
+                        err_msg = [{'err_msg': f'{e.__class__.__name__}: {e}'}]
+                        return Response({'err_msg': err_msg,'status': 202 })
+                    try:
+
+                            for one_bak in sql_bak.split(";"):
+                                if one_bak:
+                                    res_bak = test.ShowExplain(sql=one_bak)
+                                    res_bak_list = res_bak_list + res_bak
+                                else:
+                                    continue
+                    except Exception as e:
+                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                        #err_msg_1 = f'{e.__class__.__name__}: {e}'
+                        err_msg_1 = [{'err_msg':f'{e.__class__.__name__}: {e}'}]
+                        return Response({'err_msg': err_msg_1, 'status': 203})
+                return Response({'result_ddl_explain': res_ddl_list, 'result_bak_explain': res_bak_list, 'status': 200})
 
 
     def post(self, request, args=None):

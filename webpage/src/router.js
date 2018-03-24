@@ -91,7 +91,7 @@ export const appRouter = [
     component: Index,
     children: [
       {
-        path: 'myorder',
+        path: 'order',
         name: 'myorder',
         title: '我的工单',
         'icon': 'person',
@@ -201,8 +201,8 @@ export const appRouter = [
           require(['./components/Management/Record.vue'], resolve)
         }
       }, {
-        path: 'ddledit',
-        name: 'ddledit',
+        path: 'ddleditaa',
+        name: 'aaaaa',
         title: '表结构修改',
         'icon': 'compose',
         component: resolve => {
@@ -210,7 +210,7 @@ export const appRouter = [
         }
       }, {
         path: 'indexedit',
-        name: 'indexedit',
+        name: 'bbbbb',
         title: '索引修改',
         'icon': 'share',
         component: resolve => {
@@ -246,9 +246,9 @@ export const appRouter = [
       }
     ]
   }, {
-    path: '/logger',
+    path: '/logger-view',
     icon: 'social-buffer',
-    name: 'logger',
+    name: 'loggerview',
     title: '日志查看',
     component: Index,
     children: [
@@ -263,16 +263,16 @@ export const appRouter = [
       }
     ]
   }, {
-    path: '/logger',
+    path: '/logger-manage',
     icon: 'social-buffer',
-    name: 'logger-manager',
+    name: 'logger-manage',
     title: '日志管理',
     access: 0,
     component: Index,
     children: [
       {
-        path: 'logger-manager',
-        name: 'logger-manager',
+        path: 'logger-manage',
+        name: 'logger-manage-1',
         title: '日志管理',
         'icon': 'edit',
         component: resolve => {
