@@ -19,18 +19,18 @@
           <Form ref="formItem" :model="formItem" :rules="ruleValidate" :label-width="80">
             <FormItem label="机房:" prop="computer_room">
               <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i">{{i}}</Option>
+              <Option v-for="i in datalist.computer_roomlist" :value="i">{{i}}</Option>
             </Select>
             </FormItem>
 
             <FormItem label="连接名:" prop="connection_name">
               <Select v-model="formItem.connection_name" @on-change="DataBaseName"  filterable>
-              <Option v-for="i in datalist.connection_name_list" :value="i.connection_name" :key="i.connection_name" >{{ i.connection_name }}</Option>
+              <Option v-for="i in datalist.connection_name_list" :value="i.connection_name">{{ i.connection_name }}</Option>
               </Select>
             </FormItem>
 
             <FormItem label="库名:" prop="basename">
-              <Select v-model="formItem.basename" filterable>
+              <Select v-model="formItem.basename">
               <Option v-for="item in datalist.basenamelist" :value="item">{{ item }}</Option>
             </Select>
             </FormItem>
@@ -156,8 +156,8 @@ export default {
       formItem: {
         textarea: '',
         computer_room: '',
-        connection_name: {'connection_name': 'dads'},
-        basename: 'laimi',
+        connection_name: '',
+        basename: '',
         text: '',
         backup: 0,
         assigned: 'liuyan'
@@ -359,14 +359,27 @@ export default {
             'basename': 'laimi_activity'
           })
           .then(res => {
-            this.formItem.computer_room = res.data.room
-            this.formItem.connection_name = res.data.connection_name
-            this.formItem.basename = res.data.basename
+              console.log(res.data)
+              this.flag = true;
+              this.formItem.computer_room = res.data['computer_room'];
+              this.formItem.connection_name = res.data['connection_name'];
+              this.formItem.basename = res.data['laimi_db'];
+
+              this.$nextTick(() => {
+                this.flag = false;
+              });
+
+            if (res.data.status === 202) {
+              this.$Notice.error({
+              title: '警告',
+              desc: res.data['msg']
+            })
+            }
           })
-          .catch(() => {
+          .catch((error) => {
             this.$Notice.error({
               title: '警告',
-              desc: '无法连接数据库!请检查网络'
+              desc: error
             })
           })
     },
@@ -405,11 +418,12 @@ export default {
           if (item.connection_name === index) {
             return item
           }
-        })
+        });
         axios.put(`${util.url}/workorder/basename`, {
             'id': this.id[0].id
           })
           .then(res => {
+            console.info(res.data)
             this.datalist.basenamelist = res.data
           })
           .catch(() => {
@@ -622,7 +636,9 @@ export default {
       })
       .catch(error => {
         util.ajanxerrorcode(this, error)
-      })
+      });
+
+    window.vm = this;
     }
 }
 </script>

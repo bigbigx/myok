@@ -75,8 +75,6 @@ class addressing(baseview.BaseView):
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
             else:
-                base_list = [basename]
-                result = []
                 _connection = DatabaseList.objects.filter(ip=str(url)).first()
                 print(_connection.connection_name)
                 try:
