@@ -24,6 +24,7 @@ class send_email(object):
         name, addr = parseaddr(s)
         return formataddr((Header(name, 'utf-8').encode(), addr))
 
+
     def send_mail(self,mail_data=None,type=None):
         cc_list = readfile()
         _attachments = []
