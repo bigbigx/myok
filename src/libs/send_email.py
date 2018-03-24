@@ -152,6 +152,7 @@ class send_email(object):
         else:
             pass
 
+
         msg.attach(contents)
         #server = smtplib.SMTP(smtp_server, 25)
         server = smtplib.SMTP_SSL(smtp_server,port=465)
