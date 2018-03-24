@@ -57,7 +57,7 @@
 
             <FormItem>
               <Button type="warning" icon="android-search" @click.native="test_sql()">检测</Button>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :enabled="this.validate_gen">提交</Button>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">提交</Button>
             </FormItem>
 
           </Form>
