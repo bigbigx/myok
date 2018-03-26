@@ -23,8 +23,9 @@ addr_ip = conf.ipaddress
 
 class sqlorder(baseview.BaseView):
     '''
-    put   美化sql  测试sql
+    put   美化sql  测试sql 优化sql建议
     post 提交工单
+
     '''
     def put(self, request, args=None):
         if args == 'beautify':
@@ -126,6 +127,11 @@ class sqlorder(baseview.BaseView):
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return Response({'status': '500'})
+
+        elif args == 'sqlavdisor':  # sql优化建议
+            pass
+
+
         elif args == 'explain':  # explain检测，将explain的检测发送到前端
             try:
                 type = int(request.data['type'])

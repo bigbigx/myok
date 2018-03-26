@@ -17,26 +17,35 @@
         <div id="showImage" class="margin-bottom-10">
 
           <Form ref="formItem" :model="formItem" :rules="ruleValidate" :label-width="80">
-            <FormItem label="机房:" prop="computer_room">
+            <FormItem label="机房:" prop="computer_room" v-if="!this.choose_db">
               <Select v-model="formItem.computer_room" @on-change="Connection_Name">
               <Option v-for="i in datalist.computer_roomlist" :value="i">{{i}}</Option>
             </Select>
             </FormItem>
-
-            <FormItem label="连接名:" prop="connection_name">
+            <FormItem label="机房:" prop="computer_room" v-else="this.choose_db">
+              <Input  v-model="formItem.computer_room" disabled></Input>
+            </FormItem>
+            <FormItem label="连接名:" prop="connection_name" v-if="!this.choose_db">
               <Select v-model="formItem.connection_name" @on-change="DataBaseName"  filterable>
               <Option v-for="i in datalist.connection_name_list" :value="i.connection_name">{{ i.connection_name }}</Option>
               </Select>
             </FormItem>
+            <FormItem label="连接名:" prop="connection_name" v-else="this.choose_db">
+              <Input  v-model="formItem.connection_name" disabled></input>
+            </FormItem>
 
-            <FormItem label="库名:" prop="basename">
+            <FormItem label="库名:" prop="basename" v-if="!this.choose_db">
               <Select v-model="formItem.basename">
               <Option v-for="item in datalist.basenamelist" :value="item">{{ item }}</Option>
             </Select>
             </FormItem>
+            <FormItem label="库名:" prop="basename" v-else="this.choose_db">
+              <Input  v-model="formItem.basename" disabled></input>
+            </FormItem>
+
 
             <FormItem label="工单说明:" prop="text">
-              <Input v-model="formItem.text" placeholder="请输入"></Input>
+              <Input type="textarea" :rows="8" v-model="formItem.text" placeholder="请输入"></Input>
             </FormItem>
 
             <FormItem label="指定审核人:" prop="text">
@@ -45,11 +54,11 @@
               </Select>
             </FormItem>
 
-            <FormItem label="指定邮件抄送人:" prop="text">
-              <Select v-model="formItem.assigned">
-                <Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>
-              </Select>
-            </FormItem>
+            <!--<FormItem label="指定邮件抄送人:" prop="text">-->
+              <!--<Select v-model="formItem.assigned">-->
+                <!--<Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>-->
+              <!--</Select>-->
+            <!--</FormItem>-->
 
             <FormItem label="是否备份: ">
               <RadioGroup v-model="formItem.backup">
@@ -58,34 +67,38 @@
               </RadioGroup>
             </FormItem>
             <FormItem label="快速选库: ">
-              <Button type="success" icon="ios-redo" @click.native="ChooseLaimiOnline()" style="margin-left: 10%"  :enabled="this.validate_gen">线上laimi库</Button>
-              <Button type="success" icon="ios-redo" @click.native="ChooseActivityOnline()" style="margin-left: 10%"  :enabled="this.validate_gen">线上活动库</Button>
+              <Button type="default" icon="ios-redo" @click.native="ChooseLaimiOnline()"  :enabled="this.validate_gen1">线上laimi库</Button>
+              <Button type="default" icon="ios-redo" @click.native="ChooseActivityOnline()"  :enabled="this.validate_gen1">线上activity库</Button>
+              <Button type="default" icon="ios-redo" @click.native="ChooseMylaimi()"  :enabled="this.validate_gen1">我的测试库</Button>
+              <Button type="default" icon="ios-redo" @click.native="ReChooseDB()"  :enabled="this.validate_gen1">重新选择</Button>
           </FormItem>
             <br>
-            <FormItem label="SQL操作: ">
+            <FormItem label="SQL检查: ">
               <Button type="default" icon="paintbucket" @click.native="beautify()">美化</Button>
-              <Button type="default" icon="android-search" style="margin-left: 10%" @click.native="test_sql()">检测</Button>
+              <Button type="default" icon="android-search" style="margin-left: 10%" @click.native="test_sql_1()">检测</Button>
             </FormItem>
 
-
-            <FormItem>
-              <Button type="default" icon="android-search" @click.native="explain_test()">Explain</Button>
-              <Button type="default" icon="android-search" style="margin-left: 10%" @click.native="explain_test()">优化</Button>
-            </FormItem>
 
             <FormItem label="工单提交: ">
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()"   :enabled="this.validate_gen">工单提交</Button>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()"   :disabled="this.validate_gen">工单提交</Button>
+            </FormItem>
+            <FormItem label="选项: ">
+              <Checkbox v-model="single"  @click.native="show_explain_div()" >高级</Checkbox><p></p>
+              <Button type="primary" icon="ios-redo" @click.native="explain_test()"    v-if="this.single">explain</Button>
+              <Button type="primary" icon="android-search" style="margin-left: 10%" @click.native="sqladvisor()" v-if="this.single">优化</Button>
             </FormItem>
 
-
           </Form>
-          <Alert style="height: 145px">
+          <Alert style="height: 250px">
             检测表字段提示信息
             <template slot="desc">
                 <p>1.错误等级 0正常,1警告,2错误。</p>
                 <p>2.阶段状态 审核成功,Audit completed</p>
                 <p>3.错误信息 用来表示出错错误信息</p>
                 <p>4.当前检查的sql</p>
+                <p>5.选项"高级":</p>
+                <p>     1).有对SQL的explain和优化检查,可以作为参考项检查，特别针对复杂SQL的语法检查</p>
+                <p>     2).通过检测检查SQL报错，可以执行explain按钮进行检查</p>
                 <p>注:只有错误等级等于0时提交按钮才会激活</p>
               </template>
           </Alert>
@@ -100,11 +113,9 @@
         填写备份SQL语句 (备份SQL编辑框)
       </p>
       <Input v-model="formItem.textarea_backup" type="textarea" :autosize="{minRows: 10,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
-      <br>
       <Table :columns="columnsName" :data="Testresults_backup" highlight-row></Table>
-      <br>
       <Table :columns="columnsName_explain" :data="Testresults_backup_explain" highlight-row></Table>
-      <Table :columns="columnsName_explain_error" :data="Testresults_backup_explain_error" highlight-row></Table>
+      <!--<Table :columns="columnsName_explain_error" :data="Testresults_backup_explain_error" highlight-row></Table>-->
       <br>
     </Card>
        <Card>
@@ -113,12 +124,9 @@
         填写执行SQL语句 (执行SQL编辑框)
       </p>
       <Input v-model="formItem.textarea_ddl_dml" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
-      <br>
-      <br>
       <Table :columns="columnsName" :data="Testresults" highlight-row></Table>
-      <br>
       <Table :columns="columnsName_explain" :data="Testresults_explain" highlight-row></Table>
-      <Table :columns="columnsName_explain_error" :data="Testresults_explain_error" highlight-row></Table>
+      <!--<Table :columns="columnsName_explain_error" :data="Testresults_explain_error" highlight-row></Table>-->
 
     </Card>
   </Col>
@@ -129,12 +137,9 @@
         填写执行SQL语句 (执行SQL编辑框)
       </p>
       <Input v-model="formItem.textarea_ddl_dml" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请输入需要提交的SQL语句,多条sql请用;分隔" autocomplete="on"></Input>
-      <br>
-      <br>
       <Table :columns="columnsName" :data="Testresults" highlight-row></Table>
-      <br>
       <Table :columns="columnsName_explain" :data="Testresults_explain" highlight-row></Table>
-      <Table :columns="columnsName_explain_error" :data="Testresults_explain_error" highlight-row></Table>
+      <!--<Table :columns="columnsName_explain_error" :data="Testresults_explain_error" highlight-row></Table>-->
     </Card>
     </Col>
   </Row>
@@ -153,14 +158,15 @@ export default {
   data () {
     return {
       validate_gen: true,
+      validate_gen1: true,
       formItem: {
         textarea: '',
         computer_room: '',
         connection_name: '',
         basename: '',
         text: '',
-        backup: 0,
-        assigned: 'liuyan'
+        backup: 1,
+        assigned: ''
       },
       columnsName: [
         {
@@ -197,13 +203,13 @@ export default {
           width: '130'
         }
       ],
-       columnsName_explain_error: [
-       {
-          title: 'SQL报错信息',
-          key: 'err_msg',
-          width: '350'
-        }
-      ],
+      //  columnsName_explain_error: [
+      //  {
+      //     title: 'SQL报错信息',
+      //     key: 'err_msg',
+      //     width: '350'
+      //   }
+      // ],
       columnsName_explain: [
         {
           title: 'SelectType',
@@ -294,26 +300,20 @@ export default {
       },
       id: null,
       assigned: [],
-
-      flag: false
+      flag: false,
+      single: false,
+      validate_result: false,
+      choose_db: false
     }
   },
-  // watch: {
-  //     formItem: {
-  //       textarea: '',
-  //       computer_room: '',
-  //       connection_name: {
-  //
-  //       },
-  //       basename: 'laimi',
-  //       text: '',
-  //       backup: 0,
-  //       assigned: 'liuyan'
-  //     },
-  //
-  //
-  // },
   methods: {
+    show_explain_div () {
+      if (this.single) {
+        this.validate_result = true
+      } else {
+        this.validate_result = false
+      }
+    },
     beautify () {
       axios.put(`${util.url}/sqlsyntax/beautify`, {
           'data1': this.formItem.textarea_backup || '',
@@ -339,9 +339,7 @@ export default {
       } else {
         this.datalist.connection_name_list = [];
       }
-
       if (this.flag) return;
-
       this.datalist.basenamelist = [];
       this.formItem.connection_name = '';
       this.formItem.basename = '';
@@ -353,22 +351,22 @@ export default {
         }
       })
     },
-    ChooseActivityOnline () {
-        axios.put(`${util.url}/workorder/quickbasename`, {
-            'url': 'rm-m5eb3mg98au6s55xpo.mysql.rds.aliyuncs.com',
-            'basename': 'laimi_activity'
+    ChooseMylaimi () {
+          axios.put(`${util.url}/workorder/quickbasename`, {
+            'url': '101.236.41.66',
+            'basename': 'laimi_test'
           })
           .then(res => {
               console.log(res.data)
               this.flag = true;
+              this.choose_db = true;
               this.formItem.computer_room = res.data['computer_room'];
               this.formItem.connection_name = res.data['connection_name'];
               this.formItem.basename = res.data['laimi_db'];
-
+              this.id = [res.data['id']];
               this.$nextTick(() => {
                 this.flag = false;
               });
-
             if (res.data.status === 202) {
               this.$Notice.error({
               title: '警告',
@@ -383,21 +381,56 @@ export default {
             })
           })
     },
+    ChooseActivityOnline () {
+        axios.put(`${util.url}/workorder/quickbasename`, {
+            'url': 'rm-m5eb3mg98au6s55xpo.mysql.rds.aliyuncs.com',
+            'basename': 'laimi_activity'
+          })
+          .then(res => {
+              console.log(res.data)
+              this.flag = true;
+              this.choose_db = true;
+              this.formItem.computer_room = res.data['computer_room'];
+              this.formItem.connection_name = res.data['connection_name'];
+              this.formItem.basename = res.data['laimi_db'];
+              this.id = [res.data['id']];
+              this.$nextTick(() => {
+                this.flag = false;
+              });
+            if (res.data.status === 202) {
+              this.$Notice.error({
+              title: '警告',
+              desc: res.data['msg']
+            })
+            }
+          })
+          .catch((error) => {
+            this.$Notice.error({
+              title: '警告',
+              desc: error
+            })
+          })
+    },
+    ReChooseDB () {
+      this.choose_db = false;
+      this.id = null;
+    },
     ChooseLaimiOnline (val) {
         axios.put(`${util.url}/workorder/quickbasename`, {
             'url': 'rds6qxe126phmtspwi72o.mysql.rds.aliyuncs.com',
             'basename': 'laimi'
           })
           .then(res => {
+              console.log(res.data)
               this.flag = true;
+              this.choose_db = true;
               this.formItem.computer_room = res.data['computer_room'];
               this.formItem.connection_name = res.data['connection_name'];
               this.formItem.basename = res.data['laimi_db'];
-
+              this.id = [res.data['id']];
               this.$nextTick(() => {
                 this.flag = false;
               });
-
             if (res.data.status === 202) {
               this.$Notice.error({
               title: '警告',
@@ -436,17 +469,16 @@ export default {
     },
     //  sql 优化建议
     sqladvisor () {
-
     },
     //  sql 的explain执行输出
     explain_test: function () {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
           if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            let tmpddl2 = ''
-            let tmpddl = ''
-            let tmpbak = ''
-            let tmpbak2 = ''
+            let tmpddl2 = '';
+            let tmpddl = '';
+            let tmpbak = '';
+            let tmpbak2 = '';
             if (this.formItem.textarea_backup) {
               tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
               tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
@@ -459,6 +491,7 @@ export default {
             } else {
               tmpddl = ''
             }
+            console.log(this.formItem)
             axios.put(`${util.url}/sqlsyntax/explain`, {
               'id': this.id[0].id,
               'base': this.formItem.basename,
@@ -467,6 +500,7 @@ export default {
               'check_sql': tmpddl2 + '&&&' + tmpbak2
             })
               .then(res => {
+                console.log(res.data)
                 if (res.data.status === 200) {
                   this.Testresults_explain = res.data.result_ddl_explain
                   this.Testresults_backup_explain = res.data.result_bak_explain
@@ -508,9 +542,12 @@ export default {
       })
     },
     // 同时检查  备份栏只能是select语句，ddl栏只能是非select语句
-    test_sql () {
+    test_sql_1 () {
       this.$refs['formItem'].validate((valid) => {
+        console.log(valid)
         if (valid) {
+          console.log(this.formItem.textarea_ddl_dml)
+          console.log(this.formItem.textarea_backup)
           if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
             let tmpddl2 = ''
             let tmpddl = ''
@@ -528,14 +565,25 @@ export default {
             } else {
                 tmpddl = ''
             }
-            axios.put(`${util.url}/sqlsyntax/test`, {
+            console.log('this id value', this.id)
+            // debugger
+            // console.log('axios.put', `${util.url}/sqlsyntax/test`, axios.put)
+
+            // axios.put(`${util.url}/sqlsyntax/test`, { 'id': '1' })
+            // debugger
+            // console.log('this.id[0].id ---------------584', this  )
+            // console.log('this.id[0].id ---------------583', this.id[0].id)
+            var param = {
                 'id': this.id[0].id,
                 'base': this.formItem.basename,
                 'type': 1,
                 'sql': tmpddl + '&&&' + tmpbak,
                 'check_sql': tmpddl2 + '&&&' + tmpbak2
-              })
+              };
+            console.log('string param  591', param)
+            axios.put(`${util.url}/sqlsyntax/test`, param)
               .then(res => {
+               console.log(res.data)
                if (res.data.status === 200) {
                  this.Testresults = res.data.result_ddl
                  this.Testresults_backup = res.data.result_bak
@@ -573,6 +621,7 @@ export default {
               .catch(error => {
                util.ajanxerrorcode(this, error)
               })
+            console.log('end')
           } else {
             this.$Message.error('请填写sql语句后再测试!');
           }
@@ -637,7 +686,6 @@ export default {
       .catch(error => {
         util.ajanxerrorcode(this, error)
       });
-
     window.vm = this;
     }
 }
