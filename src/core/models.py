@@ -62,7 +62,8 @@ class SqlOrder(models.Model):
     assigned = models.CharField(max_length=50, blank=True)# 工单审核人
     backup_sql=models.TextField(blank=True) #s备份ql语句
     reject = models.TextField(blank=True) #驳回说明
-
+    run_type = models.IntegerField(null=True,blank=True) #执行SQL的方式 0 ---inception提交和执行  1--直接连接数据库执行sql
+    cc_list = models.CharField(max_length=500, blank=True) #该工单邮件抄送人清单
 
 
 class DatabaseList(models.Model):

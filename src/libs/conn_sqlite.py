@@ -5,8 +5,8 @@ import os
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 def create_table(sql):
-    # conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     cursor.close()
     conn.close()
@@ -14,8 +14,8 @@ def create_table(sql):
 
 
 def add_one(username,workid,token):
-    #conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     try:
         insert_sql ="insert into token_db_new values(?, ?, ?) "
@@ -30,8 +30,8 @@ def add_one(username,workid,token):
 
 
 def add_many(value : [],table_namme):
-    #conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     try:
         cursor.executemany("insert into  token_db_new  values ();", value)
@@ -46,8 +46,8 @@ def add_many(value : [],table_namme):
 
 
 def deleteByToken(token):
-    #conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     try:
         cursor.execute("delete from token_db_new where token ='%s' " % (token))
@@ -60,8 +60,8 @@ def deleteByToken(token):
     conn.close()
 
 def delete(username, workid):
-    #conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     try:
         cursor.execute("delete from token_db_new where username ='%s' and workid ='%s'" % (username, workid))
@@ -74,8 +74,8 @@ def delete(username, workid):
     conn.close()
 
 def queryByToken(token):
-    #conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     query_sql = "select token from  token_db_new where token='%s'" % (token)
     # 执行语句
@@ -92,8 +92,8 @@ def queryByToken(token):
 def query(username,workid):
 
     #os.chdir('d:\\pycharm\\lesson\\sn01')
-    #conn = sqlite3.connect('d:\\token.db')
-    conn = sqlite3.connect('/root/token.db')
+    conn = sqlite3.connect('d:\\token.db')
+    # conn = sqlite3.connect('/root/token.db')
     cursor = conn.cursor()
     query_sql = "select token from  token_db_new where username='%s' and workid='%s'" % (username, workid)
     # 执行语句

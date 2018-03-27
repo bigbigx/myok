@@ -62,20 +62,23 @@ class addressing(baseview.BaseView):
                 #info = Account.objects.filter(is_staff=1).all()
                 #info = Account.objects.filter(is_staff=0).all()
                 info = Account.objects.filter(group='approver').all()
+                cc_mail_list = util.readfile()
+                print(cc_mail_list)
                 serializers = UserINFO(info, many=True)
-                return Response({'connection': _serializers.data, 'person': serializers.data})
+                return Response({'connection': _serializers.data, 'person': serializers.data,'cc_mail_list': cc_mail_list})
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
         elif args == "quickbasename":
             try:
                 url = request.data['url']
+                port = request.data['port']
                 basename = request.data['basename']
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
             else:
-                _connection = DatabaseList.objects.filter(ip=str(url)).first()
+                _connection = DatabaseList.objects.filter(port=int(port),ip=str(url)).first()
                 print(_connection.connection_name)
                 try:
                     with con_database.SQLgo(

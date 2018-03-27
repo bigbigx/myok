@@ -4,24 +4,25 @@
 '''
 
 def readfile():
-        filename ='/root/myok/src/libs/business.txt'
-        exmail_addr = []
-        user_name = []
-        with open(filename, 'r',encoding='utf8') as file_to_read:
-            while True:
-                lines = file_to_read.readline()
-                if not lines:
-                    break
-                    pass
-                p_tmp, E_tmp = [str(i) for i in lines.split()]
-                exmail_addr.append(p_tmp)
-                user_name.append(E_tmp)
-        return exmail_addr
+        #filename ='/root/myok/src/libs/business.txt'
+        filename = 'D:\\devops\\myok\\src\\libs\\business.txt'
+        # exmail_addr = []
+        # user_name = []
+        result_inner = {'mail': '', 'username': ''}
+        result = []
+        with open(filename, 'r', encoding='utf8') as file_to_read:
 
-                # pos = np.array(pos)  # 将数据从list类型转换为array类型。
-                # Efield = np.array(Efield)
-                # pass
+            lines = file_to_read.readlines()
+            # print(lines)
+            for  line in lines:
+                line = line.rstrip('\\n')
+                # print(line)
 
+                result_inner['mail'] = line.split()[0]
+                result_inner['username'] = line.split()[1]
+                result.append({'mail':result_inner['mail'],'username': result_inner['username']})
+
+        return result
 
 
 if __name__ == "__main__":

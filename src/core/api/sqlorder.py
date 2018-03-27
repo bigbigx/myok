@@ -138,13 +138,15 @@ class sqlorder(baseview.BaseView):
                 id = request.data['id']
                 base = request.data['base']
                 tmp_sql = request.data['sql']
-                check_sql = request.data['check_sql']
+                # check_sql = request.data['check_sql']
                 sql_ddl = tmp_sql.split('&&&')[0]
                 sql_bak= tmp_sql.split('&&&')[1]
-                sql_ddl = str(sql_ddl).strip().rstrip(';')
-                sql_bak = str(sql_bak).strip().rstrip(';')
-                sql_ddl_1 = check_sql.split('&&&')[0]
-                sql_bak_1 = check_sql.split('&&&')[1]
+                sql_ddl = str(sql_ddl).strip()
+                sql_bak = str(sql_bak).strip()
+                # sql_ddl = str(sql_ddl).strip().rstrip(';')
+                # sql_bak = str(sql_bak).strip().rstrip(';')
+                # sql_ddl_1 = check_sql.split('&&&')[0]
+                # sql_bak_1 = check_sql.split('&&&')[1]
                 #base_id = request.data['base_id']
                 data = DatabaseList.objects.filter(id=id).first()
                 info = {
@@ -161,32 +163,41 @@ class sqlorder(baseview.BaseView):
                 res_bak_list = []
                 with call_explain.Explain(LoginDic=info) as test:
                     try:
-
-                            for one_ddl in sql_ddl.split(";"):
-                                if one_ddl:
-                                    res_ddl = test.ShowExplain(sql=one_ddl)
-                                    res_ddl_list=res_ddl_list+res_ddl
-                                else:
-                                    continue
-                    except Exception as e:
-                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                        #err_msg = f'{e.__class__.__name__}: {e}'
-                        err_msg = [{'err_msg': f'{e.__class__.__name__}: {e}'}]
-                        return Response({'err_msg': err_msg,'status': 202 })
-                    try:
-
+                            j = 0
                             for one_bak in sql_bak.split(";"):
                                 if one_bak:
+                                    j = j + 1
                                     res_bak = test.ShowExplain(sql=one_bak)
                                     res_bak_list = res_bak_list + res_bak
                                 else:
                                     continue
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                        #err_msg_1 = f'{e.__class__.__name__}: {e}'
-                        err_msg_1 = [{'err_msg':f'{e.__class__.__name__}: {e}'}]
-                        return Response({'err_msg': err_msg_1, 'status': 203})
-                return Response({'result_ddl_explain': res_ddl_list, 'result_bak_explain': res_bak_list, 'status': 200})
+                        err_msg_1=''
+                        if j > 0:
+                            err_msg_1 = '第 '+str(j)+'条语句报错:'+f'{e.__class__.__name__}: {e}'
+                            print(err_msg_1)
+                        return Response({'data_bak': err_msg_1, 'status': 203,'flag': False})
+                    try:
+                            i = 0
+                            for one_ddl in sql_ddl.split(";"):
+
+                                if one_ddl:
+                                    i = i + 1
+                                    res_ddl = test.ShowExplain(sql=one_ddl)
+                                    res_ddl_list=res_ddl_list+res_ddl
+                                else:
+                                    continue
+                    except Exception as e:
+                        CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                        print(f'{e.__class__.__name__}: {e}')
+                        #err_msg = f'{e.__class__.__name__}: {e}'
+                        err_msg=''
+                        if  i>0:
+                            err_msg = '第 '+str(i)+'条语句报错:'+f'{e.__class__.__name__}: {e}'
+                        return Response({'data_ddl': err_msg, 'status': 202,'flag': False })
+
+                return Response({'result_ddl_explain': res_ddl_list, 'result_bak_explain': res_bak_list, 'status': 200,'flag': True})
 
 
     def post(self, request, args=None):
@@ -197,6 +208,10 @@ class sqlorder(baseview.BaseView):
             user = request.data['user']
             assigned_man=data['assigned']
             type = request.data['type']
+            run_type = request.data['run_type']
+            cc_list = request.data['cc_list']
+            print("d==========")
+            print(cc_list)
             id = request.data['id']
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -213,7 +228,8 @@ class sqlorder(baseview.BaseView):
                     k = [k.rstrip(';') for k in tmp_bak]
                     sql_2 = ';'.join(k)
                     sql_2 = sql_2.strip(' ').rstrip(';')
-
+                # for cc in cc_list:
+                #     print(cc)
                 token = util.generateTokens(32)
                 workId = util.workId()
                 SqlOrder.objects.get_or_create(
@@ -229,25 +245,26 @@ class sqlorder(baseview.BaseView):
                     bundle_id=id,
                     assigned=data['assigned'],
                     backup_sql=sql_2,
-                    base_id=id
-
+                    base_id=id,
+                    run_type=run_type,
+                    cc_list=cc_list
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
                 mail = Account.objects.filter(username=data['assigned']).first()
                 tag = globalpermissions.objects.filter(authorization='global').first()
                 ret_info = '已提交，请等待管理员审核!'
-                if tag is None or tag.dingding == 0:  #  发送町町
-                    pass
-                else:
-                    if content.url:
-                        try:
-                            util.dingding(
-                                content='工单提交通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单说明:%s\n状态:已提交\n备注:%s'
-                                        %(workId,user,addr_ip,data['text'],content.before), url=content.url)
-                        except:
-                            #ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
-                            ret_info = '工单提交成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                # if tag is None or tag.dingding == 0:  #  发送町町
+                #     pass
+                # else:
+                #     if content.url:
+                #         try:
+                #             util.dingding(
+                #                 content='工单提交通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单说明:%s\n状态:已提交\n备注:%s'
+                #                         %(workId,user,addr_ip,data['text'],content.before), url=content.url)
+                #         except:
+                #             #ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                #             ret_info = '工单提交成功!但是钉钉推送失败,请查看错误日志排查错误.'
                 # 保存token
                 try:
                     #value = [(assigned_man, workId, token)]
@@ -271,6 +288,7 @@ class sqlorder(baseview.BaseView):
                             'run_sql':sql_1,
                             'backup_sql':sql_2,
                             'status': 'apply',
+                            'cc_list': cc_list,
                             'assigned': assigned_man,
                             'token_pass': token,    # 定义审核通过URL 的token
                             'token_reject': token,  #定义审核驳回URL 的token

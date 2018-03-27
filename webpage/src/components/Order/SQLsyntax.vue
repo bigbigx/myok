@@ -31,7 +31,7 @@
               </Select>
             </FormItem>
             <FormItem label="连接名:" prop="connection_name" v-else="this.choose_db">
-              <Input  v-model="formItem.connection_name" disabled></input>
+              <Input  v-model="formItem.connection_name" disabled ></input>
             </FormItem>
 
             <FormItem label="库名:" prop="basename" v-if="!this.choose_db">
@@ -40,42 +40,78 @@
             </Select>
             </FormItem>
             <FormItem label="库名:" prop="basename" v-else="this.choose_db">
-              <Input  v-model="formItem.basename" disabled></input>
+              <Input  v-model="formItem.basename" disabled ></input>
             </FormItem>
 
-
+            <FormItem label="快速选库: ">
+                  <RadioGroup v-model="formItem.quick_choose">
+                              <Radio label="laimi_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi','port':'32112'})" ><Icon type="social-android"></Icon><span>线上laimi库</span></Radio>
+                              <Radio label="activity_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_activity','port':'32021'})"><Icon type="social-android"></Icon><span>线上activity库</span></Radio>
+                              <Radio label="old_salesman_online"  @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_salesman','port':'23764'})"><Icon type="social-android"></Icon><span>线上老供应商salesman库</span></Radio>
+                              <Radio label="laimi_test" @click.native="ChooseDatabase({'url':'101.236.45.42','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>美团云测试库</span></Radio>
+                              <Radio label="my_laimi_test" @click.native="ChooseDatabase({'url':'101.236.41.66 ','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>我的测试库</span></Radio>
+                              <Radio label="custom" @click.native="ReChooseDB()"><Icon type="social-android"></Icon><span>自定义选库</span></Radio>
+                  </RadioGroup>
+              <!--<Button type="default" icon="ios-redo" @click.native="ChooseLaimiOnline()"  :enabled="this.validate_gen1">线上laimi库</Button>-->
+              <!--<Button type="default" icon="ios-redo" @click.native="ChooseActivityOnline()"  style="margin-left: 10%"  :enabled="this.validate_gen1">线上activity库</Button>-->
+              <!--<Button type="default" icon="ios-redo" @click.native="ChooseMylaimi()"  :enabled="this.validate_gen1">我的测试库</Button>-->
+              <!--<Button type="default" icon="ios-redo" @click.native="ReChooseDB()"   style="margin-left: 10%" :enabled="this.validate_gen1">重新选择</Button>-->
+          </FormItem>
+            <FormItem label="是否备份: ">
+              <RadioGroup v-model="formItem.backup">
+                <Radio label="1">是(默认)</Radio>
+                <Radio label="0">否</Radio>
+              </RadioGroup>
+            </FormItem>
             <FormItem label="工单说明:" prop="text">
               <Input type="textarea" :rows="8" v-model="formItem.text" placeholder="请输入"></Input>
             </FormItem>
 
             <FormItem label="指定审核人:" prop="text">
-              <Select v-model="formItem.assigned">
+              <Select v-model="formItem.assigned" v-if="formItem.person===2">
                 <Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>
               </Select>
-            </FormItem>
-
-            <!--<FormItem label="指定邮件抄送人:" prop="text">-->
-              <!--<Select v-model="formItem.assigned">-->
-                <!--<Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>-->
-              <!--</Select>-->
-            <!--</FormItem>-->
-
-            <FormItem label="是否备份: ">
-              <RadioGroup v-model="formItem.backup">
-                <Radio label="1" default>是</Radio>
-                <Radio label="0">否</Radio>
+              <Input  v-model="formItem.assigned" disabled  ></Input>
+               <RadioGroup v-model="formItem.person">
+                   <Radio label="0" @click.native="choose_approver()" ><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
+                  <Radio label="1" @click.native="choose_approver()"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
+                 <Radio  label="2" @click.native="choose_approver()"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
               </RadioGroup>
             </FormItem>
-            <FormItem label="快速选库: ">
-              <Button type="default" icon="ios-redo" @click.native="ChooseLaimiOnline()"  :enabled="this.validate_gen1">线上laimi库</Button>
-              <Button type="default" icon="ios-redo" @click.native="ChooseActivityOnline()"  :enabled="this.validate_gen1">线上activity库</Button>
-              <Button type="default" icon="ios-redo" @click.native="ChooseMylaimi()"  :enabled="this.validate_gen1">我的测试库</Button>
-              <Button type="default" icon="ios-redo" @click.native="ReChooseDB()"  :enabled="this.validate_gen1">重新选择</Button>
-          </FormItem>
-            <br>
+
+            <FormItem label="邮件抄送人:" prop="text">
+              <Tooltip placement="top">
+              <Checkbox v-model="cc_mail"  >选择(请点击)</Checkbox><p></p>
+                <div slot="content">
+                  <p>点击选择邮件抄送人</p>
+                  <p><i>勾选选人</i></p>
+              </div>
+              </Tooltip>
+              <p></p>
+               <!--<Button type="default" icon="ios-redo" size="small" @click.native="checkbox_test()" v-if="this.cc_mail" >确定</Button>-->
+              <!--<Button type="default" icon="ios-redo" size="small" @click.native="checkbox_all()" style="margin-left: 20%" v-if="this.cc_mail" >全选</Button>-->
+                  <CheckboxGroup v-if="this.cc_mail" v-model="social">
+                      <Checkbox v-for="k in this.cc_mail_list" :label="k.mail">
+                          <Icon type="social-twitter"></Icon>
+                          <span >{{k.username}}</span>
+                      </Checkbox>
+                  </CheckboxGroup>
+            </FormItem>
+
+
             <FormItem label="SQL检查: ">
+              <Tooltip placement="top">
               <Button type="default" icon="paintbucket" @click.native="beautify()">美化</Button>
+                <div slot="content">
+                  <p>对SQL语句进行排版</p>
+              </div>
+              </Tooltip>
+              <Tooltip placement="top">
               <Button type="default" icon="android-search" style="margin-left: 10%" @click.native="test_sql_1()">检测</Button>
+                <div slot="content">
+                  <p>检测SQL语句</p>
+              </div>
+              </Tooltip>
             </FormItem>
 
 
@@ -83,9 +119,17 @@
               <Button type="success" icon="ios-redo" @click.native="SubmitSQL()"   :disabled="this.validate_gen">工单提交</Button>
             </FormItem>
             <FormItem label="选项: ">
+              <Tooltip placement="top">
               <Checkbox v-model="single"  @click.native="show_explain_div()" >高级</Checkbox><p></p>
+                <div slot="content">
+                  <p>检测无法通过</p>
+                  <p><i>可点击此高级按钮</i></p>
+                  <p>然后点击explain按钮</p>
+              </div>
+              </Tooltip>
+              <p></p>
               <Button type="primary" icon="ios-redo" @click.native="explain_test()"    v-if="this.single">explain</Button>
-              <Button type="primary" icon="android-search" style="margin-left: 10%" @click.native="sqladvisor()" v-if="this.single">优化</Button>
+              <!--<Button type="primary" icon="android-search" style="margin-left: 10%" @click.native="sqladvisor()" v-if="this.single">优化</Button>-->
             </FormItem>
 
           </Form>
@@ -165,8 +209,13 @@ export default {
         connection_name: '',
         basename: '',
         text: '',
-        backup: 1,
-        assigned: ''
+        backup: '1',
+        assigned: 'liuyan',
+        cc_mail_list: [],
+        default_ccmail: [],
+        quick_choose: 'my_laimi_test',
+        hang_choose: false,
+        person: '0'
       },
       columnsName: [
         {
@@ -203,13 +252,6 @@ export default {
           width: '130'
         }
       ],
-      //  columnsName_explain_error: [
-      //  {
-      //     title: 'SQL报错信息',
-      //     key: 'err_msg',
-      //     width: '350'
-      //   }
-      // ],
       columnsName_explain: [
         {
           title: 'SelectType',
@@ -267,7 +309,7 @@ export default {
         connection_name_list: [],
         basenamelist: [],
         sqllist: [],
-        computer_roomlist: util.computer_room
+        computer_roomlist: util.computer_room,
       },
       ruleValidate: {
         computer_room: [{
@@ -302,11 +344,27 @@ export default {
       assigned: [],
       flag: false,
       single: false,
+      cc_mail: false,
       validate_result: false,
-      choose_db: false
+      validate_cc_mail: false,
+      choose_db: false,
+      cc_address_list: [],
+      social: [],
+      run_type: 0  //  0 -- inception方式提交和执行sql  1-- 直接连接数据库提交和执行
     }
   },
   methods: {
+    // checkbox_test (val) {
+    //   // this.cc_address_list=k.mail
+    //   alert(this.social)
+    // },
+    show_ccmail_div () {
+      if (this.cc_mail) {
+        this.validate_cc_mail = true
+      } else {
+        this.validate_cc_mail = false
+      }
+    },
     show_explain_div () {
       if (this.single) {
         this.validate_result = true
@@ -320,9 +378,6 @@ export default {
           'data2': this.formItem.textarea_ddl_dml || ''
         })
         .then(res => {
-          // console.log(res)
-          // console.log(res.data.select)
-          // console.log(res.data.dml_ddl)
           this.formItem.textarea_backup = res.data.select
           this.formItem.textarea_ddl_dml = res.data.dml_ddl
         })
@@ -351,41 +406,8 @@ export default {
         }
       })
     },
-    ChooseMylaimi () {
-          axios.put(`${util.url}/workorder/quickbasename`, {
-            'url': '101.236.41.66',
-            'basename': 'laimi_test'
-          })
-          .then(res => {
-              console.log(res.data)
-              this.flag = true;
-              this.choose_db = true;
-              this.formItem.computer_room = res.data['computer_room'];
-              this.formItem.connection_name = res.data['connection_name'];
-              this.formItem.basename = res.data['laimi_db'];
-              this.id = [res.data['id']];
-              this.$nextTick(() => {
-                this.flag = false;
-              });
-            if (res.data.status === 202) {
-              this.$Notice.error({
-              title: '警告',
-              desc: res.data['msg']
-            })
-            }
-          })
-          .catch((error) => {
-            this.$Notice.error({
-              title: '警告',
-              desc: error
-            })
-          })
-    },
-    ChooseActivityOnline () {
-        axios.put(`${util.url}/workorder/quickbasename`, {
-            'url': 'rm-m5eb3mg98au6s55xpo.mysql.rds.aliyuncs.com',
-            'basename': 'laimi_activity'
-          })
+    ChooseDatabase (param) {
+        axios.put(`${util.url}/workorder/quickbasename`, param)
           .then(res => {
               console.log(res.data)
               this.flag = true;
@@ -414,36 +436,6 @@ export default {
     ReChooseDB () {
       this.choose_db = false;
       this.id = null;
-    },
-    ChooseLaimiOnline (val) {
-        axios.put(`${util.url}/workorder/quickbasename`, {
-            'url': 'rds6qxe126phmtspwi72o.mysql.rds.aliyuncs.com',
-            'basename': 'laimi'
-          })
-          .then(res => {
-              console.log(res.data)
-              this.flag = true;
-              this.choose_db = true;
-              this.formItem.computer_room = res.data['computer_room'];
-              this.formItem.connection_name = res.data['connection_name'];
-              this.formItem.basename = res.data['laimi_db'];
-              this.id = [res.data['id']];
-              this.$nextTick(() => {
-                this.flag = false;
-              });
-            if (res.data.status === 202) {
-              this.$Notice.error({
-              title: '警告',
-              desc: res.data['msg']
-            })
-            }
-          })
-          .catch((error) => {
-            this.$Notice.error({
-              title: '警告',
-              desc: error
-            })
-          })
     },
     DataBaseName (index) {
       if (index) {
@@ -481,13 +473,13 @@ export default {
             let tmpbak2 = '';
             if (this.formItem.textarea_backup) {
               tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-              tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+              // tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             } else {
               tmpbak = ''
             }
             if (this.formItem.textarea_ddl_dml) {
               tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-              tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+              // tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             } else {
               tmpddl = ''
             }
@@ -496,8 +488,7 @@ export default {
               'id': this.id[0].id,
               'base': this.formItem.basename,
               'type': 1,
-              'sql': tmpddl + '&&&' + tmpbak,
-              'check_sql': tmpddl2 + '&&&' + tmpbak2
+              'sql': tmpddl2 + '&&&' + tmpbak2
             })
               .then(res => {
                 console.log(res.data)
@@ -506,27 +497,34 @@ export default {
                   this.Testresults_backup_explain = res.data.result_bak_explain
                   this.Testresults_backup_explain_error = '';
                   this.Testresults_explain_error = '';
+                  this.validate_gen = false;
+                  this.run_type = 1;
                 } else if (res.data.status === 202) {
                     this.$Notice.error({
                     title: '执行语句错误',
-                    desc: res.data.err_msg
+                    desc: res.data.data_ddl,
+                    duration: 15
                  })
                    this.Testresults_explain = '';
                    this.Testresults_explain_error = res.data.err_msg;
                    this.Testresults_backup_explain_error = '';
+                   this.validate_gen = true;
                 } else if (res.data.status === 203) {
                   this.$Notice.error({
                     title: '备份语句错误',
-                    desc: res.data.err_msg
+                    desc: res.data.data_bak,
+                    duration: 15
                  })
                    this.Testresults_backup_explain = '';
                    this.Testresults_backup_explain_error = res.data.err_msg;
                    this.Testresults_explain_error = '';
+                   this.validate_gen = true;
                 } else {
                   this.$Notice.error({
                    title: '错误-1',
                    desc: '未知的错误'
                  })
+                  this.validate_gen = true;
                }
               })
               .catch((error) => {
@@ -604,6 +602,7 @@ export default {
                  } else {
                    this.validate_gen = true
                  }
+                 this.run_type = 0;
                } else if (res.data.status === 202) {
                  this.$Notice.error({
                    title: '警告',
@@ -635,6 +634,7 @@ export default {
             this.validate_gen = true
             this.datalist.sqllist_ddl = ''
             this.datalist.sqllist_backup = ''
+
             if (this.formItem.textarea_ddl_dml) {
                 this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
             }
@@ -647,6 +647,8 @@ export default {
                 'backup_sql': JSON.stringify(this.datalist.sqllist_backup),
                 'user': Cookies.get('user'),
                 'type': 1,
+                'run_type': this.run_type,
+                'cc_list': this.social,
                 'id': this.id[0].id
               })
               .then(res => {
@@ -674,14 +676,18 @@ export default {
       this.formItem.textarea_ddl_dml = '';
       this.formItem.textarea_backup = '';
       this.Testresults = '';
-      this.Testresults_backup = ''
+      this.Testresults_backup = '';
+      this.social=[];
+      this.Testresults_backup_explain='';
+      this.Testresults_explain='';
     }
   },
   mounted () {
     axios.put(`${util.url}/workorder/connection`)
       .then(res => {
-        this.item = res.data['connection']
-        this.assigned = res.data['person']
+        this.item = res.data['connection'];
+        this.assigned = res.data['person'];
+        this.cc_mail_list = res.data['cc_mail_list'];
       })
       .catch(error => {
         util.ajanxerrorcode(this, error)
