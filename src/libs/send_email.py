@@ -92,6 +92,8 @@ class send_email(object):
                        mail_data['run_sql'],
                        mail_data['backup_sql'])
             cc_list = mail_data['cc_list']
+            approver_mail = mail_data['approver_mail']
+            mail_executer = mail_data['executer_mail']
             cc_address_list = util.myok(cc_list)
             print([self.to_addr] + cc_address_list)
             msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
@@ -111,7 +113,7 @@ class send_email(object):
             server.set_debuglevel(1)
             server.login(from_addr, password)
             # server.sendmail(from_addr, [self.to_addr] + cc_list, msg.as_string())
-            server.sendmail(from_addr, [self.to_addr] + cc_address_list, msg.as_string())
+            server.sendmail(from_addr, [self.to_addr]+[approver_mail] +[mail_executer]+ cc_address_list, msg.as_string())
             server.quit()
 
 
