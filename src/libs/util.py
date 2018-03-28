@@ -59,6 +59,15 @@ def dingding(content = None, url = None):
     request.urlopen(req, data=binary_data, context=context).read()
 
 
+def myok(str=None):
+
+    str.lstrip('[').rstrip(']')
+    hello = []
+    for i in str.lstrip('[').rstrip(']').split(','):
+        k=i.strip().replace("'",'')
+        print(k)
+        hello.append(k)
+    return hello
 #def date() -> str:
 def date():
     '''
@@ -154,3 +163,7 @@ def auth(username, password):
     else:
         return False
 
+
+#
+# if __name__ == '__main__':
+#     myok()

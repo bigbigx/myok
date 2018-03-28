@@ -210,8 +210,6 @@ class sqlorder(baseview.BaseView):
             type = request.data['type']
             run_type = request.data['run_type']
             cc_list = request.data['cc_list']
-            print("d==========")
-            print(cc_list)
             id = request.data['id']
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

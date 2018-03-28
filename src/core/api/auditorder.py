@@ -230,6 +230,7 @@ class audit(baseview.Approverpermissions):
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info = "sqlite数据库后台异常，请联系系统管理员"
+                                SqlOrder.objects.filter(id=id).update(status=2)
                                 return HttpResponse(ret_info)
 
                                 # -----增加执行的todken

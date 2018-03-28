@@ -65,7 +65,7 @@ class addressing(baseview.BaseView):
                 cc_mail_list = util.readfile()
                 print(cc_mail_list)
                 serializers = UserINFO(info, many=True)
-                return Response({'connection': _serializers.data, 'person': serializers.data,'cc_mail_list': cc_mail_list})
+                return Response({'connection': _serializers.data, 'person': serializers.data, 'cc_mail_list': cc_mail_list})
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
@@ -92,10 +92,10 @@ class addressing(baseview.BaseView):
                         for i in base_list:
                             print(i)
                             if (basename == i):
-                                 return Response({'id': {'id':_connection.id},'computer_room':_connection.computer_room,'connection_name': _connection.connection_name,'laimi_db':i})
+                                 return Response({'id': {'id':_connection.id},'computer_room_custom':_connection.computer_room,'connection_name_custom': _connection.connection_name,'laimi_db':i})
                             else:
                                 continue
-                        return Response({'msg': '此数据库地址没有laimi'}, status=202)
+                        return Response({'msg': '连接名没有找到对应的数据库'}, status=202)
                 except Exception as e:
                     print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

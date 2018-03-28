@@ -50,7 +50,7 @@
                               <Radio label="old_salesman_online"  @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_salesman','port':'23764'})"><Icon type="social-android"></Icon><span>线上老供应商salesman库</span></Radio>
                               <Radio label="laimi_test" @click.native="ChooseDatabase({'url':'101.236.45.42','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>美团云测试库</span></Radio>
                               <Radio label="my_laimi_test" @click.native="ChooseDatabase({'url':'101.236.41.66 ','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>我的测试库</span></Radio>
-                              <Radio label="custom" @click.native="ReChooseDB()"><Icon type="social-android"></Icon><span>自定义选库</span></Radio>
+                              <!--<Radio label="custom" @click.native="ReChooseDB()"><Icon type="social-android"></Icon><span>自定义选库</span></Radio>-->
                   </RadioGroup>
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseLaimiOnline()"  :enabled="this.validate_gen1">线上laimi库</Button>-->
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseActivityOnline()"  style="margin-left: 10%"  :enabled="this.validate_gen1">线上activity库</Button>-->
@@ -64,18 +64,18 @@
               </RadioGroup>
             </FormItem>
             <FormItem label="工单说明:" prop="text">
-              <Input type="textarea" :rows="8" v-model="formItem.text" placeholder="请输入"></Input>
+              <Input type="textarea" :rows="6" v-model="formItem.text" placeholder="请输入"></Input>
             </FormItem>
 
-            <FormItem label="指定审核人:" prop="text">
-              <Select v-model="formItem.assigned" v-if="formItem.person===2">
+            <FormItem label="指定审核人:" prop="text" >
+              <Select v-model="formItem.assigned" v-if="person==2" >
                 <Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>
               </Select>
-              <Input  v-model="formItem.assigned" disabled  ></Input>
-               <RadioGroup v-model="formItem.person">
-                   <Radio label="0" @click.native="choose_approver()" ><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
-                  <Radio label="1" @click.native="choose_approver()"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
-                 <Radio  label="2" @click.native="choose_approver()"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
+                <Input type="text"  v-model="formItem.assigned"  disabled  v-if="person==0 || person==1"  ></Input>
+               <RadioGroup v-model="person" >
+                 <Radio label=0 @click.native="chooseapprover(0)"><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
+                 <Radio label=1 @click.native="chooseapprover(1)"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
+                 <Radio label=2 @click.native="chooseapprover(2)"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
               </RadioGroup>
             </FormItem>
 
@@ -123,8 +123,9 @@
               <Checkbox v-model="single"  @click.native="show_explain_div()" >高级</Checkbox><p></p>
                 <div slot="content">
                   <p>检测无法通过</p>
-                  <p><i>可点击此高级按钮</i></p>
+                  <p>可点击此高级按钮</p>
                   <p>然后点击explain按钮</p>
+                  <p>只要explain正常,则工单可提交</p>
               </div>
               </Tooltip>
               <p></p>
@@ -213,9 +214,8 @@ export default {
         assigned: 'liuyan',
         cc_mail_list: [],
         default_ccmail: [],
-        quick_choose: 'my_laimi_test',
-        hang_choose: false,
-        person: '0'
+        quick_choose: 'custom',
+        hang_choose: false
       },
       columnsName: [
         {
@@ -345,6 +345,7 @@ export default {
       flag: false,
       single: false,
       cc_mail: false,
+      person: 0,
       validate_result: false,
       validate_cc_mail: false,
       choose_db: false,
@@ -354,10 +355,16 @@ export default {
     }
   },
   methods: {
-    // checkbox_test (val) {
-    //   // this.cc_address_list=k.mail
-    //   alert(this.social)
-    // },
+    chooseapprover (val) {
+
+     if (val===0) {
+        this.formItem.assigned = "liuyan";
+     } else if (val===1) {
+       this.formItem.assigned = 'paul';
+     } else {
+       this.formItem.assigned='';
+     }
+    },
     show_ccmail_div () {
       if (this.cc_mail) {
         this.validate_cc_mail = true
@@ -394,8 +401,9 @@ export default {
       } else {
         this.datalist.connection_name_list = [];
       }
-      if (this.flag) return;
+      // if (this.flag) return;
       this.datalist.basenamelist = [];
+
       this.formItem.connection_name = '';
       this.formItem.basename = '';
     },
@@ -409,13 +417,13 @@ export default {
     ChooseDatabase (param) {
         axios.put(`${util.url}/workorder/quickbasename`, param)
           .then(res => {
-              console.log(res.data)
               this.flag = true;
               this.choose_db = true;
-              this.formItem.computer_room = res.data['computer_room'];
-              this.formItem.connection_name = res.data['connection_name'];
+              this.formItem.computer_room = res.data['computer_room_custom'];
+              this.formItem.connection_name = res.data['connection_name_custom'];
               this.formItem.basename = res.data['laimi_db'];
               this.id = [res.data['id']];
+              this.datalist.connection_name_list=[];
               this.$nextTick(() => {
                 this.flag = false;
               });
@@ -436,6 +444,11 @@ export default {
     ReChooseDB () {
       this.choose_db = false;
       this.id = null;
+      this.formItem.computer_room = null;
+      this.formItem.connection_name = null;
+      this.formItem.basename = null;
+      this.datalist.basenamelist = [];
+      this.datalist.connection_name_list =[];
     },
     DataBaseName (index) {
       if (index) {
@@ -685,6 +698,7 @@ export default {
   mounted () {
     axios.put(`${util.url}/workorder/connection`)
       .then(res => {
+        console.log('ddddd', res.data)
         this.item = res.data['connection'];
         this.assigned = res.data['person'];
         this.cc_mail_list = res.data['cc_mail_list'];

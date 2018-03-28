@@ -186,6 +186,7 @@ class execute(baseview.Approverpermissions):
                         run_type_value = c.run_type
                         sql_value = c.sql
                         workid = c.work_id
+                        cc_list = c.cc_list
                         conn = conn_sqlite.query(from_user, workid)  # 查询token 是否存在
                     except Exception as e:
                         print(e)
@@ -301,7 +302,7 @@ class execute(baseview.Approverpermissions):
                                     # execute_time=i['execute_time']
                                 )
                             else:
-                                for j in res:
+                                for i in res:
                                     SqlRecord.objects.get_or_create(
                                         date=util.date(),
                                         state=i['stagestatus'],
@@ -351,20 +352,20 @@ class execute(baseview.Approverpermissions):
                             mail_executer = Account.objects.filter(username=from_user).first()  # 执行人
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
-
-                            if tag is None or tag.dingding == 0:
-                                pass
-                            else:
-                                try:
-                                    if content.url:
-                                        util.dingding(
-                                            content='工单执行成功通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单备注:%s\n状态:同意\n备注:%s'
-                                                    % (c.work_id, c.username, addr_ip, c.text, content.after),
-                                            url=content.url)
-
-
-                                except:
-                                    ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
+                            #
+                            # if tag is None or tag.dingding == 0:
+                            #     pass
+                            # else:
+                            #     try:
+                            #         if content.url:
+                            #             util.dingding(
+                            #                 content='工单执行成功通知\n工单编号:%s\n发起人:%s\n地址:%s\n工单备注:%s\n状态:同意\n备注:%s'
+                            #                         % (c.work_id, c.username, addr_ip, c.text, content.after),
+                            #                 url=content.url)
+                            #
+                            #
+                            #     except:
+                            #         ret_info = '工单执行成功!但是钉钉推送失败,请查看错误日志排查错误.'
 
                             if tag is None or tag.email == 0:
                                 pass
@@ -383,6 +384,7 @@ class execute(baseview.Approverpermissions):
                                             'type': '执行成功',
                                             'backup': backup_status,
                                             'note': content.after,
+                                            'cc_list': cc_list,
                                             'file': file_path}
                                         put_mess = send_email.send_email(to_addr=mail_apply.email)  # 发功给申请人
                                         put_mess.send_mail(mail_data=mess_info, type=3)
