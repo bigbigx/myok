@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email import encoders
 from email.utils import parseaddr, formataddr
 import smtplib
-from libs.readfile import readfile
+# from libs.readfile import readfile
 
 conf = util.conf_path()
 from_addr = conf.mail_user
