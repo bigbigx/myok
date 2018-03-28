@@ -14,6 +14,8 @@ class Inception(object):
         self.__dict__.update(LoginDic)
         self.con = object
 
+
+
     def __enter__(self):
         self.con = pymysql.connect(host=conf.inc_host,
                                    user=conf.inc_user,
