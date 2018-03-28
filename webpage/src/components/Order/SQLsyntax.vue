@@ -68,14 +68,14 @@
             </FormItem>
 
             <FormItem label="指定审核人:" prop="text">
-              <Select v-model="formItem.assigned" v-if="formItem.person===2">
+              <Select v-model="formItem.assigned" v-if="person==2">
                 <Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>
               </Select>
-              <Input  v-model="formItem.assigned" disabled  ></Input>
-               <RadioGroup v-model="formItem.person">
-                   <Radio label="0" @click.native="choose_approver()" ><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
-                  <Radio label="1" @click.native="choose_approver()"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
-                 <Radio  label="2" @click.native="choose_approver()"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
+              <Input  v-model="formItem.assigned" disabled v-if="person==1 || person==0" ></Input>
+               <RadioGroup v-model="person">
+                   <Radio label=0 @click.native="chooseapprover(0)" ><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
+                  <Radio label=1 @click.native="chooseapprover(1)"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
+                 <Radio  label=2 @click.native="chooseapprover(2)"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
               </RadioGroup>
             </FormItem>
 
@@ -203,6 +203,7 @@ export default {
     return {
       validate_gen: true,
       validate_gen1: true,
+      person: 0,
       formItem: {
         textarea: '',
         computer_room: '',
@@ -214,8 +215,7 @@ export default {
         cc_mail_list: [],
         default_ccmail: [],
         quick_choose: 'my_laimi_test',
-        hang_choose: false,
-        person: '0'
+        hang_choose: false
       },
       columnsName: [
         {
@@ -354,10 +354,15 @@ export default {
     }
   },
   methods: {
-    // checkbox_test (val) {
-    //   // this.cc_address_list=k.mail
-    //   alert(this.social)
-    // },
+    chooseapprover (val) {
+      if (val===0) {
+        this.formItem.assigned='liuyan'
+      } else if (val===1) {
+        this.formItem.assigned='paul'
+      } else {
+        this.formItem.assigned=''
+      }
+    },
     show_ccmail_div () {
       if (this.cc_mail) {
         this.validate_cc_mail = true
