@@ -50,7 +50,7 @@
                               <Radio label="old_salesman_online"  @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_salesman','port':'23764'})"><Icon type="social-android"></Icon><span>线上老供应商salesman库</span></Radio>
                               <Radio label="laimi_test" @click.native="ChooseDatabase({'url':'101.236.45.42','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>美团云测试库</span></Radio>
                               <Radio label="my_laimi_test" @click.native="ChooseDatabase({'url':'101.236.41.66 ','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>我的测试库</span></Radio>
-                              <Radio label="custom" @click.native="ReChooseDB()"><Icon type="social-android"></Icon><span>自定义选库</span></Radio>
+                              <!--<Radio label="custom" @click.native="ReChooseDB()"><Icon type="social-android"></Icon><span>自定义选库</span></Radio>-->
                   </RadioGroup>
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseLaimiOnline()"  :enabled="this.validate_gen1">线上laimi库</Button>-->
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseActivityOnline()"  style="margin-left: 10%"  :enabled="this.validate_gen1">线上activity库</Button>-->
