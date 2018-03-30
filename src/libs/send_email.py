@@ -87,9 +87,9 @@ class send_email(object):
                        mail_data['run_sql'],
                        mail_data['backup_sql'])
             cc_list = mail_data['cc_list']
-            approver_mail = mail_data['approver']
+            approver_mail = mail_data['approve_man']
             cc_address_list = util.myok(cc_list)
-            print([self.to_addr] + cc_address_list)
+            print([self.to_addr] + [approver_mail] + cc_address_list)
             msg['To'] = self._format_addr('Dear 用户 <%s> <%s>' % (self.to_addr,approver_mail))
             msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
             msg['Subject'] = Header('蜜罐工单状态---SQL执行完成', 'utf-8').encode()
@@ -105,7 +105,12 @@ class send_email(object):
             server = smtplib.SMTP_SSL(smtp_server, port=465)
             server.set_debuglevel(1)
             server.login(from_addr, password)
-            server.sendmail(from_addr, [self.to_addr]+[approver_mail] + cc_address_list, msg.as_string())
+            if cc_address_list==['']:
+                print(1)
+                server.sendmail(from_addr, [self.to_addr] + [approver_mail], msg.as_string())
+            else:
+                print(2)
+                server.sendmail(from_addr, [self.to_addr] + [approver_mail] + cc_address_list, msg.as_string())
             server.quit()
 
 
