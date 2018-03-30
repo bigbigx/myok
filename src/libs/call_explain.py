@@ -29,7 +29,6 @@ class Explain(object):
 
     def ShowExplain(self, sql=None):
         sql=''' explain  ''' + sql
-        print(sql)
         with self.con.cursor() as cursor:
             cursor.execute(sql)
             result = cursor.fetchall()
@@ -94,4 +93,3 @@ if __name__ == '__main__':
        # test.RunSQL(sql='''SELECT * FROM t_erp_sale_order t WHERE t.bill_id IN (11, 12);''')
 
        result = test.RunSQL(sql='''UPDATE t_erp_sale_order t SET t.delivery_status='cancel' WHERE t.bill_id IN (11, 12); UPDATE t_erp_sale_order t SET t.delivery_status='cancel' WHERE t.bill_id IN (11,12)''')
-       print(result)

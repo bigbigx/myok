@@ -365,15 +365,10 @@ class orderdetail(baseview.BaseView):
                     return Response({'data':_serializers.data, 'type':type_id.type})
                 else:
                     data = SqlOrder.objects.filter(work_id=workid).first()
-                    print("=====")
-                    print(data.backup_sql)
                     mylist=[{'sql': x} for x in data.sql.split(';')]
                     my_bak_list=[{'backup_sql': y} for y in data.backup_sql.split(';')]
-                    print(mylist+my_bak_list)
 
                     _in = {'data': mylist+my_bak_list, 'type': type_id.type}
-                    print("+++++")
-                    print(_in)
                     return Response(_in)
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__} : {e}')

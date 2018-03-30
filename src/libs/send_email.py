@@ -89,7 +89,6 @@ class send_email(object):
             cc_list = mail_data['cc_list']
             approver_mail = mail_data['approver']
             cc_address_list = util.myok(cc_list)
-            print([self.to_addr] + cc_address_list)
             msg['To'] = self._format_addr('Dear 用户 <%s> <%s>' % (self.to_addr,approver_mail))
             msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
             msg['Subject'] = Header('蜜罐工单状态---SQL执行完成', 'utf-8').encode()

@@ -120,9 +120,6 @@ class sqlorder(baseview.BaseView):
                             res_ddl = test.Check(sql=sql_ddl)
                         if sql_bak:
                            res_bak = test.Check(sql=sql_bak)
-                        print("=====")
-                        print(res_ddl)
-                        print(res_bak)
                         return Response({'result_ddl': res_ddl,'result_bak': res_bak, 'status': 200})
                 except Exception as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -176,7 +173,6 @@ class sqlorder(baseview.BaseView):
                         err_msg_1=''
                         if j > 0:
                             err_msg_1 = '第 '+str(j)+'条语句报错:'+f'{e.__class__.__name__}: {e}'
-                            print(err_msg_1)
                         return Response({'data_bak': err_msg_1, 'status': 203,'flag': False})
                     try:
                             i = 0

@@ -256,7 +256,6 @@ class execute(baseview.Approverpermissions):
                                     pass
                             else:  # 发送sql语句到后台数据库中直接执行
                                 if sql_value:
-                                    print(sql_value)
                                     with  call_explain.Explain(LoginDic={
                                         'host': SQL_LIST.ip,
                                         'user': SQL_LIST.username,

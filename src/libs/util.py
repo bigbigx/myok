@@ -65,7 +65,6 @@ def myok(str=None):
     hello = []
     for i in str.lstrip('[').rstrip(']').split(','):
         k=i.strip().replace("'",'')
-        print(k)
         hello.append(k)
     return hello
 #def date() -> str:

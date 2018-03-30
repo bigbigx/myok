@@ -18,7 +18,7 @@ def startnode():
     subprocess.call('npm run dev', shell=True)
 
 def main():
-    print('请访问%s'%OutIp)
+    # print('请访问%s'%OutIp)
     django = Process(target=startdjango, args=())
     node = Process(target=startnode, args=())
     django.start()

@@ -11,7 +11,7 @@ def test():
    data2 = call_inception.Inception.BeautifySQL(sql=data_ddl_dml)
    data['select'] = data1
    data['dml_ddl'] = data2
-   print(data)
+
 
 
 

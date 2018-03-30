@@ -71,7 +71,7 @@ class Inception(object):
                 Type='--enable-execute',
                 backup='--disable-remote-backup')
 
-        print(Inceptionsql)
+
         with self.con.cursor() as cursor:
             cursor.execute(Inceptionsql)
             result = cursor.fetchall()

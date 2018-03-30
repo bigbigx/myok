@@ -82,13 +82,12 @@ def queryByToken(token):
     hello = results.fetchall()
     if hello:
         result = True
-    print(result)
     return result
 
 
 def query(username,workid):
 
-    #os.chdir('d:\\pycharm\\lesson\\sn01')
+
     conn = sqlite3.connect(tokendb_path)
     cursor = conn.cursor()
     query_sql = "select token from  token_db_new where username='%s' and workid='%s'" % (username, workid)
@@ -99,5 +98,4 @@ def query(username,workid):
     hello = results.fetchall()
     if hello:
         result = True
-    print(result)
     return result

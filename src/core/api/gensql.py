@@ -63,7 +63,6 @@ class addressing(baseview.BaseView):
                 #info = Account.objects.filter(is_staff=0).all()
                 info = Account.objects.filter(group='approver').all()
                 cc_mail_list = util.readfile()
-                print(cc_mail_list)
                 serializers = UserINFO(info, many=True)
                 return Response({'connection': _serializers.data, 'person': serializers.data, 'cc_mail_list': cc_mail_list})
             except Exception as e:
@@ -79,7 +78,6 @@ class addressing(baseview.BaseView):
                 return HttpResponse(status=500)
             else:
                 _connection = DatabaseList.objects.filter(port=int(port),ip=str(url)).first()
-                print(_connection.connection_name)
                 try:
                     with con_database.SQLgo(
                         ip=_connection.ip,
@@ -88,7 +86,6 @@ class addressing(baseview.BaseView):
                         port=_connection.port
                     ) as f:
                         base_list = f.basename()
-                        print(base_list)
                         for i in base_list:
                             print(i)
                             if (basename == i):

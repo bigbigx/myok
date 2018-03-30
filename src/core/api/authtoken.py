@@ -152,7 +152,6 @@ class authtoken(baseview.AnyLogin):
                                 reject_remark = '快捷审核通过，通过原因请联系审核人'
                                 title = '工单:' + _tmpData['work_id'] + '审核通过通知'
                                 mail = Account.objects.filter(username='dba').first()
-                                print(mail.email)
                                 msg_content = '工单详情是：' + _tmpData['text'] + '\r\n'
                                 Usermessage.objects.get_or_create(
                                     from_user=username,
