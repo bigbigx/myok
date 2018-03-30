@@ -283,8 +283,8 @@ class exetoken(baseview.AnyLogin):
                                     '''
 
                                     content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                                    mail = Account.objects.filter(username=to_user).first()
-                                    mail_approver = Account.objects.filter(username=username).first()
+                                    approve_man_mail = Account.objects.filter(username=to_user).first() #指派人，即审核人
+                                    apply_man_approver = Account.objects.filter(username=username).first()
                                     tag = globalpermissions.objects.filter(authorization='global').first()
                                     ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
 
@@ -311,6 +311,7 @@ class exetoken(baseview.AnyLogin):
                                                     'workid': c.work_id,
                                                     'to_user': c.username,
                                                     'approver': to_user,
+                                                    'approve_man': approve_man_mail.email,
                                                     'run_sql': c.sql,
                                                     'backup_sql': bak_sql,
                                                     'addr': addr_ip,
@@ -321,10 +322,10 @@ class exetoken(baseview.AnyLogin):
                                                     'note': content.after,
                                                     'cc_list': cc_list,
                                                     'file': file_path}
-                                                put_mess = send_email.send_email(to_addr=mail.email)
+                                                put_mess = send_email.send_email(to_addr=apply_man_approver.email)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)
-                                                put_mess1 = send_email.send_email(to_addr=mail_approver.email)
-                                                put_mess1.send_mail(mail_data=mess_info, type=3)
+                                                # put_mess1 = send_email.send_email(to_addr=mail_approver.email)
+                                                # put_mess1.send_mail(mail_data=mess_info, type=3)
 
 
 

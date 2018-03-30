@@ -374,6 +374,7 @@ class execute(baseview.Approverpermissions):
                                             'workid': c.work_id,
                                             'to_user': c.username,
                                             'approver': to_user,
+                                            'approve_man': mail_approver.email,
                                             'run_sql': c.sql,
                                             'backup_sql': bak_sql,
                                             'addr': addr_ip,
