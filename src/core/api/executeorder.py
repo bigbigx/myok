@@ -168,7 +168,7 @@ class execute(baseview.Approverpermissions):
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
 
-            elif type == 1:  ##开始执行
+            elif type == 1:  ##开始执行, 邮件发送到发起人，审核人和抄送人员
                 try:
                     from_user = request.data['from_user']
                     to_user = request.data['to_user']
@@ -349,7 +349,6 @@ class execute(baseview.Approverpermissions):
                             content = DatabaseList.objects.filter(id=c.bundle_id).first()
                             mail_apply = Account.objects.filter(username=c.username).first()  # 工单发起人
                             mail_approver = Account.objects.filter(username=to_user).first()  # 指派人，即审核人
-                            mail_executer = Account.objects.filter(username=from_user).first()  # 执行人
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                             #
@@ -385,7 +384,6 @@ class execute(baseview.Approverpermissions):
                                             'backup': backup_status,
                                             'note': content.after,
                                             'approver_mail': mail_approver.email,
-                                            'executer_mail': mail_executer.email,
                                             'cc_list': cc_list,
                                             'file': file_path}
                                         put_mess = send_email.send_email(to_addr=mail_apply.email)  # 发功给申请人

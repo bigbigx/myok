@@ -7,6 +7,7 @@ from libs import util
 from libs import conn_sqlite
 from libs import exportexcel
 from libs import call_inception
+from libs import call_explain
 from libs.serializers import SqlRecord
 import time
 from rest_framework.response import Response
@@ -123,7 +124,7 @@ class exetoken(baseview.AnyLogin):
                         ret_info = '<h1> 访问服务器异常</h1>'
                         return HttpResponse(ret_info)
 
-                elif type == 1:  #   执行，发送信息和邮件给到工单发起人和审核人
+                elif type == 1:  #   执行，发送信息和邮件给到工单发起人和审核人和抄送人员
                         token = request.GET.get('mytoken')
                         workid = request.GET.get('workid')
                         username = request.GET.get('username')
@@ -133,8 +134,6 @@ class exetoken(baseview.AnyLogin):
                         try:
                             mail = Account.objects.filter(username=username).first()
                             #tag = globalpermissions.objects.filter(authorization='global').first()
-
-
                             try:
                                 conn = conn_sqlite.queryByToken(token)
                             except Exception as e:
@@ -145,8 +144,9 @@ class exetoken(baseview.AnyLogin):
 
                             if conn:  #如果存在该token，下一步就是直接执行，执行完后还要删除此条数据库token 数据
                                 try:  # 备份sql语句
-
                                     c = SqlOrder.objects.filter(work_id=workid).first()
+                                    cc_list = c.cc_list
+                                    sql_value = c.sql
                                     SQL_LIST = DatabaseList.objects.filter(id=c.bundle_id).first()
                                     sql_data = SqlOrder.objects.filter(work_id=workid).first()
                                     bak_sql = sql_data.backup_sql
@@ -179,6 +179,7 @@ class exetoken(baseview.AnyLogin):
 
                                 try:
                                     SqlOrder.objects.filter(work_id=workid).update(status=5)  # 执行中
+
                                     # c = SqlOrder.objects.filter(id=id).first()  # 前面已经执行
                                     title = f'工单:{c.work_id}执行成功通知'
                                     '''
@@ -189,23 +190,39 @@ class exetoken(baseview.AnyLogin):
                                     发送sql语句到inception中执行
                                  '''
                                     res = []
-                                    if c.sql:
-                                        with call_inception.Inception(
-                                                LoginDic={
-                                                    'host': SQL_LIST.ip,
-                                                    'user': SQL_LIST.username,
-                                                    'password': SQL_LIST.password,
-                                                    'db': c.basename,
-                                                    'port': SQL_LIST.port
-                                                }
-                                        ) as f:
-                                            res = f.Execute(sql=c.sql, backup=c.backup)
+                                    if c.run_type == 0:  # 发送sql语句到inception中执行
+                                        if sql_value:
+                                            with call_inception.Inception(
+                                                    LoginDic={
+                                                        'host': SQL_LIST.ip,
+                                                        'user': SQL_LIST.username,
+                                                        'password': SQL_LIST.password,
+                                                        'db': c.basename,
+                                                        'port': SQL_LIST.port
+                                                    }
+                                            ) as f:
+                                                res = f.Execute(sql=c.sql, backup=c.backup)
+                                                SqlOrder.objects.filter(work_id=workid).update(status=4)
+                                        else:
+                                            pass
+                                    else: # 发送sql语句到后台数据库中直接执行
+                                        if sql_value:
+                                            with  call_explain.Explain(LoginDic={
+                                                'host': SQL_LIST.ip,
+                                                'user': SQL_LIST.username,
+                                                'password': SQL_LIST.password,
+                                                'db': c.basename,
+                                                'port': SQL_LIST.port
+                                            }) as test:
+                                                for i_sql in str(sql_value).split(';'):
+                                                   test.RunSQL(sql=i_sql)
                                             SqlOrder.objects.filter(work_id=workid).update(status=4)
-                                    else:
-                                        pass
+
+
 
 
                                 except Exception as e:
+                                    print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     SqlOrder.objects.filter(work_id=workid).update(status=1)  # 状态回滚
                                     return HttpResponse(status=500)
@@ -302,18 +319,24 @@ class exetoken(baseview.AnyLogin):
                                                     'type': '执行成功',
                                                     'backup': backup_status,
                                                     'note': content.after,
+                                                    'cc_list': cc_list,
                                                     'file': file_path}
                                                 put_mess = send_email.send_email(to_addr=mail.email)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)
                                                 put_mess1 = send_email.send_email(to_addr=mail_approver.email)
                                                 put_mess1.send_mail(mail_data=mess_info, type=3)
+
+
+
                                         except Exception as e:
+                                            print(e)
                                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                             ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
                                             return HttpResponse(ret_info)
                                 except Exception as e:
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     return HttpResponse(status=500)
+
 
                                 # ----删除token
 
