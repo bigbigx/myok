@@ -51,6 +51,9 @@ from core.api.exetoken import (
 from core.api.asset.assets import (
     assets
 )
+from core.api.asset.yunassets import (
+    yunassets
+)
 from core.api.record import recordorder
 from core.api.sqlorder import sqlorder
 from core.api.serachsql import serach
@@ -80,7 +83,8 @@ urlpatterns = [
     url(r'^api-token-auth/', login_auth.as_view()),
     url(r'^api/v1/audit_token', authtoken.as_view()),
     url(r'^api/v1/exe_token', exetoken.as_view()),
-    url(r'^api/v1/filecontent', filecontent.as_view()),
-    url(r'^api/v1/assets', assets.as_view()),
+    url(r'^api/v1/assets/(.*)', assets.as_view()),
+    url(r'^api/v1/yunassets/(.*)', yunassets.as_view()),
+    url(r'^api/v1/fileview', filecontent.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

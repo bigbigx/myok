@@ -120,7 +120,8 @@ class ToWord:
                 cells[3].text = '%s' % column[7]
                 cells[4].text = '%s' % column[8]
         time = datetime.now()
-        self.document.save('./exportData/%s_%s_Dictionary_%s.docx' % (Conn, Schemal, time))
+        # self.document.save('./exportData/%s_%s_Dictionary_%s.docx' % (Conn, Schemal, time))
+        self.document.save('exportData/%s_%s_Dictionary_%s.docx' % (Conn, Schemal, time))
         return time
 
     def exportSchemal(self, Conn=None, Schemal=None):

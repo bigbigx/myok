@@ -53,6 +53,20 @@ class assets(baseview.BaseView):
     def put(self, request, args=None):
         print(args)
         # 获取
+        if args == 'cabinet':  ##  获取机柜信息
+            try:
+
+                computer_room = request.GET.get('room')
+                id = request.GET.get('id')
+            except KeyError as e:
+                print(e)
+                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                return HttpResponse(status=500)
+            else:
+                try:
+                    pass
+                except Exception as e:
+                    print(e)
         if args == 'add':
             try:
                 asset_name = request.GET.get('name') #资产名称
@@ -66,6 +80,7 @@ class assets(baseview.BaseView):
                 OutBankWidth = request.GET.get('OutBankWidth')
                 AssetRoom.object.filter(id=id).first()
             except KeyError as e:
+                print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
             else:

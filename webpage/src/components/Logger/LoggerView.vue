@@ -8,7 +8,7 @@
     <Card>
       <p slot="title">
         <Icon type="person"></Icon>
-        我的实时日志清单
+        日志清单
         <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_log">刷新</Button>
       </p>
 
@@ -48,11 +48,6 @@ export default {
           sortable: true
         },
         {
-          title: '上下行数',
-          key: 'hostname',
-          sortable: true
-        },
-        {
           title: 'IP地址',
           key: 'IP',
           sortable: true
@@ -61,10 +56,6 @@ export default {
           title: '主机名',
           key: 'hostname',
           sortable: true
-        },
-        {
-          title: '审核备注',
-          key: 'reject'
         },
         {
           title: '操作',
@@ -85,7 +76,7 @@ export default {
                     })
                   }
                 }
-              }, '查看实时内容')
+              }, '查看')
             ])
           }
         },
@@ -147,7 +138,7 @@ export default {
   },
 
   mounted () {
-    axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
+    axios.get(`${util.url}/fileview/?user=${Cookies.get('user')}&page=1`)
       .then(res => {
         this.applytable = res.data.data
         this.pagenumber = res.data.page.alter_number

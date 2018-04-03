@@ -35,36 +35,6 @@
             </Select>
             </FormItem>
 
-
-            <FormItem>
-              <Button type="warning" icon="android-search" @click.native="test_sql()">一键搜索</Button>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">添加</Button>
-            </FormItem>
-
-          </Form>
-          <Alert style="height: 145px">
-            检测表字段提示信息
-            <template slot="desc">
-                <p>1.错误等级 0正常,1警告,2错误。</p>
-                <p>2.阶段状态 审核成功,Audit completed</p>
-                <p>3.错误信息 用来表示出错错误信息</p>
-                <p>4.当前检查的sql</p>
-                <p>注:只有错误等级等于0时提交按钮才会激活</p>
-              </template>
-          </Alert>
-        </div>
-      </div>
-    </Card>
-    </Col>
-    <Col span="18" class="padding-left-10">
-    <Card>
-      <p slot="title">
-        <Icon type="ios-crop-strong"></Icon>
-        选择具体配置
-      </p>
-       <div class="edittable-test-con">
-        <div id="showImage1" class="margin-bottom-10">
-          <Form ref="formItem" :model="formItem" :rules="ruleValidate" :label-width="80">
             <FormItem label="主机名:" prop="computer_room">
               <Select v-model="formItem.computer_room" @on-change="Connection_Name">
               <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
@@ -83,12 +53,39 @@
               <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
             </Select>
             </FormItem>
-          </Form>
-         </div>
-      </div>
-      </Card>
 
+            <FormItem>
+              <Button type="warning" icon="android-search" @click.native="test_sql()">一键搜索</Button>
+              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">添加</Button>
+            </FormItem>
+          </Form>
+          <Alert style="height: 145px">
+            检测表字段提示信息
+            <template slot="desc">
+                <p>1.错误等级 0正常,1警告,2错误。</p>
+                <p>2.阶段状态 审核成功,Audit completed</p>
+                <p>3.错误信息 用来表示出错错误信息</p>
+                <p>4.当前检查的sql</p>
+                <p>注:只有错误等级等于0时提交按钮才会激活</p>
+              </template>
+          </Alert>
+        </div>
+      </div>
+    </Card>
     </Col>
+<Col span="18" class="padding-left-10">
+  <Card>
+    <p slot="title">
+      <Icon type="ios-crop-strong"></Icon>
+      文件配置清单
+    </p>
+    <div class="edittable-con-1">
+      <Table :columns="columns" :data="rowdata" height="550"></Table>
+    </div>
+    <br>
+    <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+  </Card>
+  </Col>
   </Row>
 </div>
 </template>

@@ -13,6 +13,10 @@ util.url = '/api/v1'
 util.auth = '/api-token-auth/'
 
 util.computer_room = ['AWS', 'Aliyun', 'Own', 'Other']
+util.yun_room_list = ['Aliyun', 'MeiTuanYun', 'HuaWeiYun']
+util.own_room_list = ['Own', 'GzIDC']
+util.yun_area_list = ['华北1', '华北2', '华东1', '华南1']
+util.yun_instance_type_list = ['ECS', 'RDS', 'SLB', 'MongDB', 'Redis']
 
 util.ajanxerrorcode = function (vm, error) {
   if (error.response) {

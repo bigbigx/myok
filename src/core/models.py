@@ -32,15 +32,109 @@ class SqlDictionary(models.Model):
     def __str__(self):
         return self.TableName
 
-#class SqlOrderBak(models.Model):
-#    '''
-#    工单sql备份主表#
-#
-#    '''
-#    work_id = models.CharField(max_length=50, blank=True) #工单id
-#    sql = models.TextField(blank=True) #sql语句
-##    order_id = models.IntegerField(blank=True) #执行顺序
-#   status = models.IntegerField(blank=True)是 #此条SQL备份状态
+class FileContent(models.Model):
+    '''
+    文件内容表
+    '''
+    filename =  models.CharField(max_length=50, blank=True)  # 文件名字‘
+    filepath =  models.CharField(max_length=50, blank=True)  # 文件路径
+    inner_server_ip =  models.CharField(max_length=50, blank=True)  # 文件所在服务器的内部IP
+    outer_server_ip = models.CharField(max_length=50, blank=True)  # 文件所在服务器的外部IP
+    server_hostname = models.CharField(max_length=50, blank=True)  # 文件所在服务器的主机名
+    pg_id =  models.CharField(max_length=50, blank=True)  # 关联的项目的编号
+    keyword =  models.CharField(max_length=50, blank=True)  # 搜索的关键字
+    file_remark =  models.CharField(max_length=50, blank=True)   # 文件说明YunRdsObj
+
+class YunRdsObj(models.Model):
+    LockMode = models.CharField(max_length=300, blank=True)
+    DBInstanceNetType = models.CharField(max_length=300, blank=True)
+    DBInstanceClass = models.CharField(max_length=300, blank=True)
+    ResourceGroupId = models.CharField(max_length=300, blank=True)
+    DBInstanceId = models.CharField(max_length=300, blank=True)
+    VpcCloudInstanceId = models.CharField(max_length=300, blank=True)
+    ZoneId = models.CharField(max_length=300, blank=True)
+    ReadOnlyDBInstanceIds = models.CharField(max_length=300, blank=True)
+    InstanceNetworkType = models.CharField(max_length=300, blank=True)
+    DBInstanceDescription = models.CharField(max_length=300, blank=True)
+    ConnectionMode = models.CharField(max_length=300, blank=True)
+    Engine = models.CharField(max_length=300, blank=True)
+    MutriORsignle = models.CharField(max_length=300, blank=True)
+    InsId = models.CharField(max_length=300, blank=True)
+    ExpireTime = models.CharField(max_length=300, blank=True)
+    CreateTime = models.CharField(max_length=300, blank=True)
+    DBInstanceType = models.CharField(max_length=300, blank=True)
+    RegionId = models.CharField(max_length=300, blank=True)
+    EngineVersion = models.CharField(max_length=300, blank=True)
+    LockReason = models.CharField(max_length=300, blank=True)
+    DBInstanceStatus = models.CharField(max_length=300, blank=True)
+    PayType = models.CharField(max_length=300, blank=True)
+
+
+class YunEcsObj(models.Model):
+    InnerIpAddress = models.CharField(max_length=300, blank=True)
+    ImageId= models.CharField(max_length=300, blank=True)
+    InstanceTypeFamily= models.CharField(max_length=300, blank=True)
+    VlanId= models.CharField(max_length=300, blank=True)
+    InstanceId= models.CharField(max_length=300, blank=True)
+    EipAddress= models.CharField(max_length=300, blank=True)
+    InternetMaxBandwidthIn= models.CharField(max_length=300, blank=True)
+    ZoneId= models.CharField(max_length=300, blank=True)
+    InternetChargeType= models.CharField(max_length=300, blank=True)
+    SpotStrategy= models.CharField(max_length=300, blank=True)
+    StoppedMode= models.CharField(max_length=300, blank=True)
+    SerialNumber= models.CharField(max_length=300, blank=True)
+    IoOptimized= models.CharField(max_length=300, blank=True)
+    Memory= models.CharField(max_length=300, blank=True)
+    Cpu= models.CharField(max_length=300, blank=True)
+    VpcAttributes= models.CharField(max_length=300, blank=True)
+    InternetMaxBandwidthOut= models.CharField(max_length=300, blank=True)
+    DeviceAvailable= models.CharField(max_length=300, blank=True)
+    SecurityGroupIds= models.CharField(max_length=300, blank=True)
+    SaleCycle= models.CharField(max_length=300, blank=True)
+    SpotPriceLimit= models.CharField(max_length=300, blank=True)
+    AutoReleaseTime= models.CharField(max_length=300, blank=True)
+    StartTime= models.CharField(max_length=300, blank=True)
+    InstanceName= models.CharField(max_length=300, blank=True)
+    Description= models.CharField(max_length=300, blank=True)
+    ResourceGroupId= models.CharField(max_length=300, blank=True)
+    OSType= models.CharField(max_length=300, blank=True)
+    OSName= models.CharField(max_length=300, blank=True)
+    InstanceNetworkType = models.CharField(max_length=300, blank=True)
+    PublicIpAddress = models.CharField(max_length=300, blank=True)
+    HostName = models.CharField(max_length=300, blank=True)
+    InstanceType = models.CharField(max_length=300, blank=True)
+    CreationTime = models.CharField(max_length=300, blank=True)
+    Status = models.CharField(max_length=300, blank=True)
+    ClusterId = models.CharField(max_length=300, blank=True)
+    Recyclable = models.CharField(max_length=300, blank=True)
+    RegionId = models.CharField(max_length=300, blank=True)
+    GPUSpec = models.CharField(max_length=300, blank=True)
+    OperationLocks = models.CharField(max_length=300, blank=True)
+    InstanceChargeType = models.CharField(max_length=300, blank=True)
+    GPUAmount = models.CharField(max_length=300, blank=True)
+    xpiredTime = models.CharField(max_length=300, blank=True)
+
+
+class YunAssetArea(models.Model):
+    '''
+    云环境的区域： 如阿里云
+    yun_obj:  0--阿里云  1--美团云  2--腾讯云  3 --华为云 等
+    area_name: 区域名称： 如华北，华南等
+    status  区域的使用状态 :  1--可用 0 --不可用
+    '''
+    yun_obj = models.IntegerField(blank=True)
+    area_name = models.CharField(max_length=50, blank=True)
+    status = models.IntegerField(blank=True)
+
+class YunAssetObj(models.Model):
+    '''
+    云环境的实例类型，如ecs,rds,mq,slb,cdn,等
+    '''
+    yun_obj = models.IntegerField(blank=True)
+    objname = models.CharField(max_length=50, blank=True)
+    status = models.IntegerField(blank=True)
+
+
 
 
 class SqlOrder(models.Model):
@@ -62,6 +156,8 @@ class SqlOrder(models.Model):
     assigned = models.CharField(max_length=50, blank=True)# 工单审核人
     backup_sql=models.TextField(blank=True) #s备份ql语句
     reject = models.TextField(blank=True) #驳回说明
+    cc_list = models.CharField(max_length=500, blank=True)# 邮件抄送人
+    run_type = models.IntegerField(default=0)# 运行类型
 
 
 
@@ -77,7 +173,7 @@ class DatabaseList(models.Model):
     password = models.CharField(max_length=50) #数据库密码
     before = models.TextField(null=True) #提交工单 钉钉webhook发送内容
     after = models.TextField(null=True)  #工单执行成功后 钉钉webhook发送内容
-    url = models.TextField(blank=True)    #钉钉webhook url地址
+    url = models.TextField(blank=False)    #钉钉webhook url地址
 
 class AssetType(models.Model):
     """
