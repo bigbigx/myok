@@ -99,7 +99,8 @@ class send_email(object):
                     file.add_header('Content-Disposition', 'attachment', filename=i)
                     encoders.encode_base64(file)
                     _attachments.append(file)
-
+            for att in _attachments:
+                msg.attach(att)
             msg.attach(contents)
             server = smtplib.SMTP_SSL(smtp_server, port=465)
             server.set_debuglevel(1)

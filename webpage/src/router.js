@@ -223,7 +223,6 @@ export const appRouter = [
     icon: 'search',
     name: 'view',
     title: '数据库查看',
-    access: 0,
     component: Index,
     children: [
       {
