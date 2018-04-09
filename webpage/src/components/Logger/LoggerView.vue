@@ -76,12 +76,26 @@ export default {
                     })
                   }
                 }
-              }, '查看')
+              }, '增量查看'),
+               h('Button', {
+                props: {
+                  size: 'small',
+                  type: 'text'
+                },
+                on: {
+                  click: () => {
+                    this.$router.push({
+                      name: 'orderlist',
+                      query: {workid: params.row.work_id, id: params.row.id, status: params.row.status, type: params.row.type}
+                    })
+                  }
+                }
+              }, '全量查看')
             ])
           }
         },
         {
-          title: '编辑管理',
+          title: '设置关键字',
           key: 'action',
           align: 'center',
           render: (h, params) => {
@@ -138,14 +152,14 @@ export default {
   },
 
   mounted () {
-    axios.get(`${util.url}/fileview/?user=${Cookies.get('user')}&page=1`)
-      .then(res => {
-        this.applytable = res.data.data
-        this.pagenumber = res.data.page.alter_number
-      })
-      .catch(error => {
-        util.ajanxerrorcode(this, error)
-      })
+    // axios.get(`${util.url}/filemanager?user=${Cookies.get('user')}&page=1`)
+    //   .then(res => {
+    //     this.applytable = res.data.data
+    //     this.pagenumber = res.data.page.alter_number
+    //   })
+    //   .catch(error => {
+    //     util.ajanxerrorcode(this, error)
+    //   })
   }
 }
 </script>

@@ -7,6 +7,9 @@ from core.models import DatabaseList
 from core.models import SqlDictionary
 from core.models import SqlRecord
 from core.models import Account
+from core.models import AssetAreaList
+from core.models import FileContent
+
 
 
 class MessagesUser(serializers.HyperlinkedModelSerializer):
@@ -25,6 +28,14 @@ class UserINFO(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Account
         fields = ('username', 'group', 'department', 'email')
+
+class FileContentSeri(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = FileContent
+        fields = (
+            'private_server_ip', 'public_server_ip', 'server_hostname', 'region_name',
+            'room_name', 'server_status', 'pg_id', 'file_title' , 'file_type', 'file_path', 'file_remark' , 'keyword'
+            )
 
 
 class SQLGeneratDic(serializers.HyperlinkedModelSerializer):
@@ -46,6 +57,11 @@ class Sqllist(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = DatabaseList
         fields = ('id', 'connection_name', 'ip', 'computer_room', 'password', 'port', 'username')
+
+class Cabinet(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = AssetAreaList
+        fields = ('id', 'room_id', 'room_name', 'area_name')
 
 
 class Area(serializers.HyperlinkedModelSerializer):

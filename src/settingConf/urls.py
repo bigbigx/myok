@@ -85,6 +85,6 @@ urlpatterns = [
     url(r'^api/v1/exe_token', exetoken.as_view()),
     url(r'^api/v1/assets/(.*)', assets.as_view()),
     url(r'^api/v1/yunassets/(.*)', yunassets.as_view()),
-    url(r'^api/v1/fileview', filecontent.as_view()),
+    url(r'^api/v1/filemanager/(.*)', filecontent.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

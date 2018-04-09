@@ -13,8 +13,10 @@ util.url = '/api/v1'
 util.auth = '/api-token-auth/'
 
 util.computer_room = ['AWS', 'Aliyun', 'Own', 'Other']
-util.yun_room_list = ['Aliyun', 'MeiTuanYun', 'HuaWeiYun']
-util.own_room_list = ['Own', 'GzIDC']
+// util.yun_dev = ['Aliyun', 'Meituanyun', 'Huaweiyun']
+// util.idc_dev = ['zskx', 'gzIDC']
+util.yun_room_list = ['阿里云', '美团云', '华为云']
+util.own_room_list = ['独立机房', '广州IDC']
 util.yun_area_list = ['华北1', '华北2', '华东1', '华南1']
 util.yun_instance_type_list = ['ECS', 'RDS', 'SLB', 'MongDB', 'Redis']
 

@@ -64,13 +64,12 @@
             <Card>
               <Tabs value="refresh_tab" style="height: 180px;">
                 <TabPane label="手工更新"  name="handle_refresh_assets" >
-                  <Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click.native="handle_yun_assets" size="large">手工更新资产</Button>
-                  <Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click.native="handle_yun_assets" size="large">刷新云资产清单</Button>
-                </TabPane>
+                  <Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click="confirm"  size="large">手工更新资产</Button>
+                  </TabPane>
                 <TabPane label="定时更新"  name="crontab_refresh_assets">
                   <Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click.native="orderswitch" size="large">设置定时更新资产</Button>
                 </TabPane>
-                <TabPane label="导出资产"  name="crontab_export_assets">
+                <TabPane label="导出资产清单"  name="crontab_export_assets">
                   <Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click.native="orderswitch" size="large">导出云资产</Button>
                 <Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click.native="orderswitch" size="large">查看资产更新日志</Button>
                 </TabPane>
@@ -78,28 +77,43 @@
             </Card>
               <Card>
                 <p slot="title">
-                  <Icon type="ios-crop-strong"></Icon>最近资产动作
+                  <Icon type="ios-crop-strong"></Icon>资产操作记录
                 </p>
-                <div class="edittable-con-0">
-                   <Table :columns="columns_refresh_log" :data="yun_diff_list" height="300"></Table>
-                  <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+                <!--<Tabs value="name_history" >-->
+                    <!--<TabPane label="目录" icon="load-b" name="asset_operation_melu">-->
+                         <div class="edittable-con-0">
+                   <Table  border :columns="columns_refresh_log" :data="yun_diff_list" stripe height="300"></Table>
+                  <!--<Page :total="pagenumber-asset" show-elevator @on-change="splicpage" :page-size="10"></Page>-->
+
                 </div>
+                    <!--</TabPane>-->
+                     <!--<TabPane label="ECS" icon="load-b" name="asset_ecs_detail">-->
+                       <!--<Table border :columns="columns_ecs_diff_detail" style="overflow-y: scroll;" :data="ecs_diff_detail" stripe height="300"></Table>-->
+                    <!--</TabPane>-->
+                     <!--<TabPane label="RDS" icon="load-b" name="asset_rds_detail">-->
+                       <!--<Table border :columns="columns_rds_diff_detail" :data="rds_diff_detail" stripe height="300"></Table>-->
+                    <!--</TabPane>-->
+                <!--</Tabs>-->
+                <!--<Modal-->
+                  <!--v-model="diff_detail_model"-->
+                  <!--title="Common Modal dialog box title"-->
+                  <!--@on-ok="ok"-->
+                  <!--@on-cancel="cancel"></Modal>-->
+                  <!--<Modal v-model="diff_detail_model"  width="75%" scrollable="true" closable="false">-->
+                      <!--<h3 slot="header" style="color:#2D8CF0">查看资产差异详情</h3>-->
+                      <!--<p>ECS</p>-->
+                    <!--&lt;!&ndash;<Button type="primary" style="margin-left: 25%;margin-top: 5%;" @click.native="orderswitch" size="small">查看资产更新日志</Button>&ndash;&gt;-->
+                      <!--<Table   stripe   border :columns="columns_change_name" :data="ecs_diff_detail"    size="small" ></Table>-->
+                      <!--<br>-->
+                      <!--<h2>RDS</h2>-->
+                      <!--<Table border  stripe :columns="columns_change_name" :data="rds_diff_detail"   size="small"></Table>-->
+                      <!--<div slot="footer">-->
+                        <!--<Button type="text" @click="diff_detail_model = false">取消</Button>-->
+                        <!--<Button type="primary" @click="add2asset">同步到数据库</Button>-->
+                      <!--</div>-->
+                   <!--</Modal>-->
               </Card>
-              <Modal v-model="delbaseModal" :width="500">
-    <h3 slot="header" style="color:#2D8CF0">删除数据库</h3>
-    <Form :label-width="100" label-position="right">
-      <FormItem label="数据库连接名">
-        <Input v-model="delbasename" readonly="readonly"></Input>
-      </FormItem>
-      <FormItem label="请输入数据库连接名">
-        <Input v-model="delconfirmbasename" placeholder="请确认数据库连接名"></Input>
-      </FormItem>
-    </Form>
-    <div slot="footer">
-      <Button type="text" @click="delbaseModal = false">取消</Button>
-      <Button type="primary" @click="delbaselink">删除</Button>
-    </div>
-  </Modal>
+
           </div>
         </div>
         </TabPane>
@@ -175,11 +189,12 @@
         </Card>
 
     </Col>
+
 <Col span="17" class="padding-left-10">
   <Card>
     <p slot="title">
       <Icon type="ios-crop-strong"></Icon>资产清单
-
+<Button type="primary" style="margin-left: 85%;" @click.native="test" size="small">刷新清单</Button>
     </p>
 
     <div class="edittable-con-0">
@@ -191,23 +206,42 @@
                 <div class="edittable-testauto-con">
                   <Card>
                     <Tabs value="name999">
-                      <TabPane label="阿里云"  name="child_right_tab_aliyun">
+                      <TabPane    label="阿里云" name="child_right_tab_aliyun">
+                        <Tabs value="aliyun-fenlei">
+                          <TabPane :label="ecs_label" name="aliyun-ecs">
                             <div class="edittable-con-0">
-                              <Table :columns="yun_columnsName" :data="aliyun_assets" height="550"></Table>
+                              <Table :columns="columns_ecs_diff_detail" :data="this.aliyun_result_list.aliyun_ECS_assets" height="500"></Table>
                             </div>
                             <br>
-                        <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+                            <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+                          </TabPane>
+                          <TabPane :label="rds_label"  name="aliyun-rds">
+                            <div class="edittable-con-0">
+                              <Table :columns="columns_rds_diff_detail" :data="this.aliyun_result_list.aliyun_RDS_assets" height="500"></Table>
+                            </div>
+                            <br>
+                            <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+                          </TabPane>
+                          <TabPane label="SLB"  name="aliyun-slb">
+                            <div class="edittable-con-0">
+                              <Table :columns="columns_slb_diff_detail" :data="this.aliyun_result_list.aliyun_SLB_assets" height="500"></Table>
+                            </div>
+                            <br>
+                            <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+                          </TabPane>
+                        </Tabs>
+
                       </TabPane>
                       <TabPane label="美团云"  name="child_right_tab_meituanyun">
                             <div class="edittable-con-0">
-                              <Table :columns="yun_columnsName" :data="meituanyun_assets" height="550"></Table>
+                              <Table :columns="yun_columnsName1" :data="meituanyun_assets" height="500"></Table>
                             </div>
                             <br>
                             <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
                       </TabPane>
                       <TabPane label="华为云" name="child_right_tab_huaweiyun">
                             <div class="edittable-con-0">
-                              <Table :columns="yun_columnsName" :data="huaweiyun_assets" height="550"></Table>
+                              <Table :columns="yun_columnsName1" :data="huaweiyun_assets" height="550"></Table>
                             </div>
                             <br>
                             <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
@@ -263,7 +297,35 @@ export default {
   name: 'host-manager',
   data () {
     return {
+
+       ecs_label: (h) => {
+                    return h('div', [
+                        h('span', 'ECS'),
+                        h('Badge', {
+                            props: {
+                                count: this.coutlist.aliyun_ecs_count
+                            }
+                        })
+                    ])
+                },
+       rds_label: (h) => {
+                    return h('div', [
+                        h('span', 'RDS'),
+                        h('Badge', {
+                            props: {
+                                count: this.coutlist.aliyun_rds_count
+                            }
+                        })
+                    ])
+                },
       validate_gen: true,
+      coutlist: {
+        aliyun_ecs_count: 0,
+        aliyun_rds_count: 0,
+        aliyun_slb_count: 0,
+        meituanyun_ecs_count: 0,
+        meituanyun_rds_count: 0
+      },
       formYunItem: {
         textarea: '',
         computer_room: '',
@@ -280,6 +342,344 @@ export default {
         backup: 0,
         assigned: ''
       },
+      columns_rds_diff_detail: [
+        {
+          title: 'DBInstanceDescription',
+          key: 'DBInstanceDescription',
+          fixed: 'left',
+          width: 160
+        },
+        {
+          title: 'LockMode',
+          key: 'LockMode',
+          width: 160
+        },
+        {
+          title: 'DBInstanceNetType',
+          key: 'DBInstanceNetType',
+          width: 160
+        },
+        {
+          title: 'DBInstanceClass',
+          key: 'DBInstanceClass',
+          width: 160
+        },
+        {
+          title: 'ResourceGroupId',
+          key: 'ResourceGroupId',
+          width: 160
+        },
+        {
+          title: 'DBInstanceId',
+          key: 'DBInstanceId',
+          width: 160
+        },
+        {
+          title: 'VpcCloudInstanceId',
+          key: 'VpcCloudInstanceId',
+          width: 160
+        },
+        {
+          title: 'ZoneId',
+          key: 'ZoneId',
+          width: 160
+        },
+        {
+          title: 'InstanceNetworkTypes',
+          key: 'InstanceNetworkType',
+          width: 160
+        },
+        {
+          title: 'ConnectionMode',
+          key: 'ConnectionMode',
+          width: 160
+        },
+        {
+          title: 'Engine',
+          key: 'Engine',
+          width: 160
+        },
+        {
+          title: 'MutriORsignle',
+          key: 'MutriORsignle',
+          width: 160
+        },
+        {
+          title: 'InsId',
+          key: 'InsId',
+          width: 160
+        },
+        {
+          title: 'ExpireTime',
+          key: 'ExpireTime',
+          width: 160
+        },
+        {
+          title: 'CreateTime',
+          key: 'CreateTime',
+          width: 160
+        },
+        {
+          title: 'DBInstanceType',
+          key: 'DBInstanceType',
+          width: 160
+        },
+        {
+          title: 'RegionId',
+          key: 'RegionId',
+          width: 160
+        },
+        {
+          title: 'EngineVersion',
+          key: 'EngineVersion',
+          width: 160
+        },
+        {
+          title: 'LockReason',
+          key: 'LockReason',
+          width: 160
+        },
+        {
+          title: 'DBInstanceStatus',
+          key: 'DBInstanceStatus',
+          width: 160
+        },
+        {
+          title: 'PayType',
+          key: 'PayType',
+          width: 160
+        }
+      ],
+      columns_change_name: [
+        {
+          title: '变动实例ID',
+          key: 'id_count',
+          width: 150
+        },
+        {
+          title: '变动实例名字',
+          key: 'id_count',
+          width: 150
+        },
+        {
+          title: '变动项目数',
+          key: 'item_count',
+          width: 150
+        },
+        {
+          title: '操作',
+          key: 'item_count',
+          width: 150
+        }
+      ],
+      columns_ecs_diff_detail: [
+        {
+          title: '实例名称',
+          key: 'InstanceName',
+          fixed: 'left',
+          width: 160
+        },
+        {
+          title: '实例ID',
+          key: 'InstanceId',
+          width: 120
+        },
+        {
+          title: '内网IP',
+          key: 'InnerIpAddress',
+          width: 120
+        },
+        {
+          title: '公网IP',
+          key: 'PublicIpAddress',
+          width: 120
+        },
+        {
+          title: '主机名',
+          key: 'HostName',
+          width: 100
+        },
+        {
+          title: 'IO',
+          key: 'IoOptimized',
+          width: 100
+        },
+        {
+          title: '内存',
+          key: 'Memory',
+          width: 100
+        },
+        {
+          title: 'Cpu',
+          key: 'Cpu',
+          width: 100
+        },
+        {
+          title: '镜像ID',
+          key: 'ImageId',
+          width: 100
+        },
+        {
+          title: 'InstanceTypeFamily',
+          key: 'InstanceTypeFamily',
+          width: 100
+        },
+        {
+          title: 'VlanId',
+          key: 'VlanId',
+          width: 100
+        },
+        {
+          title: 'EipAddress',
+          key: 'EipAddress',
+          width: 300
+        },
+        {
+          title: '公网入带宽',
+          key: 'InternetMaxBandwidthIn',
+          width: 100
+        },
+        {
+          title: 'ZoneId',
+          key: 'ZoneId',
+          width: 100
+        },
+        {
+          title: 'InternetChargeType',
+          key: 'InternetChargeType',
+          width: 100
+        },
+        {
+          title: 'SpotStrategy',
+          key: 'SpotStrategy',
+          width: 100
+        },
+        {
+          title: '停止模式',
+          key: 'StoppedMode',
+          width: 100
+        },
+        {
+          title: 'VPC',
+          key: 'VpcAttributes',
+          width: 100
+        },
+        {
+          title: '公网出带宽',
+          key: 'InternetMaxBandwidthOut',
+          width: 100
+        },
+        {
+          title: '设备可用性',
+          key: 'DeviceAvailable',
+          width: 100
+        },
+        {
+          title: '安全组',
+          key: 'SecurityGroupIds',
+          width: 100
+        },
+        {
+          title: 'SaleCycle',
+          key: 'SaleCycle',
+          width: 100
+        },
+        {
+          title: 'SpotPriceLimit',
+          key: 'SpotPriceLimit',
+          width: 100
+        },
+        {
+          title: 'AutoReleaseTime',
+          key: 'AutoReleaseTime',
+          width: 100
+        },
+        {
+          title: 'StartTime',
+          key: 'StartTime',
+          width: 100
+        },
+        {
+          title: '描述',
+          key: 'Description',
+          width: 100
+        },
+        {
+          title: '资源组ID',
+          key: 'ResourceGroupId',
+          width: 100
+        },
+        {
+          title: 'OS类型',
+          key: 'OSType',
+          width: 100
+        },
+        {
+          title: 'OSName',
+          key: 'OSName',
+          width: 100
+        },
+        {
+          title: 'InstanceNetworkType',
+          key: 'InstanceNetworkType',
+          width: 100
+        },
+        {
+          title: 'InstanceType',
+          key: 'InstanceType',
+          width: 100
+        },
+        {
+          title: 'CreationTime',
+          key: 'CreationTime',
+          width: 100
+        },
+        {
+          title: 'Status',
+          key: 'Status',
+          width: 100
+        },
+        {
+          title: 'ClusterId',
+          key: 'ClusterId',
+          width: 100
+        },
+        {
+          title: 'Recyclable',
+          key: 'Recyclable',
+          width: 100
+        },
+        {
+          title: 'RegionId',
+          key: 'RegionId',
+          width: 100
+        },
+        {
+          title: 'GPUSpec',
+          key: 'GPUSpec',
+          width: 100
+        },
+        {
+          title: 'OperationLocks',
+          key: 'OperationLocks',
+          width: 100
+        },
+        {
+          title: 'InstanceChargeType',
+          key: 'InstanceChargeType',
+          width: 100
+        },
+        {
+          title: 'GPUAmount',
+          key: 'GPUAmount',
+          width: 100
+        },
+        {
+          title: 'xpiredTime',
+          key: 'xpiredTime',
+          width: 100
+        }
+      ],
       columns_refresh_log: [
         {
           title: '时间',
@@ -297,12 +697,11 @@ export default {
           width: ''
         },
         {
-          title: '详情',
-          key: 'action',
-          width: 400,
+          title: '操作',
+          key: 'diff_detail',
+          width: 80,
           align: 'center',
           render: (h, params) => {
-            if (params.row.username !== this.data5[0].username) {
               return h('div', [
                 h('Button', {
                   props: {
@@ -314,29 +713,11 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.edituser(params.index)
+                      this.show_diif_detail(params.index)
                     }
                   }
-                }, '更改密码')
+                }, '详情')
               ])
-            } else {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.edituser(params.index)
-                    }
-                  }
-                }, '更改密码')
-              ])
-            }
           }
         }
       ],
@@ -367,9 +748,16 @@ export default {
         }
       ],
       ecsdata: [],
+      pagenumber_asset: 1,
       rdsdata: [],
       Testresults: [],
       yun_diff_list: [],
+      asset_diff_detail: [],
+      data_asset_list: {
+        ecs_diff_detail: [],
+        rds_diff_detail: []
+      },
+      diff_detail_model: false,
       Testresults_backup: [],
       item: {},
       yun_datalist: {
@@ -414,207 +802,104 @@ export default {
         ]
       },
       id: null,
-      assigned: []
+      assigned: [],
+      aliyun_result_list: {
+        aliyun_ECS_assets: [],
+        aliyun_RDS_assets: [],
+        aliyun_SLB_assets: []
+      },
+      meituanyun_result_list: {
+        meituanyun_ECS_assets: [],
+        meituanyun_RDS_assets: []
+      },
+      huaweiyun_result_list: {
+        huaweiyun_ECS_assets: [],
+        huaweiyun_RDS_assets: []
+      }
     }
   },
   methods: {
-    show_diif_detail (index) {
-      // this.editPasswordModal = true
-      // this.username = this.data5[index].username
+    confirm () {
+      // this.diff_detail_model = true
+      this.$Modal.confirm({
+                    title: '准备写入变动到资产数据表(后期会添加校验码功能)',
+                    content: '<p>预备</p><p>开始</p>',
+                    loading: true,
+                    onOk: () => {
+                       setTimeout(() => {
+                            this.$Modal.remove();
+                            // this.$Message.info('关闭');
+                            // this.diff_detail_model = true;
+                            this.add2asset();
+                        }, 2000);
+                    },
+                    onCancel: () => {
+                        this.$Message.info('Clicked cancel');
+                    }
+                });
     },
-    handle_yun_assets () { // 手工更新资产 按钮，显示所有ecs和rds的差异
-      axios.put(`${util.url}/yunassets/showdiff`, {
-        'user': Cookies.get('user')
-      })
-          .then(res => {
-              // this.ecsdata = res.data.ecs
-              // this.rdsdata = res.data.rds
-              // this.time = res.data.cur_time
-              // this.person = res.data.cur_person
-              this.yun_diff_list = res.data
-              console.log(res.data.ecs, 'ecs')
-              console.log(res.data.rds, 'rds')
-              // this.formItem
-          })
-          .catch(() => {
-            this.$Notice.error({
-              title: '错误',
-              desc: '无法连接阿里云API，请检查',
-              duration: 10
-            })
-          })
+    handleSelectAll (status) {
+      this.$refs.selection.selectAll(status);
     },
-    Connection_Name (val) {
-      this.datalist.connection_name_list = []
-      this.datalist.basenamelist = []
-      this.formItem.connection_name = ''
-      this.formItem.basename = ''
-      if (val) {
-        this.ScreenConnection(val)
-      }
-    },
-    ScreenConnection (val) {
-      this.datalist.connection_name_list = this.item.filter(item => {
-        if (item.computer_room === val) {
-          return item
-        }
-      })
-    },
-    DataBaseName (index) {
-      if (index) {
-        this.id = this.item.filter(item => {
-          if (item.connection_name === index) {
-            return item
-          }
-        })
-        axios.put(`${util.url}/workorder/basename`, {
-            'id': this.id[0].id
-          })
-          .then(res => {
-            this.datalist.basenamelist = res.data
-          })
-          .catch(() => {
-            this.$Notice.error({
-              title: '警告',
-              desc: '无法连接数据库!请检查网络'
-            })
-          })
-      }
-    },
-    //  sql 优化建议
-    sqladvisor () {
-
-    },
-    // 同时检查  备份栏只能是select语句，ddl栏只能是非select语句
-    test_sql () {
-      this.$refs['formItem'].validate((valid) => {
-        if (valid) {
-          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            let tmpddl2 = ''
-            let tmpddl = ''
-            let tmpbak = ''
-            let tmpbak2 = ''
-            if (this.formItem.textarea_backup) {
-                tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-                tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            } else {
-                tmpbak = ''
-            }
-            if (this.formItem.textarea_ddl_dml) {
-                tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-                tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            } else {
-                tmpddl = ''
-            }
-            axios.put(`${util.url}/sqlsyntax/test`, {
-                'id': this.id[0].id,
-                'base': this.formItem.basename,
-                'type': 1,
-                'sql': tmpddl + '&&&' + tmpbak,
-                'check_sql': tmpddl2 + '&&&' + tmpbak2
-              })
-              .then(res => {
-               if (res.data.status === 200) {
-                 this.Testresults = res.data.result_ddl
-                 this.Testresults_backup = res.data.result_bak
-                 let gen = 0
-                 let gen1 = 0
-                 this.Testresults.forEach(vl => {
-                   if (vl.errlevel !== 0) {
-                     gen += 1
-                   }
-                 })
-                 this.Testresults_backup.forEach(v2 => {
-                   if (v2.errlevel !== 0) {
-                     gen1 += 1
-                   }
-                 })
-                 if (gen === 0 && gen1 === 0) {
-                   this.validate_gen = false
-                 } else {
-                   this.validate_gen = true
-                 }
-               } else if (res.data.status === 202) {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: res.data.result
-                 })
-                 this.validate_gen = true
-               } else {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: 'ddl-dml-无法连接到Inception!'
-                 })
-                 this.validate_gen = true
-               }
-              })
-              .catch(error => {
-               util.ajanxerrorcode(this, error)
-              })
-          } else {
-            this.$Message.error('请填写sql语句后再测试!');
-          }
-       }
-      })
-    },
-    SubmitSQL () {
-      this.$refs['formItem'].validate((valid) => {
-        if (valid) {
-          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            this.validate_gen = true
-            this.datalist.sqllist_ddl = ''
-            this.datalist.sqllist_backup = ''
-            if (this.formItem.textarea_ddl_dml) {
-                this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            }
-            if (this.formItem.textarea_backup) {
-                this.datalist.sqllist_backup = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            }
-            axios.post(`${util.url}/sqlsyntax/`, {
-                'data': JSON.stringify(this.formItem),
-                'sql': JSON.stringify(this.datalist.sqllist_ddl),
-                'backup_sql': JSON.stringify(this.datalist.sqllist_backup),
+    add2asset () {  //  添加数据到数据库
+             axios.put(`${util.url}/yunassets/showdiff`)
+                  .then(res => {
+                      this.data_asset_list.ecs_diff_detail = res.data.diff_detail.ecs
+                      this.data_asset_list.rds_diff_detail = res.data.diff_detail.rds
+                      console.log(this.data_asset_list.rds_diff_detail, 'rds')
+                      console.log(this.data_asset_list.ecs_diff_detail, 'ecs')
+                  })
+                  .catch(error => {
+                  util.ajanxerrorcode(this, error)
+                })
+              axios.post(`${util.url}/yunassets/`, {
                 'user': Cookies.get('user'),
-                'type': 1,
-                'id': this.id[0].id
+                'ecs_data': JSON.stringify(this.data_asset_list.ecs_diff_detail),
+                'rds_data': JSON.stringify(this.data_asset_list.rds_diff_detail)
+                // 'ecs_data': this.ecs_diff_detail,
+                // 'rds_data': this.rds_diff_detail
               })
               .then(res => {
                 this.$Notice.success({
                   title: '成功',
-                  desc: res.data
+                  desc: '更新资产成功'
                 })
-                // this.validate_gen = !this.validate_gen
-                this.validate_gen = true
-                this.ClearForm()
+                // 添加记录到 资产操作记录栏目理
+                this.yun_diff_list = res.data
               })
               .catch(error => {
                 util.ajanxerrorcode(this, error)
               })
-          } else {
-            this.$Message.error('请填写sql语句后再提交!');
-          }
-        } else {
-          this.$Message.error('表单验证失败!');
-        }
-      })
     },
-    ClearForm () {
-      this.$refs['formItem'].resetFields();
-      this.formItem.textarea_ddl_dml = '';
-      this.formItem.textarea_backup = '';
-      this.Testresults = '';
-      this.Testresults_backup = ''
+    show_diif_detail (index) {
+      this.diff_detail_model = true
+
+      // this.username = this.data5[index].username
     }
   },
   mounted () {
-    axios.put(`${util.url}/workorder/connection`)
-      .then(res => {
-        this.item = res.data['connection']
-        this.assigned = res.data['person']
-      })
-      .catch(error => {
-        util.ajanxerrorcode(this, error)
-      })
+     axios.put(`${util.url}/yunassets/showdiff`)
+          .then(res => {
+              this.data_asset_list.ecs_diff_detail = res.data.diff_detail.ecs
+              this.data_asset_list.rds_diff_detail = res.data.diff_detail.rds
+              console.log(this.data_asset_list.rds_diff_detail, 'rds')
+              console.log(this.data_asset_list.ecs_diff_detail, 'ecs')
+          })
+          .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
+     axios.get(`${util.url}/yunassets/`)
+          .then(res => {
+              this.aliyun_result_list.aliyun_ECS_assets = res.data.ecs_data.data
+              this.aliyun_result_list.aliyun_RDS_assets = res.data.rds_data.data
+              this.coutlist.aliyun_ecs_count = res.data.ecs_data.data.length
+              this.coutlist.aliyun_rds_count = res.data.rds_data.data.length
+              console.log(this.aliyun_result_list.aliyun_ECS_assets, 'aliyunassets')
+              // this.data_asset_list.rds_diff_detail = res.data.diff_detail.rds
+          })
+          .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
     }
 }
 </script>

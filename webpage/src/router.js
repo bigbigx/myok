@@ -254,7 +254,7 @@ export const appRouter = [
     children: [
       {
         path: 'mylog-order',
-        name: 'logger-mywork',
+        name: 'mylog-order',
         title: '我的工单',
         'icon': 'edit',
         component: resolve => {
@@ -262,21 +262,12 @@ export const appRouter = [
         }
       },
       {
-        path: 'logger-view',
-        name: 'logger-my-iew',
-        title: '文件增量内容',
+        path: 'mylogger-view',
+        name: 'mylogger-view',
+        title: '我的文件',
         'icon': 'edit',
         component: resolve => {
           require(['./components/Logger/LoggerView.vue'], resolve)
-        }
-      },
-      {
-        path: 'logger-view-full',
-        name: 'logger-view-full',
-        title: '文件全部内容',
-        'icon': 'edit',
-        component: resolve => {
-          require(['./components/Logger/LoggerViewFull.vue'], resolve)
         }
       }
     ]
@@ -297,6 +288,23 @@ export const appRouter = [
           require(['./components/Logger/LoggerManager.vue'], resolve)
         }
       }
+    ]
+  }, {
+    path: '/asset',
+    icon: 'social-buffer',
+    name: 'asset-service',
+    title: '主机服务',
+    component: Index,
+    children: [
+        {
+        path: 'asset-service',
+        name: 'asset-service',
+        title: '远程控制',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Asset/AssetService.vue'], resolve)
+          }
+        }
     ]
   }, {
     path: '/asset',

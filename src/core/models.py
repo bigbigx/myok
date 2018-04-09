@@ -34,18 +34,31 @@ class SqlDictionary(models.Model):
 
 class FileContent(models.Model):
     '''
-    文件内容表
+    文件内容表(含日志)
     '''
-    filename =  models.CharField(max_length=50, blank=True)  # 文件名字‘
-    filepath =  models.CharField(max_length=50, blank=True)  # 文件路径
-    inner_server_ip =  models.CharField(max_length=50, blank=True)  # 文件所在服务器的内部IP
-    outer_server_ip = models.CharField(max_length=50, blank=True)  # 文件所在服务器的外部IP
-    server_hostname = models.CharField(max_length=50, blank=True)  # 文件所在服务器的主机名
-    pg_id =  models.CharField(max_length=50, blank=True)  # 关联的项目的编号
-    keyword =  models.CharField(max_length=50, blank=True)  # 搜索的关键字
-    file_remark =  models.CharField(max_length=50, blank=True)   # 文件说明YunRdsObj
 
-class YunRdsObj(models.Model):
+    private_server_ip = models.CharField(max_length=50, blank=True)  # 文件所在服务器的内部IP
+    public_server_ip = models.CharField(max_length=50, blank=True)  # 文件所在服务器的外部IP
+    server_hostname = models.CharField(max_length=50, blank=True)  # 文件所在服务器的主机名
+    region_name = models.CharField(max_length=50, blank=True)  # 华北1
+    room_name = models.CharField(max_length=50, blank=True)  # 阿里云
+    server_status = models.CharField(max_length=50, blank=True)  # running,stopped  主机运行状态
+    pg_id = models.CharField(max_length=50, blank=True)  # 关联的项目的编号
+    keyword = models.CharField(max_length=50, blank=True)  # 搜索的关键字
+    file_title = models.CharField(max_length=300, blank=True)  # 文件标题
+    file_type = models.CharField(max_length=50, blank=True)  # 文件类型
+    file_path = models.CharField(max_length=50, blank=True)  # 文件路径
+    file_remark = models.CharField(max_length=50, blank=True)   # 文件说明YunRdsObj
+
+
+class AssetChangeHistory(models.Model):
+    time = models.CharField(max_length=50, blank=True)
+    content = models.TextField()
+    person = models.CharField(max_length=50, blank=True)
+
+class YunRdsObj(models.Model):  #  阿里云的RDS
+    Room_id = models.CharField(max_length=300, default='yun001', blank=True)  # 机房或者云环境编号
+    Area_id = models.CharField(max_length=300, default='cn_qingdao', blank=True)  #  区域编号
     LockMode = models.CharField(max_length=300, blank=True)
     DBInstanceNetType = models.CharField(max_length=300, blank=True)
     DBInstanceClass = models.CharField(max_length=300, blank=True)
@@ -70,7 +83,9 @@ class YunRdsObj(models.Model):
     PayType = models.CharField(max_length=300, blank=True)
 
 
-class YunEcsObj(models.Model):
+class YunEcsObj(models.Model):  #  阿里云的ECS
+    Room_id = models.CharField(max_length=300, default='yun001',blank=True)  # 机房或者云环境编号
+    Area_id = models.CharField(max_length=300, default='cn_qingdao',blank=True)  # 区域编号
     InnerIpAddress = models.CharField(max_length=300, blank=True)
     ImageId= models.CharField(max_length=300, blank=True)
     InstanceTypeFamily= models.CharField(max_length=300, blank=True)
@@ -112,18 +127,24 @@ class YunEcsObj(models.Model):
     OperationLocks = models.CharField(max_length=300, blank=True)
     InstanceChargeType = models.CharField(max_length=300, blank=True)
     GPUAmount = models.CharField(max_length=300, blank=True)
-    xpiredTime = models.CharField(max_length=300, blank=True)
+    xpiredTime = models.CharField(max_length=300, null=True,blank=True)
 
 
-class YunAssetArea(models.Model):
+class AssetAreaList(models.Model):
     '''
     云环境的区域： 如阿里云
-    yun_obj:  0--阿里云  1--美团云  2--腾讯云  3 --华为云 等
+    和机房的机柜
+    room_id:  0--阿里云  1--美团云  2--腾讯云  3 --华为云 和 独立机房，已经广州IDC 等等
+    room_name
+    area_id : 区域或者机柜的编号
     area_name: 区域名称： 如华北，华南等
     status  区域的使用状态 :  1--可用 0 --不可用
     '''
-    yun_obj = models.IntegerField(blank=True)
-    area_name = models.CharField(max_length=50, blank=True)
+    room_id = models.CharField(max_length=300, blank=True)
+    room_name = models.CharField(max_length=300, blank=True)
+    area_id = models.CharField(max_length=300, blank=True)
+    area_name = models.CharField(max_length=300, blank=True)
+    area_city = models.CharField(max_length=300, blank=True)
     status = models.IntegerField(blank=True)
 
 class YunAssetObj(models.Model):
