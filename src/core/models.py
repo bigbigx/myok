@@ -13,7 +13,13 @@ class Account(AbstractUser):
     #group = models.CharField(max_length=40)   #权限组 guest/admin
     group = models.CharField(max_length=40)   #权限组 guest/approver/executer/admin
     department = models.CharField(max_length=40) #部门
+    workgroup_id = models.CharField(max_length=40,blank=True)  # 工作分组，跟group属性不一样，group是角色分组
 
+class AccountGroup(models.Model):
+    GroupName = models.CharField(max_length=80)
+    GroupID = models.CharField(max_length=40)
+    PermissonID= models.CharField(max_length=300)  # 权限编号，可以多个，以逗号分割
+    status = models.IntegerField(blank=True) #  0 -- 禁用  1 --启用
 
 class SqlDictionary(models.Model):
     '''
@@ -49,7 +55,10 @@ class FileContent(models.Model):
     file_type = models.CharField(max_length=50, blank=True)  # 文件类型
     file_path = models.CharField(max_length=50, blank=True)  # 文件路径
     file_remark = models.CharField(max_length=50, blank=True)   # 文件说明YunRdsObj
-
+    file_owner = models.CharField(max_length=400, blank=True)   # 文件归属，可以是多人，都好分隔
+    full_file_status = models.CharField(max_length=50, blank=True,default='false') #  全量查看文件的开关  false--禁止， true-- 开启
+    visit_way = models.IntegerField(default=1,blank=True) #  0 -- 私网访问  1 --公网访问
+    visit_user = models.CharField(max_length=20, blank=True)   # 设置访问用户
 
 class AssetChangeHistory(models.Model):
     time = models.CharField(max_length=50, blank=True)
@@ -128,7 +137,22 @@ class YunEcsObj(models.Model):  #  阿里云的ECS
     InstanceChargeType = models.CharField(max_length=300, blank=True)
     GPUAmount = models.CharField(max_length=300, blank=True)
     xpiredTime = models.CharField(max_length=300, null=True,blank=True)
+    user_pwd_id = models.CharField(max_length=300, null=True,blank=True)  # ecs服务器用户账号密码清单编号
 
+class HostUserPwd(models.Model):
+    '''
+    服务器用户密码对象表
+    '''
+    public_IP = models.CharField(max_length=30, blank=True)  # 外网 IP
+    private_IP = models.CharField(max_length=30, blank=True) # 内网 IP
+    mac_address = models.CharField(max_length=60, blank=True) # 物理地址
+    user_name = models.CharField(max_length=30, blank=True)  # 用户名
+    password = models.CharField(max_length=50, blank=True)  # ssh登录密码
+    remark = models.CharField(max_length=300, blank=True)  # 用户说明
+    type = models.IntegerField(blank=True)  # 账号分类  0--超级管理员  1--高级管理员  2 --普通用户 3 --   99--guest
+    status = models.IntegerField(blank=True)  # 启用状态  0--禁用   1-- 启用
+    server_status = models.IntegerField(blank=True, default=1)  # 服务器启用状态  0--禁用   1-- 启用
+    workgroup_id = models.CharField(max_length=30, blank=True)  # 工作组编号，此账号分配给的工作组
 
 class AssetAreaList(models.Model):
     '''
@@ -212,7 +236,7 @@ class AssetTypeDetail(models.Model):
     资产型号明细表
     '''
     cab_type = models.CharField(max_length=20, default="暂无", null=True, blank=True)  # own,aliyun,other,aws等四个机房
-    type_id = models.IntegerField(max_length=20, null=True, blank=True)
+    type_id = models.IntegerField(null=True, blank=True)
     type_name = models.CharField(max_length=20, default="暂无", null=True, blank=True)
 
 

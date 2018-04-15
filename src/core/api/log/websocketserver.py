@@ -9,33 +9,39 @@ import threading
 import paramiko
 #import simplejson
 
-from  asset.assets_controler  import ControlerCenter
+# from  asset.assets_controler  import ControlerCenter
 
 
 def get_ssh(ip, user, pwd):
-  try:
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(ip, 22, user, pwd, timeout=15)
-    return ssh
-  except Exception as e:
-    print(e)
-    return "False"
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(ip, 22, user, pwd, timeout=15)
+        return ssh
+    except Exception as e:
+        print("异常")
+        print(e)
+        # return "False"
 
 
 def recv_data(conn): # 服务器解析浏览器发送的信息
-  try:
-    all_data = conn.recv(1024)
-    print("start next")
-    print（all_data）
-    if not len(all_data):
-        return False
+    try:
+        all_data = conn.recv(1024).decode('utf-8', 'ignore')
+        # all_data = conn.recv(1024).decode('base64','strict')
+        # all_data = conn.recv(1024).decode()
+
+        print("start next")
+        print(all_data)
+        if not len(all_data):
+            return False
     #dic = simplejson.loads(all_data)
     # print "hello"
     # print dic
-    except:
-        pass
+    except Exception as e:
+        print('nonononono')
+        print(e)
     else:
+      print('yes')
       code_len = ord(all_data[1]) & 127
       if code_len == 126:
           masks = all_data[4:8]
@@ -60,18 +66,19 @@ def recv_data(conn): # 服务器解析浏览器发送的信息
 def send_data(conn, data):  # 服务器处理发送给浏览器的信息
     if data:
         data = str(data)
+        print(data)
     else:
         return False
     token = "\x81"
     length = len(data)
     if length < 126:
-        token += struct.pack("B", length)  # struct为Python中处理二进制数的模块，二进制流为C，或网络流的形式。
+        token += struct.pack("B", length).decode()  # struct为Python中处理二进制数的模块，二进制流为C，或网络流的形式。
     elif length <= 0xFFFF:
-        token += struct.pack("!BH", 126, length)
+        token += struct.pack("!BH", 126, length).decode()
     else:
-        token += struct.pack("!BQ", 127, length)
+        token += struct.pack("!BQ", 127, length).decode()
     data = '%s%s' % (token, data)
-    conn.send(data)
+    conn.send(data.encode('utf-8'))
     return True
 
 
@@ -81,7 +88,11 @@ def handshake(conn, address, thread_name):
     if not len(shake):
         return False
     print('%s : Socket start handshaken with %s:%s' % (thread_name, address[0], address[1]))
-    header, data = shake.split('\r\n\r\n', 1)
+    print(shake)
+    # tmp = str(shake)
+    # tmp1 = tmp[2:-1]
+    # print(tmp1)
+    header, data = shake.decode().split('\r\n\r\n', 1)
     for line in header.split('\r\n')[1:]:
         key, value = line.split(': ', 1)
         headers[key] = value
@@ -97,10 +108,12 @@ def handshake(conn, address, thread_name):
                        "WebSocket-Origin: {2}\r\n" \
                        "WebSocket-Location: ws://{3}/\r\n\r\n"
     sec_key = headers['Sec-WebSocket-Key']
-    res_key = base64.b64encode(hashlib.sha1(sec_key + MAGIC_STRING).digest())
-    str_handshake = HANDSHAKE_STRING.replace('{1}', res_key).replace('{2}', headers['Origin']).replace('{3}',
+    tmp = (sec_key + MAGIC_STRING).encode("utf-8")
+    res_key = base64.b64encode(hashlib.sha1(tmp).digest())
+    print(res_key)
+    str_handshake = HANDSHAKE_STRING.replace('{1}', res_key.decode()).replace('{2}', headers['Origin']).replace('{3}',
                                                                                                        headers['Host'])
-    conn.send(str_handshake)
+    conn.send(str_handshake.encode('utf-8'))
     print('%s : Socket handshaken with %s:%s success' % (thread_name, address[0], address[1]))
     print('Start transmitting data...')
     print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
@@ -108,23 +121,19 @@ def handshake(conn, address, thread_name):
 
 
 
-def  get_username_and_password(IP):
-     #username="root"
-     user_pwd={"username":'',"password":''}
-     controller = ControlerCenter(servers_list=["all"],task_type="multi")
-     user_pwd = controller.get_user_pwd_by_ip(IP)
-     if user_pwd["exception"] != "":
-         print("产生exception")
-         sys.exit(1)
-     else:
-         return user_pwd
+
+#  publicIP 是外网IP
+def  get_username_and_password(publicIP):
+    user_pwd = {'username': 'root', 'password':'NtpxyH9NuqG3'}
+    return user_pwd
 
 def dojob(conn, address, thread_name):
   goahead=handshake(conn, address, thread_name)# 握手
+  print('ppppppppppppppp')
+  print(goahead)
   if goahead is not True:
       sys.exit(1)
-  else:
-      pass
+
 
   #print conn
   #print goahead
@@ -133,11 +142,15 @@ def dojob(conn, address, thread_name):
   user="root"
   #password=getPassword(ip)
   password="q9mQ7axgjPaY"
-  ssh = get_ssh('172.16.187.127', 'root', 'q9mQ7axgjPaY')# 连接远程服务器
-  ssh_t = ssh.get_transport()
-  chan = ssh_t.open_session()
-  chan.setblocking(0)  # 设置非阻塞
-  chan.exec_command('date')
+  ssh = get_ssh('43.241.232.104', 'root', 'q9mQ7axgjPaY')# 连接远程服务器
+  print(ssh)
+  try:
+      ssh_t = ssh.get_transport()
+      chan = ssh_t.open_session()
+      chan.setblocking(0)  # 设置非阻塞
+      chan.exec_command('date')
+  except Exception as e:
+      print(e)
 
 
   while True:
@@ -150,6 +163,7 @@ def dojob(conn, address, thread_name):
     cnum=""
 
     clientdata11 = recv_data(conn)
+    print(clientdata11)
     if clientdata11 is not None and 'myip' in clientdata11:#初始化的时候，数据传递过来
       msg=clientdata11
       print(msg)
@@ -213,8 +227,6 @@ def dojob(conn, address, thread_name):
            conn.close()
            break
 
-
-
         while True:
              while chan.recv_ready():
                  clientdata1 = recv_data(conn)
@@ -258,6 +270,9 @@ def ws_service():
   while True:
     #connection, address,ip,path,keyword = sock.accept()
     connection, address = sock.accept()
+    print('hhhhhhhhhhhh')
+    print(connection)
+    print(address)
     #ip="172.16.187.127"
     #path="/var/log/nginx/access.log.1"
     #keyword=""

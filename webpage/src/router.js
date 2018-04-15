@@ -299,10 +299,10 @@ export const appRouter = [
         {
         path: 'asset-service',
         name: 'asset-service',
-        title: '远程控制',
+        title: '我的主机',
         'icon': 'edit',
         component: resolve => {
-          require(['./components/Asset/AssetService.vue'], resolve)
+          require(['./components/Asset/MyHost.vue'], resolve)
           }
         }
     ]
@@ -331,7 +331,15 @@ export const appRouter = [
         component: resolve => {
           require(['./components/Asset/HostManager.vue'], resolve)
           }
+        }, {
+        path: 'management-group',
+        name: 'management-group',
+        title: '群组',
+        'icon': 'person-stalker',
+        component: resolve => {
+          require(['./components/Management/UserGroup.vue'], resolve)
         }
+      }
     ]
   }, {
     path: '/online',
@@ -344,7 +352,7 @@ export const appRouter = [
         {
         path: 'online-manager',
         name: 'online-project-manager-add',
-        title: '添加应用',
+        title: '应用配置',
         'icon': 'edit',
         component: resolve => {
           require(['./components/Online/OnlineManager.vue'], resolve)

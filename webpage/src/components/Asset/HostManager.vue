@@ -1,99 +1,180 @@
 <style lang="less">
 @import '../../styles/common.less';
-@import '../common/table.less';
+@import '../Order/components/table.less';
+.demo-spin-icon-load {
+    animation: ani-demo-spin 1s linear infinite;
+}
 </style>
-
 <template>
 <div>
-  <Row>
-    <Col span="6">
-    <Card>
-      <p slot="title">
-        <Icon type="ios-redo"></Icon>
-        服务器配置
-      </p>
-      <div class="edittable-test-con">
-        <div id="showImage" class="margin-bottom-10">
-
-          <Form ref="formItem" :model="formItem" :rules="ruleValidate" :label-width="80">
-            <FormItem label="机房:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem label="所在区域:" prop="connection_name">
-              <Select v-model="formItem.connection_name" @on-change="DataBaseName" filterable>
-              <Option v-for="i in datalist.connection_name_list" :value="i.connection_name" :key="i.connection_name">{{ i.connection_name }}</Option>
-            </Select>
-            </FormItem>
-
-
-            <FormItem label="所属资产:" prop="connection_name">
-              <Select v-model="formItem.connection_name" @on-change="DataBaseName" filterable>
-              <Option v-for="i in datalist.connection_name_list" :value="i.connection_name" :key="i.connection_name">{{ i.connection_name }}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem label="主机名:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem label="IP地址:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-
-            <FormItem label="硬盘:" prop="computer_room">
-              <Select v-model="formItem.computer_room" @on-change="Connection_Name">
-              <Option v-for="i in datalist.computer_roomlist" :key="i" :value="i" >{{i}}</Option>
-            </Select>
-            </FormItem>
-
-            <FormItem>
-              <Button type="warning" icon="android-search" @click.native="test_sql()">一键搜索</Button>
-              <Button type="success" icon="ios-redo" @click.native="SubmitSQL()" style="margin-left: 10%"  :disabled="this.validate_gen">添加</Button>
-            </FormItem>
-          </Form>
-          <Alert style="height: 145px">
-            检测表字段提示信息
-            <template slot="desc">
-                <p>1.错误等级 0正常,1警告,2错误。</p>
-                <p>2.阶段状态 审核成功,Audit completed</p>
-                <p>3.错误信息 用来表示出错错误信息</p>
-                <p>4.当前检查的sql</p>
-                <p>注:只有错误等级等于0时提交按钮才会激活</p>
-              </template>
-          </Alert>
-        </div>
-      </div>
-    </Card>
-    </Col>
-<Col span="18" class="padding-left-10">
+  <Col span="6">
   <Card>
     <p slot="title">
-      <Icon type="ios-crop-strong"></Icon>
-      文件配置清单
+      <Icon type="load-b"></Icon>
+      主机访问账号配置
     </p>
-    <div class="edittable-con-1">
-      <Table :columns="columns" :data="rowdata" height="550"></Table>
+    <div class="edittable-testauto-con">
+      <div id="showImage" class="margin-bottom-10">
+      <Form ref="formFileItem" :model="formFileItem" :rules="ruleValidate" :label-width="100" >
+
+      <Tabs value="yun_env_init" @on-click="ClearForm">
+        <TabPane label="云环境"  name="yun-env" >
+        <Form-item label="云环境:" prop="computer_room">
+          <Select v-model="formFileItem.computer_room" placeholder="请选择" @on-change="Computer_Room">
+            <Option v-for="i in datalist.yun_env_list" :key="i" :value="i" >{{i}}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="区域:" prop="area">
+          <Select v-model="formFileItem.area" placeholder="请选择" @on-change="Area" filterable>
+            <Option v-for="i in datalist.area_list" :value="i.area_name" :key="i.area_name">{{ i.area_name }}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="服务器实例:" prop="server_instance_name">
+          <Select v-model="formFileItem.server_instance_name" placeholder="请选择" @on-change="Server_instance" filterable>
+            <Option v-for="item in datalist.server_instance_list" :value="item.name" :key="item.name">{{ item.name }}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="主机公网IP:" prop="publicip">
+          <Input v-model="formFileItem.publicip" disabled placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="主机内网IP:" prop="privateip">
+          <Input v-model="formFileItem.privateip" disabled placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="主机状态:" prop="serverstatus">
+          <Input v-model="formFileItem.serverstatus" disabled placeholder="请输入"></Input>
+        </Form-item>
+        </TabPane>
+      <TabPane label="物理机房"  name="idc-env" >
+        <Form-item label="机房:" prop="computer_room">
+          <Select v-model="formFileItem.computer_room" placeholder="请选择" @on-change="Computer_Room">
+            <Option v-for="i in datalist.idc_env_list" :key="i" :value="i" >{{i}}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="机柜:" prop="area">
+          <Select v-model="formFileItem.area" placeholder="请选择" @on-change="Area" filterable>
+            <Option v-for="i in datalist.area_list" :value="i.area_name" :key="i.area_name">{{ i.area_name }}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="服务器编号:" prop="server_instance_name">
+          <Select v-model="formFileItem.server_instance_name" placeholder="请选择" @on-change="Server_instance" filterable>
+            <Option v-for="item in datalist.server_instance_list" :value="item.name" :key="item.name">{{ item.name }}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="主机公网IP:" prop="publicip">
+          <Input v-model="formFileItem.publicip" disabled placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="主机内网IP:" prop="pricateip">
+          <Input v-model="formFileItem.privateip" disabled placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="主机状态:" prop="serverstatus">
+          <Input v-model="formFileItem.serverstatus" disabled placeholder="请输入"></Input>
+        </Form-item>
+      </TabPane>
+     </Tabs>
+
+        <Form-item label="添加登录用户:" prop="file_title">
+          <Input v-model="formFileItem.ssh_user" placeholder="请输入"></Input>
+        </Form-item>
+
+        <Form-item label="添加登录密码:" prop="file_title">
+          <Input v-model="formFileItem.ssh_pwd" type="password" placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="账号说明:" prop="file_title">
+          <Input v-model="formFileItem.ssh_user_remark" placeholder="请输入"></Input>
+        </Form-item>
+        <p></p>
+        <Button type="default" @click="test_ssh()" style="margin-left: 5%">连接测试</Button>
+        <Button type="success" @click="add_sshuser()" style="margin-left: 19%" :disabled="this.validate_gen">确定</Button>
+        <Button type="warning" @click="del_sshuser()" style="margin-left: 10%">重填</Button>
+
+      </Form>
+      </div>
     </div>
-    <br>
-    <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
   </Card>
+
   </Col>
-  </Row>
+  <Col span="18" class="padding-left-10">
+  <Card>
+    <Tabs value="主机控制" style="height: 660px;">
+      <TabPane label="主机SSH账号" icon="load-b" name="account_ssh">
+          <p slot="title">
+            <Icon type="ios-crop-strong"></Icon>
+            主机SSH账号清单
+          </p>
+          <div class="edittable-con-3">
+            <Table :columns="columns" :data="host_list" height="550"></Table>
+          </div>
+          <br>
+          <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+      </TabPane>
+
+
+      <TabPane label="主机访问控制" icon="load-b" name="control_server">
+        <p slot="title">
+          <Icon type="ios-crop-strong"></Icon>
+          主机访问控制
+        </p>
+        <div class="edittable-con-3">
+          <Table :columns="columns_server" :data="host_list_server" height="550"></Table>
+        </div>
+        <br>
+        <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+      </TabPane>
+    </Tabs>
+
+  </Card>
+
+  </Col>
+
+  <!--进入编辑按钮对话框-->
+   <Modal v-model="delFileModal" :width="500">
+    <h3 slot="header" style="color:#2D8CF0">编辑</h3>
+    <Form :label-width="100" label-position="right">
+      <FormItem label="文件名称">
+        <Input v-model="delbasename" readonly="readonly"></Input>
+      </FormItem>
+      <FormItem label="请输入文件名称">
+        <Input v-model="delconfirmfilename" placeholder="请确认数据库连接名"></Input>
+      </FormItem>
+    </Form>
+    <div slot="footer">
+      <Button type="text" @click="delbaseModal = false">取消</Button>
+      <Button type="primary" @click="delfilelink">删除</Button>
+    </div>
+  </Modal>
+
+
+  <Modal v-model="editGroupModal" :width="800" :mask-closable="false">
+    <h3 slot="header" style="color:#2D8CF0">编辑群组</h3>
+    <Form ref="formFileItem" :model="formFileItem" :rules="ruleValidate" :label-width="120" >
+
+        <Form-item label="群组:" prop="computer_room">
+          <Select v-model="formFileItem.area" placeholder="请选择" @on-change="Group" filterable>
+            <Option v-for="i in datalist.area_list" :value="i.area_name" :key="i.area_name">{{ i.area_name }}</Option>
+          </Select>
+        </Form-item>
+        <Form-item label="区域或机柜:" prop="area">
+            <Transfer
+                    :data="data2"
+                    :target-keys="targetKeys2"
+                    filterable
+                    :filter-method="filterMethod"
+                    @on-change="handleChange2"></Transfer>
+            </Form-item>
+        <p></p>
+        <p></p>
+        <!--<Button type="success" @click="add_file()" style="margin-left: 5%">确定</Button>-->
+
+      </Form>
+  </Modal>
 </div>
 </template>
 <script>
-import ICol from '../../../node_modules/iview/src/components/grid/col.vue'
+import '../../assets/tablesmargintop.css'
 import axios from 'axios'
-import Cookies from 'js-cookie'
+// import Cookies from '../js-cookie'
 import util from '../../libs/util'
+import ICol from '../../../node_modules/iview/src/components/grid/col'
 export default {
   components: {
     ICol
@@ -102,283 +183,506 @@ export default {
   data () {
     return {
       validate_gen: true,
-      formItem: {
-        textarea: '',
-        computer_room: '',
-        connection_name: '',
-        basename: '',
-        text: '',
-        backup: 0,
-        assigned: ''
-      },
-      columnsName: [
+      social: [],
+      file_owern_list: [],
+      host_list_server: [],
+      host_list_group: [],
+      editGroupModal: false,
+      columns_server: [
         {
-          title: 'ID',
-          key: 'ID',
-          width: '50'
+          title: '外网IP',
+          key: 'publicip'
         },
         {
-          title: '阶段',
-          key: 'stage',
-          width: '100'
+          title: '内网IP',
+          key: 'privateip'
         },
         {
-          title: '错误等级',
-          key: 'errlevel',
-          width: '100'
-        },
-        {
-          title: '阶段状态',
-          key: 'stagestatus',
-          width: '150'
-        },
-        {
-          title: '错误信息',
-          key: 'errormessage'
-        },
-        {
-          title: '当前检查的sql',
-          key: 'sql'
-        },
-        {
-          title: '预计影响的SQL',
-          key: 'affected_rows',
-          width: '130'
+          title: '是否进制普通用户访问',
+          key: 'switch_server',
+          width: 150,
+          render: (h, params) => {
+            return h('div', [
+              h('i-switch', { // 数据库1是已处理，0是未处理
+                props: {
+                  type: 'primary',
+                  value: params.row.treatment === 1  // 控制开关的打开或关闭状态，官网文档属性是value
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  'on-change': (value) => { // 触发事件是on-change,用双引号括起来，
+                    // 参数value是回调值，并没有使用到
+                    this.switch(params.index) // params.index是拿到table的行序列，可以取到对应的表格值
+                  }
+                }
+              }, 'bb')
+            ])
+          }
         }
       ],
-      Testresults: [],
-      Testresults_backup: [],
-      item: {},
-      datalist: {
-        connection_name_list: [],
-        basenamelist: [],
-        sqllist: [],
-        computer_roomlist: util.computer_room
-      },
-      ruleValidate: {
-        computer_room: [{
-          required: true,
-          message: '机房地址不得为空',
-          trigger: 'change'
-        }],
-        connection_name: [{
-          required: true,
-          message: '连接名不得为空',
-          trigger: 'change'
-        }],
-        basename: [{
-          required: true,
-          message: '数据库名不得为空',
-          trigger: 'change'
-        }],
-        text: [{
-            required: true,
-            message: '说明不得为空',
-            trigger: 'blur'
-          },
-          {
-            type: 'string',
-            max: 150,
-            message: '最多150个字',
-            trigger: 'blur'
+      columns_visit_group: [
+        {
+          title: '外网IP',
+          key: 'publicip'
+        },
+        {
+          title: '内网IP',
+          key: 'privateip'
+        },
+        {
+          title: '访问群组',
+          key: 'workgroup'
+        },
+        {
+          title: '操作',
+          key: 'switch_group',
+          width: 180,
+          render: (h, params) => {
+            return h('div', [
+               h('Button', {
+                props: {
+                  size: 'small',
+                  type: 'info'
+                },
+                on: {
+                  click: () => {
+                    this.edit_File(params.index)
+                  }
+                }
+              }, '编辑'),
+              h('Button', {
+                style: {
+                  marginLeft: '8px'
+                },
+                props: {
+                  type: 'warning',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.def_File(params.index)
+                  }
+                }
+              }, '删除')
+            ])
           }
-        ]
+        }
+      ],
+      columns: [
+        {
+          title: '环境',
+          key: 'room_name'
+        },
+        {
+          title: '区域',
+          key: 'region_name'
+        },
+        {
+          title: '服务器说明',
+          key: 'remark'
+        },
+        {
+          title: '用户名',
+          key: 'username'
+        },
+        {
+          title: '公网IP',
+          key: 'publicip'
+        },
+
+        {
+          title: '内网IP',
+          key: 'privateip'
+        },
+        {
+          title: '归属群组',
+          key: 'workgroup'
+        },
+        {
+          title: '账号编辑',
+          key: 'action',
+          width: 200,
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  size: 'small',
+                  type: 'info'
+                },
+                on: {
+                  click: () => {
+                    this.edit_File(params.index)
+                  }
+                }
+              }, '编辑账号'),
+              h('Button', {
+                style: {
+                  marginLeft: '8px'
+                },
+                props: {
+                  type: 'warning',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.def_File(params.index)
+                  }
+                }
+              }, '删除')
+            ])
+          }
+        },
+        {
+          title: '编辑群组',
+          key: 'action',
+          width: 130,
+          render: (h, params) => {
+            return h('div', [
+              h('Button', {
+                props: {
+                  size: 'small',
+                  type: 'info'
+                },
+                on: {
+                  click: () => {
+                    this.editGroupModal = true
+                  }
+                }
+              }, '选择群组')
+            ])
+          }
+        },
+        {
+          title: '允许此账号SSH访问',
+          key: 'switch',
+          width: 70,
+          render: (h, params) => {
+            return h('div', [
+              h('i-switch', { // 数据库1是已处理，0是未处理
+                props: {
+                  type: 'primary',
+                  value: params.row.treatment === 1  // 控制开关的打开或关闭状态，官网文档属性是value
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  'on-change': (value) => { // 触发事件是on-change,用双引号括起来，
+                    // 参数value是回调值，并没有使用到
+                    this.switch(params.index) // params.index是拿到table的行序列，可以取到对应的表格值
+                  }
+                }
+              }, 'aa')
+            ])
+          }
+        }
+      ],
+      rowdata: [],
+      host_list: [],
+      group_list: [],
+      editFileModal: false,
+      delFileModal: false,
+      delfilename: '',
+      delconfirmfilename: '',
+      modal: false,
+      // 添加数据库信息
+      formFileItem: {
+        computer_room: '',
+        cabinet: '',
+        server_instance_name: '',
+        serverip: '',
+        publicip: '',
+        privateip: '',
+        serverstatus: '',
+        ssh_user: '',
+        ssh_pwd: '',
+        ssh_user_remark: ''
       },
-      id: null,
-      assigned: []
+      // 添加表单验证规则
+      ruleValidate: {
+        serverip: [{
+          required: true,
+          message: '请填写主机IP',
+          trigger: 'blur'
+        }],
+        serverhost: [{
+          required: true,
+          message: '请填写主机名',
+          trigger: 'blur'
+        }],
+        ssh_user: [{
+          required: true,
+          message: '请填写登录账号',
+          trigger: 'blur'
+        }],
+        ssh_pwd: [{
+          required: true,
+          message: '请填写登录账号密码',
+          trigger: 'blur'
+        }],
+        ssh_user_remark: [{
+          required: true,
+          message: '请填写登录账号说明',
+          trigger: 'blur'
+        }]
+      },
+
+      Generate: {
+        textarea: '',
+        add: '',
+        name: ''
+      },
+      file_type: ['Log', 'Config', 'Other'],
+      computer_room_set: util.computer_room,
+      item: {},
+      item_user: {},
+      // datalist_init: {
+      //   yun_room_list: [],
+      //   idc_room_list: [],
+      //   // cabinet_list: [],
+      //   own_cabinet_list:[],
+      //   gzidc_cabinet_list: [],
+      //   aliyun_area_list: [],
+      //   meituanyun_area_list: [],
+      //   huaweiyun_area_list: [],
+      //   area_list: [],
+      //   server_instance_name_list: [],
+      //   server_id_name_list: [],
+      //   serverhost_list: [],
+      //   serverip_list: []
+      // },
+      datalist: {
+        yun_env_list: util.yun_room_list,
+        idc_env_list: util.own_room_list,
+        area_list: [],
+        server_instance_list: []
+      },
+      server_host_ip: {
+        name: '',
+        publicip: '',
+        privateip: '',
+        status: ''
+      },
+      delbaseModal: false,
+      delbasename: '',
+      delconfirmbasename: '',
+      pagenumber: 1,
+      tmp_id: null,
+      diclist: [],
+      mail_switch: false,
+      dingding_switch: false
     }
   },
   methods: {
-    beautify () {
-      axios.put(`${util.url}/sqlsyntax/beautify`, {
-          'data1': this.formItem.textarea_backup || '',
-          'data2': this.formItem.textarea_ddl_dml || ''
+    test_ssh () {
+      axios.put(`${util.url}/host/test`, {
+        'publicip': this.formFileItem.publicip,
+        'privateip': this.formFileItem.privateip,
+        'ssh_user': this.formFileItem.ssh_user,
+        'ssh_pwd': this.formFileItem.ssh_pwd
+      }).then(res => {
+        if (res.data.status === 200) {
+          this.$Notice.success({
+            title: '成功',
+            desc: res.data.data
+          })
+          this.validate_gen = false
+        } else {
+          this.$Notice.success({
+            title: '失败',
+            desc: res.data.data
+          })
+        }
         })
-        .then(res => {
-          // console.log(res)
-          // console.log(res.data.select)
-          // console.log(res.data.dml_ddl)
-          this.formItem.textarea_backup = res.data.select
-          this.formItem.textarea_ddl_dml = res.data.dml_ddl
-        })
-        .catch(error => {
+        .catch(() => {
           this.$Notice.error({
             title: '警告',
-            desc: error
+            desc: '无法连接数据库!请检查网络'
           })
         })
     },
-    Connection_Name (val) {
-      this.datalist.connection_name_list = []
-      this.datalist.basenamelist = []
-      this.formItem.connection_name = ''
-      this.formItem.basename = ''
+    add_sshuser () {
+       axios.post(`${util.url}/host/`, {
+        // 'room_name': this.formFileItem.computer_room,
+        // 'area_name': this.formFileItem.area,
+        // 'server_name': this.formFileItem.server_instance_name,
+        // 'server_status': this.formFileItem.serverstatus,
+        'publicip': this.formFileItem.publicip,
+        'privateip': this.formFileItem.privateip,
+        'ssh_user': this.formFileItem.ssh_user,
+        'ssh_pwd': this.formFileItem.ssh_pwd,
+        'remark': this.formFileItem.ssh_user_remark
+      })
+        .then(res => {
+          this.$Notice.success({
+                  title: '成功',
+                  desc: res.data.msg
+                })
+          this.host_list = res.data.data
+        })
+        .catch(() => {
+          this.$Notice.error({
+            title: '警告',
+            desc: '无法连接数据库!请检查网络'
+          })
+        })
+    },
+    del_sshuser () {},
+    ClearForm () {
+      this.formFileItem.publicip = ''
+      this.formFileItem.privateip = ''
+      this.formFileItem.serverstatus = ''
+      this.formFileItem.file_type = ''
+      this.formFileItem.file_title = ''
+      this.formFileItem.file_remark = ''
+      this.formFileItem.file_owner = ''
+      this.formFileItem.area = ''
+      this.formFileItem.file_path = ''
+      this.formFileItem.serverip = ''
+      this.formFileItem.server_instance_name = ''
+      // this.formFileItem.server_instance = ''
+      this.formFileItem.cabinet = ''
+      this.formFileItem.computer_room = ''
+      this.datalist.area_list = []
+      // this.Computer_Room
+    },
+    // del () {
+    //   this.modal = false
+    //   this.formFileItem = {}
+    // },
+    Computer_Room (val) {
+      this.formFileItem.server_instance = '';
+      this.formFileItem.server_instance_name = '';
+      this.formFileItem.cabinet = '';
+      // this.datalist.area_list = [];
+      this.formFileItem.cabinet = '';
+      this.formFileItem.server_instance = '';
       if (val) {
-        this.ScreenConnection(val)
+        // alert(val)
+        this.ScreenComputer(val)
       }
     },
-    ScreenConnection (val) {
-      this.datalist.connection_name_list = this.item.filter(item => {
-        if (item.computer_room === val) {
+    ScreenComputer (val) {
+      this.datalist.area_list = this.item.filter(item => {
+        if (item.room_name === val) {
+          // alert(item.room_name)
+          return item
+        }
+        // console.log(item, 'yes')
+      })
+      // console.log(this.datalist.area_list, 'hello')
+    },
+    delfilelink () {
+      if (this.delfilename === this.delconfirmfilename) {
+        axios.delete(util.url + '/filemanager/' + this.delbasename)
+          .then(res => {
+            this.$Notice.success({
+              title: '通知',
+              desc: res.data
+            })
+            this.delbaseModal = false
+            this.delconfirmbasename = ''
+            this.mountdata()
+          })
+          .catch(error => {
+            util.ajanxerrorcode(this, error)
+          })
+      } else {
+        this.$Message.error({
+          content: '请确认输入的连接名称一致！'
+        })
+      }
+    },
+    Area () {
+      axios.put(`${util.url}/filemanager/instance`, {
+        'room_name': this.formFileItem.computer_room,
+        'area_name': this.formFileItem.area
+      })
+        .then(res => {
+          this.datalist.server_instance_list = res.data
+          console.log(res.data, 'jiangtest')
+        })
+        .catch(() => {
+          this.$Notice.error({
+            title: '警告',
+            desc: '无法连接数据库!请检查网络'
+          })
+        })
+    // }
+    },
+    Server_instance (val) {
+      this.server_host_ip = this.datalist.server_instance_list.filter(item => {
+        if (item.name === val) {
           return item
         }
       })
+      console.log(this.server_host_ip, 'jack')
+      console.log(this.server_host_ip[0].publicip, 'jack1')
+      console.log(this.server_host_ip[0].privateip, 'jack2')
+      console.log(this.server_host_ip[0].status, 'jack3')
+      this.formFileItem.publicip = this.server_host_ip[0].publicip
+      this.formFileItem.privateip = this.server_host_ip[0].privateip
+      this.formFileItem.serverstatus = this.server_host_ip[0].status
     },
-    DataBaseName (index) {
-      if (index) {
-        this.id = this.item.filter(item => {
-          if (item.connection_name === index) {
-            return item
-          }
-        })
-        axios.put(`${util.url}/workorder/basename`, {
-            'id': this.id[0].id
-          })
-          .then(res => {
-            this.datalist.basenamelist = res.data
-          })
-          .catch(() => {
-            this.$Notice.error({
-              title: '警告',
-              desc: '无法连接数据库!请检查网络'
-            })
-          })
+    edit_File (index) {
+      this.editFileModal = true
+    },
+    def_File (index) {
+      this.delFileModal = true
+      this.delfiilename = this.rowdata[index].file_title
+    },
+    // 全选
+    dicCheckAll () {
+      if (this.dictionary.indeterminate) {
+        this.dictionary.checkAll = false;
+      } else {
+        this.dictionary.checkAll = !this.dictionary.checkAll;
+      }
+      this.dictionary.indeterminate = false;
+
+      if (this.dictionary.checkAll) {
+        this.dictionary.databases = this.dictionary.databasesList;
+      } else {
+        this.dictionary.databases = [];
       }
     },
-    //  sql 优化建议
-    sqladvisor () {
+    // 重置
+    cleardata () {
+      this.dictionary.databases = []
+      this.dictionary.databasesList = []
+      this.dictionary.getdellist = []
+      this.dictionary.getdel = []
+    },
+    splicpage (page) {
+      this.mountdata(page)
+    },
+    mountdata (vl = 1) {
+      axios.put(`${util.url}/filemanager/init`)
+        .then(res => {
+          this.item = res.data.area
+          // this.host_list = res.data.host_list
+          // console.log(res.data.host_list, 'jianglb')
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
 
-    },
-    // 同时检查  备份栏只能是select语句，ddl栏只能是非select语句
-    test_sql () {
-      this.$refs['formItem'].validate((valid) => {
-        if (valid) {
-          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            let tmpddl2 = ''
-            let tmpddl = ''
-            let tmpbak = ''
-            let tmpbak2 = ''
-            if (this.formItem.textarea_backup) {
-                tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-                tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            } else {
-                tmpbak = ''
-            }
-            if (this.formItem.textarea_ddl_dml) {
-                tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
-                tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
-            } else {
-                tmpddl = ''
-            }
-            axios.put(`${util.url}/sqlsyntax/test`, {
-                'id': this.id[0].id,
-                'base': this.formItem.basename,
-                'type': 1,
-                'sql': tmpddl + '&&&' + tmpbak,
-                'check_sql': tmpddl2 + '&&&' + tmpbak2
-              })
-              .then(res => {
-               if (res.data.status === 200) {
-                 this.Testresults = res.data.result_ddl
-                 this.Testresults_backup = res.data.result_bak
-                 let gen = 0
-                 let gen1 = 0
-                 this.Testresults.forEach(vl => {
-                   if (vl.errlevel !== 0) {
-                     gen += 1
-                   }
-                 })
-                 this.Testresults_backup.forEach(v2 => {
-                   if (v2.errlevel !== 0) {
-                     gen1 += 1
-                   }
-                 })
-                 if (gen === 0 && gen1 === 0) {
-                   this.validate_gen = false
-                 } else {
-                   this.validate_gen = true
-                 }
-               } else if (res.data.status === 202) {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: res.data.result
-                 })
-                 this.validate_gen = true
-               } else {
-                 this.$Notice.error({
-                   title: '警告',
-                   desc: 'ddl-dml-无法连接到Inception!'
-                 })
-                 this.validate_gen = true
-               }
-              })
-              .catch(error => {
-               util.ajanxerrorcode(this, error)
-              })
-          } else {
-            this.$Message.error('请填写sql语句后再测试!');
-          }
-       }
-      })
-    },
-    SubmitSQL () {
-      this.$refs['formItem'].validate((valid) => {
-        if (valid) {
-          if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            this.validate_gen = true
-            this.datalist.sqllist_ddl = ''
-            this.datalist.sqllist_backup = ''
-            if (this.formItem.textarea_ddl_dml) {
-                this.datalist.sqllist_ddl = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            }
-            if (this.formItem.textarea_backup) {
-                this.datalist.sqllist_backup = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/(;|；)$/gi, '').replace(/\s/g, ' ').replace(/；/g, ';').split(';')
-            }
-            axios.post(`${util.url}/sqlsyntax/`, {
-                'data': JSON.stringify(this.formItem),
-                'sql': JSON.stringify(this.datalist.sqllist_ddl),
-                'backup_sql': JSON.stringify(this.datalist.sqllist_backup),
-                'user': Cookies.get('user'),
-                'type': 1,
-                'id': this.id[0].id
-              })
-              .then(res => {
-                this.$Notice.success({
-                  title: '成功',
-                  desc: res.data
-                })
-                // this.validate_gen = !this.validate_gen
-                this.validate_gen = true
-                this.ClearForm()
-              })
-              .catch(error => {
-                util.ajanxerrorcode(this, error)
-              })
-          } else {
-            this.$Message.error('请填写sql语句后再提交!');
-          }
-        } else {
-          this.$Message.error('表单验证失败!');
-        }
-      })
-    },
-    ClearForm () {
-      this.$refs['formItem'].resetFields();
-      this.formItem.textarea_ddl_dml = '';
-      this.formItem.textarea_backup = '';
-      this.Testresults = '';
-      this.Testresults_backup = ''
+      axios.get(`${util.url}/host/`)
+        .then(res => {
+          this.host_list = res.data.data
+          this.host_list_server = res.data.distinct_data
+          this.host_list_group = res.data
+          // console.log(res.data.host_list, 'jianglb')
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
     }
   },
   mounted () {
-    axios.put(`${util.url}/workorder/connection`)
-      .then(res => {
-        this.item = res.data['connection']
-        this.assigned = res.data['person']
-      })
-      .catch(error => {
-        util.ajanxerrorcode(this, error)
-      })
-    }
+    this.mountdata()
+  }
 }
 </script>

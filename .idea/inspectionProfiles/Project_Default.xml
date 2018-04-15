@@ -9,6 +9,7 @@
           <option value="src.core.api.log.filecontent.core" />
           <option value="libs.baseview" />
           <option value="libs.util" />
+          <option value="src.core.api.log.mywebsocket.core" />
         </list>
       </option>
     </inspection_tool>

@@ -8,8 +8,9 @@
     <Card>
       <p slot="title">
         <Icon type="person"></Icon>
-        我的查看文件清单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_log_full">刷新</Button>
+        我可访问的服务器清单：
+        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh">刷新</Button>
+
       </p>
 
       <Row>
@@ -20,6 +21,18 @@
       <br>
       <Page :total="pagenumber" show-elevator @on-change="currentpage" :page-size="20"></Page>
     </Card>
+
+      <!--进入编辑按钮对话框-->
+   <Modal v-model="showPublicSShModal" :width="1000" :mask-closable="false">
+     <div>
+
+
+     </div>
+    <div slot="footer">
+      <Button type="text" @click="showPublicSShModal = false">取消</Button>
+      <Button type="primary" @click="delfilelink">删除</Button>
+    </div>
+  </Modal>
   </Row>
 </div>
 </template>
@@ -28,43 +41,28 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import util from '../../libs/util'
 export default {
-  name: 'put',
+  name: 'my-host',
   data () {
     return {
       columns6: [
         {
-          title: '日志说明',
-          key: 'log_title',
+          title: '账号说明:',
+          key: 'remark',
           sortable: true
         },
         {
-          title: '日志路径',
-          key: 'log_path',
+          title: '外网IP:',
+          key: 'publicip'
+        },
+        {
+          title: '内网IP:',
+          key: 'privateip',
           sortable: true
         },
         {
-          title: '搜索关键字',
-          key: 'hostname',
+          title: '我的账号:',
+          key: 'username',
           sortable: true
-        },
-        {
-          title: '上下行数',
-          key: 'hostname',
-          sortable: true
-        },
-        {
-          title: 'IP地址',
-          key: 'IP',
-          sortable: true
-        },
-        {
-          title: '主机名',
-          key: 'hostname',
-          sortable: true
-        },
-        {
-          title: '审核备注',
-          key: 'reject'
         },
         {
           title: '操作',
@@ -75,50 +73,41 @@ export default {
               h('Button', {
                 props: {
                   size: 'small',
-                  type: 'text'
+                  type: 'info'
                 },
                 on: {
                   click: () => {
-                    this.$router.push({
-                      name: 'show_incream_log',
-                      query: {workid: params.row.work_id, id: params.row.id, status: params.row.status, type: params.row.type}
-                    })
+                    this.showPublicSShModal = true
                   }
                 }
-              }, '查看实时内容')
-            ])
-          }
-        },
-        {
-          title: '编辑管理',
-          key: 'action',
-          align: 'center',
-          render: (h, params) => {
-            return h('div', [
+              }, '公网访问'),
               h('Button', {
                 props: {
                   size: 'small',
-                  type: 'text'
+                  type: 'info'
+                },
+                style: {
+                  marginLeft: '10px'
                 },
                 on: {
                   click: () => {
                     this.$router.push({
-                      name: 'show_full_log',
+                      name: 'orderlist',
                       query: {workid: params.row.work_id, id: params.row.id, status: params.row.status, type: params.row.type}
                     })
                   }
                 }
-              }, '编辑')
+              }, '内网访问')
             ])
           }
         }
-
       ],
       sql: [],
       pagenumber: 1,
       computer_room: util.computer_room,
       applytable: [],
       openswitch: false,
+      showPublicSShModal: false,
       modaltext: {},
       editsql: ''
     }
@@ -134,8 +123,8 @@ export default {
           util.ajanxerrorcode(this, error)
         })
     },
-    _Refresh_full () {
-    axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
+    _Refresh () {
+    axios.get(`${util.url}/host/?user=${Cookies.get('user')}&page=1`)
       .then(res => {
         this.applytable = res.data.data
         this.pagenumber = res.data.page.alter_number
@@ -143,14 +132,14 @@ export default {
       .catch(error => {
         util.ajanxerrorcode(this, error)
       })
-  }
+    }
   },
 
   mounted () {
-    axios.get(`${util.url}/workorder/?user=${Cookies.get('user')}&page=1`)
+    axios.get(`${util.url}/host/myhost?user=${Cookies.get('user')}&page=1`)
       .then(res => {
-        this.applytable = res.data.data
-        this.pagenumber = res.data.page.alter_number
+        this.applytable = res.data
+        // this.pagenumber = res.data.page.alter_number
       })
       .catch(error => {
         util.ajanxerrorcode(this, error)
@@ -158,4 +147,3 @@ export default {
   }
 }
 </script>
-<!-- remove delete request -->

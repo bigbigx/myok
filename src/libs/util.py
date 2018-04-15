@@ -19,9 +19,33 @@ import random
 import ssl
 import time
 import ldap3
+import base64
 import configparser
 import hashlib
 import random,string
+
+
+# 生成MD5
+def genearteMD5(str):
+    # 创建md5对象
+    hl = hashlib.md5()
+
+    # Tips
+    # 此处必须声明encode
+    # 否则报错为：hl.update(str)    Unicode-objects must be encoded before hashing
+    hl.update(str.encode(encoding='utf-8'))
+    return hl.hexdigest()
+# 解码MD5密码：
+
+def mycode(str):
+    return base64.b64encode(bytes(str,'ascii'))
+
+def mydecode(str):
+    # tmp = b'%s' % str
+    tmp = base64.b64decode(str)
+    print(bytes.decode(tmp))
+    return bytes.decode(tmp)
+    # return tmp.rstrip("b'")
 
 #def dingding(content: str = None, url: str = None):
 def dingding(content = None, url = None):
@@ -131,3 +155,6 @@ def auth(username, password):
     else:
         return False
 
+
+if __name__ == '__main__':
+    print(mydecode(mycode('jianhlb')))

@@ -882,8 +882,8 @@ export default {
           .then(res => {
               this.data_asset_list.ecs_diff_detail = res.data.diff_detail.ecs
               this.data_asset_list.rds_diff_detail = res.data.diff_detail.rds
-              console.log(this.data_asset_list.rds_diff_detail, 'rds')
-              console.log(this.data_asset_list.ecs_diff_detail, 'ecs')
+              // console.log(this.data_asset_list.rds_diff_detail, 'rds')
+              // console.log(this.data_asset_list.ecs_diff_detail, 'ecs')
           })
           .catch(error => {
           util.ajanxerrorcode(this, error)

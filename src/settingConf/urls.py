@@ -20,6 +20,10 @@ from core.api.user import (
     ldapauth,
     login_auth
 )
+
+from core.api.group import (
+    Group
+)
 from core.api.log.filecontent import (
     filecontent
 )
@@ -41,6 +45,9 @@ from core.api.executeorder import (
     execute
 )
 
+from core.api.asset.host import (
+    host
+)
 from core.api.authtoken import (
     authtoken
 )
@@ -86,5 +93,7 @@ urlpatterns = [
     url(r'^api/v1/assets/(.*)', assets.as_view()),
     url(r'^api/v1/yunassets/(.*)', yunassets.as_view()),
     url(r'^api/v1/filemanager/(.*)', filecontent.as_view()),
+    url(r'^api/v1/group/(.*)', Group.as_view()),
+    url(r'^api/v1/host/(.*)', host.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

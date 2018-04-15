@@ -78,20 +78,26 @@
         <Form-item label="文件路径:" prop="file_path">
           <Input v-model="formFileItem.file_path" placeholder="请输入"></Input>
         </Form-item>
+        <Form-item label="文件备注:" prop="file_remark">
+          <Input v-model="formFileItem.file_remark" placeholder="请输入"></Input>
+        </Form-item>
         <Form-item label="文件类型:" prop="file_type">
           <Select v-model="formFileItem.file_type" placeholder="请选择">
             <Option v-for="type in file_type" :value="type" :key="type">{{ type }}</Option>
           </Select>
         </Form-item>
 
-        <Form-item label="文件备注:" prop="file_remark">
-          <Input v-model="formFileItem.file_remark" placeholder="请输入"></Input>
-        </Form-item>
-        <Form-item label="文件归属:" prop="file_owner">
-          <Select v-model="formFileItem.file_owner" placeholder="请选择">
-            <Option v-for="list in item_user" :value="list.username" :key="list.username">{{ list.username }}</Option>
+        <!--<Form-item label="文件归属:" prop="file_owner">-->
+          <!--<Select v-model="formFileItem.file_owner" placeholder="请选择">-->
+            <!--<Option v-for="list in item_user" :value="list.username" :key="list.username">{{ list.username }}</Option>-->
+          <!--</Select>-->
+        <!--</Form-item>-->
+
+        <FormItem label="所属群组:" prop="group">
+              <Select v-model="formFileItem.group" placeholder="请选择">
+            <Option v-for="group in group_list" :value="group.name" :key="group.name">{{ group.name }}</Option>
           </Select>
-        </Form-item>
+            </FormItem>
         <p></p>
         <p></p>
         <Button type="info" @click="filetest()">文件检测</Button>
@@ -117,41 +123,69 @@
     <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
   </Card>
   </Col>
-  <Modal v-model="delbaseModal" :width="500">
-    <h3 slot="header" style="color:#2D8CF0">删除数据库</h3>
+  <!--进入编辑按钮对话框-->
+   <Modal v-model="delFileModal" :width="500">
+    <h3 slot="header" style="color:#2D8CF0">编辑</h3>
     <Form :label-width="100" label-position="right">
-      <FormItem label="数据库连接名">
+      <FormItem label="文件名称">
         <Input v-model="delbasename" readonly="readonly"></Input>
       </FormItem>
-      <FormItem label="请输入数据库连接名">
-        <Input v-model="delconfirmbasename" placeholder="请确认数据库连接名"></Input>
+      <FormItem label="请输入文件名称">
+        <Input v-model="delconfirmfilename" placeholder="请确认数据库连接名"></Input>
       </FormItem>
     </Form>
     <div slot="footer">
       <Button type="text" @click="delbaseModal = false">取消</Button>
-      <Button type="primary" @click="delbaselink">删除</Button>
+      <Button type="primary" @click="delfilelink">删除</Button>
     </div>
   </Modal>
-  <Modal v-model="addDingding" :width="500">
-    <h3 slot="header" style="color:#2D8CF0">添加钉钉推送接口</h3>
-    <Form :label-width="100" label-position="right">
-      <FormItem label="数据库连接名">
-        <Input v-model="dingname" readonly="readonly"></Input>
-      </FormItem>
-      <FormItem label="钉钉Webhook:">
-        <Input v-model="dingurl"></Input>
-      </FormItem>
-      <FormItem label="提交工单推送的消息内容:">
-        <Input v-model="dingdingbeforetext" type="textarea" :autosize="{minRows: 2,maxRows: 5}"></Input>
-      </FormItem>
-      <FormItem label="审核成功后推送的消息内容:">
-        <Input v-model="dingdingaftertext" type="textarea" :autosize="{minRows: 2,maxRows: 5}"></Input>
-      </FormItem>
-    </Form>
-    <div slot="footer">
-      <Button type="text" @click="addDingding = false">取消</Button>
-      <Button type="primary" @click="savedingding()">添加</Button>
-    </div>
+
+
+  <Modal v-model="editFileModal" :width="500">
+    <h3 slot="header" style="color:#2D8CF0">编辑文件</h3>
+    <Form ref="formFileItem" :model="formFileItem" :rules="ruleValidate" :label-width="100" >
+
+        <Form-item label="环境或机房:" prop="computer_room">
+          <Input v-model="formFileItem.computer_room" disabled placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="区域或机柜:" prop="area">
+          <Input v-model="formFileItem.area" disabled placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="服务器实例:" prop="server_instance_name">
+          <Input v-model="formFileItem.server_instance_name" disabled placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="主机公网IP:" prop="publicip">
+          <Input v-model="formFileItem.publicip" disabled placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="主机内网IP:" prop="privateip">
+          <Input v-model="formFileItem.privateip" disabled placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="主机状态:" prop="serverstatus">
+          <Input v-model="formFileItem.serverstatus" disabled placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="文件标题:" prop="file_title">
+          <Input v-model="formFileItem.file_title" placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="文件路径:" prop="file_path">
+          <Input v-model="formFileItem.file_path" placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="文件类型:" prop="file_type">
+          <Input v-model="formFileItem.file_type" placeholder="没数据"></Input>
+        </Form-item>
+        <Form-item label="文件备注:" prop="file_remark">
+          <Input v-model="formFileItem.file_remark" placeholder="请输入"></Input>
+        </Form-item>
+
+        <FormItem label="文件归属:" prop="group">
+            <Select v-model="formFileItem.group" placeholder="请选择">
+              <Option v-for="group in group_list" :value="group.name" :key="group.name">{{ group.name }}</Option>
+            </Select>
+            </FormItem>
+        <p></p>
+        <p></p>
+        <!--<Button type="success" @click="add_file()" style="margin-left: 5%">确定</Button>-->
+
+      </Form>
   </Modal>
 </div>
 </template>
@@ -164,42 +198,61 @@ export default {
   components: {
     ICol
   },
-  name: 'sqlist',
+  name: 'logger-manager',
   data () {
     return {
+      social: [],
+      file_owern_list: [],
       columns: [
         {
+          title: '主机名',
+          key: 'server_hostname',
+          width: 150,
+          fixed: 'left',
+          sortable: true
+        },
+        {
           title: '文件标题',
-          key: 'file_title'
+          key: 'file_title',
+          width: 150,
+          fixed: 'left'
+        },
+        {
+          title: '文件路径',
+          key: 'file_path',
+          width: 180,
+          fixed: 'left'
         },
         {
           title: '文件类型',
-          key: 'file_type'
+          key: 'file_type',
+          width: 80
         },
         {
           title: '区域',
-          key: 'region_name'
+          key: 'region_name',
+          width: 150
         },
         {
           title: '环境',
-          key: 'room_name'
-        },
-        {
-          title: '主机名',
-          key: 'server_instance_name'
+          key: 'room_name',
+          width: 150
         },
         {
           title: '公网IP',
-          key: 'publicip'
+          key: 'public_server_ip',
+          width: 150
         },
 
         {
           title: '内网IP',
-          key: 'privateip'
+          key: 'private_server_ip',
+          width: 150
         },
         {
           title: '文件归属',
-          key: 'file_owner'
+          key: 'file_owner',
+          width: 150
         },
         {
           title: '操作',
@@ -214,7 +267,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.edit_tab(params.index)
+                    this.edit_File(params.index)
                   }
                 }
               }, '编辑'),
@@ -228,7 +281,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.delFile(params.index)
+                    this.def_File(params.index)
                   }
                 }
               }, '删除')
@@ -238,30 +291,65 @@ export default {
         {
           title: '是否允许全量查看文件',
           key: 'switch',
+          align: 'center',
+          fixed: 'right',
           width: 70,
           render: (h, params) => {
-            return h('div', [
-              h('i-switch', { // 数据库1是已处理，0是未处理
-                props: {
-                  type: 'primary',
-                  value: params.row.treatment === 1  // 控制开关的打开或关闭状态，官网文档属性是value
-                },
-                style: {
-                  marginRight: '5px'
-                },
-                on: {
-                  'on-change': (value) => { // 触发事件是on-change,用双引号括起来，
-                    // 参数value是回调值，并没有使用到
-                    this.switch(params.index) // params.index是拿到table的行序列，可以取到对应的表格值
+            // console.log(Boolean(params.row.full_file_status), 'jianglibin')
+            if (params.row.full_file_status === 'false') {
+              return h('div', [
+                h('i-switch', { // 数据库1是已处理，0是未处理
+                  props: {
+                    type: 'primary',
+                    value: false// 控制开关的打开或关闭状态，官网文档属性是value
+                    // value: params.row.status // 控制开关的打开或关闭状态，官网文档属性是value
+                    // value: params.row.switch === params.row.full_file_status  // 控制开关的打开或关闭状态，官网文档属性是value
+                    // value: params.row.full_file_status // 控制开关的打开或关闭状态，官网文档属性是value
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    'on-change': (value) => { // 触发事件是on-change,用双引号括起来，
+                      // 参数value是回调值，并没有使用到
+                      this.switch(params.index) // params.index是拿到table的行序列，可以取到对应的表格值
+                    }
                   }
-                }
-              }, 'aa')
-            ])
+                }, '')
+              ])
+            } else {
+               return h('div', [
+                h('i-switch', { // 数据库1是已处理，0是未处理
+                  props: {
+                    type: 'primary',
+                    value: true// 控制开关的打开或关闭状态，官网文档属性是value
+                    // value: params.row.status // 控制开关的打开或关闭状态，官网文档属性是value
+                    // value: params.row.switch === params.row.full_file_status  // 控制开关的打开或关闭状态，官网文档属性是value
+                    // value: params.row.full_file_status // 控制开关的打开或关闭状态，官网文档属性是value
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    'on-change': (value) => { // 触发事件是on-change,用双引号括起来，
+                      // 参数value是回调值，并没有使用到
+                      this.switch(params.index) // params.index是拿到table的行序列，可以取到对应的表格值
+                    }
+                  }
+                }, '')
+              ])
+            }
           }
         }
       ],
       rowdata: [],
       file_list: [],
+      group_list: [],
+      editFileModal: false,
+      delFileModal: false,
+      delfilename: '',
+      delconfirmfilename: '',
+      full_file_status: 0,
       modal: false,
       // 添加数据库信息
       formFileItem: {
@@ -394,9 +482,9 @@ export default {
           message: '文件说明不得为空',
           trigger: 'change'
         }],
-        file_owner: [{
+        group: [{
           required: true,
-          message: '文件归属不得为空',
+          message: '文件归属群组不得为空',
           trigger: 'change'
         }]
       },
@@ -411,10 +499,55 @@ export default {
     }
   },
   methods: {
-    // filetest () {
-    //
-    //
-    // },
+     // 通过开关状态判断值然后传值进行更新
+     switch (index) {
+      // 打开是true,已经处理1
+        console.log(this.file_list[index], 'hehe')
+        if (this.file_list[index].full_file_status === 'true') {
+            this.file_list[index].switch = false
+            this.updateFeedbackMessage(this.file_list[index].id, 'false')
+        } else {
+          this.file_list[index].switch = true
+            this.updateFeedbackMessage(this.file_list[index].id, 'true')
+        }
+     },
+     // 更新反馈信息某一字段
+     updateFeedbackMessage (id, value) {
+       axios.put(`${util.url}/filemanager/save_status`, {
+        'full_file_status': value,
+        'file_id': id
+      }).then(res => {
+          this.$Notice.success({
+                  title: '成功',
+                  desc: res.data
+                })
+        }).catch(() => {
+          this.$Notice.error({
+            title: '警告',
+            desc: '无法连接数据库!请检查网络'
+          })
+        })
+     },
+     // // 获取所有反馈信息列表
+     // getFeedbackMessages() {
+     //  var vm = this
+     //  var url = '/v1/suggestions?'
+     //  url = url + "pageNum=" + this.pageNum + '&pageSize=' + this.pageSize
+     //  if (this.createByValue !== '') {
+     //    url = url + '&createBy=' + this.createByValue
+     //  }
+     //  if (this.dealModelValue !== '') {
+     //      url = url + '&treatment=' + this.dealModelValue
+     //  }
+     //  axios.get(util.url + '/filemanager/' + this.delbasename).then(response => {
+     //    if (response.data.code === '000000') {
+     //       vm.data1 = response.data.data
+     //       vm.pageTotal = parseInt(response.data.message)
+     //    }
+     //  }).catch(error => {
+     //    console.log(error)
+     //  })
+     // },
     add_file () {
        axios.post(`${util.url}/filemanager/`, {
         'room_name': this.formFileItem.computer_room,
@@ -425,11 +558,11 @@ export default {
         'privateip': this.formFileItem.privateip,
         'file_path': this.formFileItem.file_path,
         'file_remark': this.formFileItem.file_remark,
-        'file_owner': this.formFileItem.file_owner,
+        // 'file_owner': this.formFileItem.file_owner,
+        'file_owner': this.formFileItem.group,
         'file_title': this.formFileItem.file_title,
         'file_type': this.formFileItem.file_type
-      })
-        .then(res => {
+      }).then(res => {
           this.$Notice.success({
                   title: '成功',
                   desc: res.data
@@ -487,6 +620,27 @@ export default {
       })
       // console.log(this.datalist.area_list, 'hello')
     },
+    delfilelink () {
+      if (this.delfilename === this.delconfirmfilename) {
+        axios.delete(util.url + '/filemanager/' + this.delbasename)
+          .then(res => {
+            this.$Notice.success({
+              title: '通知',
+              desc: res.data
+            })
+            this.delbaseModal = false
+            this.delconfirmbasename = ''
+            this.mountdata()
+          })
+          .catch(error => {
+            util.ajanxerrorcode(this, error)
+          })
+      } else {
+        this.$Message.error({
+          content: '请确认输入的连接名称一致！'
+        })
+      }
+    },
     Area () {
       axios.put(`${util.url}/filemanager/instance`, {
         'room_name': this.formFileItem.computer_room,
@@ -518,12 +672,12 @@ export default {
       this.formFileItem.privateip = this.server_host_ip[0].privateip
       this.formFileItem.serverstatus = this.server_host_ip[0].status
     },
-    edit_tab (index) {
-      this.$Modal.info({
-        title: '数据库连接信息',
-        content: `机房: ${this.rowdata[index].computer_room}<br> 连接名称：${this.rowdata[index].connection_name}<br>
-                  数据库地址：${this.rowdata[index].ip}<br>端口: ${this.rowdata[index].port}<br>用户名: ${this.rowdata[index].username}`
-      })
+    edit_File (index) {
+      this.editFileModal = true
+    },
+    def_File (index) {
+      this.delFileModal = true
+      this.delfiilename = this.rowdata[index].file_title
     },
     // 全选
     dicCheckAll () {
@@ -557,6 +711,7 @@ export default {
           this.item = res.data.area
           this.item_user = res.data.user
           this.file_list = res.data.file_list
+          this.group_list = res.data.group
           console.log(res.data.file_list, 'jianglb')
           // this.datalist_init.aliyun_area_list = res.data.aliyun
           // this.datalist_init.meituanyun_area_list = res.data.meituanyun

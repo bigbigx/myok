@@ -14,7 +14,8 @@ from core.models import (
     AssetAreaList,
     YunEcsObj,
     YunRdsObj,
-    Account
+    Account,
+    AccountGroup
 )
 from libs.serializers import (
     Cabinet,
@@ -29,7 +30,7 @@ CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
 
 class filecontent(baseview.Approverpermissions):
     '''
-    获取文件或者日志的清单
+    我的文件 菜单 进入方法： 获取某个用户下的其所有文件
     '''
 
     def get(self, request, args=None):
@@ -43,21 +44,35 @@ class filecontent(baseview.Approverpermissions):
             return HttpResponse(ret_info)
         else:
             try:
-                pagenumber = FileContent.objects.filter(assigned=username).aggregate(alter_number=Count('id'))
+                data = []
                 start = (int(page) - 1) * 20
                 end = int(page) * 20
-                info = FileContent.objects.raw(
-                    '''
-                    select core_sqlorder.*,core_databaselist.connection_name, \
-                    core_databaselist.computer_room from FileContent \
-                    INNER JOIN core_databaselist on \
-                    core_sqlorder.bundle_id = core_databaselist.id where core_sqlorder.assigned = '%s'\
-                    ORDER BY core_sqlorder.id desc
-                    ''' % username
-                )[start:end]
-                data = util.ser(info)
+
+                pagenumber = FileContent.objects.aggregate(alter_number=Count('id'))
+                workgroup_name= Account.objects.filter(username=username).first()
+                if workgroup_name is not None:
+
+                    account_group = AccountGroup.objects.filter(GroupID=workgroup_name.workgroup_id).first()
+                    print(account_group)
+                    # FileContent.objects.filter(assigned=username).aggregate(alter_number=Count('id'))
+                    info = FileContent.objects.filter(file_owner=account_group.GroupName).all()
+                    print(info)
+                    if info is not None:  # 如果查询有结果，那么执行
+                        for item in info:
+                            tmp = {'file_title': item.file_title, 'file_path': item.file_path,
+                                   'file_owner': item.file_owner, 'public_server_ip': item.public_server_ip,
+                                   'server_hostname': item.server_hostname, 'private_server_ip': item.private_server_ip,
+                                   'file_type': item.file_type, 'file_remark': item.file_remark,
+                                   'region_name': item.region_name, 'room_name': item.room_name,
+                                   'full_file_status':item.full_file_status,
+                                   'keyword': item.keyword,
+                                   'visit_user':item.visit_user,'visit_way':item.visit_way}
+                            # filecontent_serializers = FileContentSeri(tmp, many=True)
+                            data.append(tmp)
+                    # data = util.ser(info)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
+                print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
 
@@ -72,18 +87,21 @@ class filecontent(baseview.Approverpermissions):
             try:
                 area_list = []
                 file_list = []
+                group_list = []
                 info = AssetAreaList.objects.all()
                 _serializers = Cabinet(info, many=True)
                 user = Account.objects.all()
                 user_serializers = UserINFO(user, many=True)
-
+                group_info = AccountGroup.objects.filter(status=1).all()
                 tmp = FileContent.objects.all()
                 for item in tmp:
-                    tmp = {'file_title':item.file_title,'file_path': item.file_path,'public_server_ip':item.public_server_ip,'server_hostname':item.server_hostname,'private_server_ip':item.private_server_ip, 'file_type': item.file_type, 'file_remark': item.file_remark,'region_name':item.region_name, 'room_name':item.room_name}
-                # filecontent_serializers = FileContentSeri(tmp, many=True)
+                    tmp = {'id': item.id,'full_file_status': item.full_file_status, 'file_title': item.file_title,'file_path': item.file_path, 'file_owner': item.file_owner,'public_server_ip':item.public_server_ip,'server_hostname':item.server_hostname,'private_server_ip':item.private_server_ip, 'file_type': item.file_type, 'file_remark': item.file_remark,'region_name':item.region_name, 'room_name':item.room_name}
                     file_list.append(tmp)
-                print(file_list)
-                return Response({'area':_serializers.data, 'user':user_serializers.data,'file_list': file_list})
+                # print(file_list)
+                for group in group_info:
+                    group_tmp = {'name': group.GroupName, 'ID': group.GroupID}
+                    group_list.append(group_tmp)
+                return Response({'area': _serializers.data, 'user': user_serializers.data, 'file_list': file_list, 'group': group_list})
             except Exception as e:
                 print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -110,6 +128,33 @@ class filecontent(baseview.Approverpermissions):
                     print(ecs_name)
                     return Response(ecs_name)
 
+                except Exception as e:
+                    print(e)
+                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                    return HttpResponse(500)
+
+        elif args == 'save_status':
+            try:
+                full_file_status = request.data['full_file_status']
+                file_id = request.data['file_id']
+                print(full_file_status)
+                print(file_id)
+            except Exception as e:
+                print(e)
+                CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+                # return HttpResponse({'title': '失败', 'data': 500})
+                return HttpResponse(500)
+            else:
+                try:
+
+                    if file_id != '':
+                        FileContent.objects.filter(id=file_id).update(
+                            full_file_status=full_file_status
+                        )
+                        # return Response('修改成功！ 目前是否启用：%s ' % (str(file_id), str(full_file_status)))
+                        return Response('修改成功！')
+                    else:
+                        return Response('没有找到匹配的文件ID')
                 except Exception as e:
                     print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -147,7 +192,8 @@ class filecontent(baseview.Approverpermissions):
                     file_title=file_title,
                     file_type=file_type,
                     file_path=file_path,
-                    file_remark=file_remark
+                    file_remark=file_remark,
+                    file_owner=file_owner
                 )
 
 
@@ -157,3 +203,12 @@ class filecontent(baseview.Approverpermissions):
                     print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(500)
+
+    def delete(self, request, args: str = None):
+        try:
+            FileContent.objects.filter(file_title=args).delete()
+            return Response('数据库信息已删除!')
+        except Exception as e:
+            print(e)
+            CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
+            return HttpResponse(status=500)
