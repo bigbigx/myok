@@ -26,7 +26,8 @@ def get_ssh(ip, user, pwd):
 
 def recv_data(conn): # 服务器解析浏览器发送的信息
     try:
-        all_data = conn.recv(1024).decode('utf-8', 'ignore')
+        # all_data = conn.recv(1024).decode('utf-8', 'ignore')
+        all_data = conn.recv(1024).decode('utf-8')
         # all_data = conn.recv(1024).decode('base64','strict')
         # all_data = conn.recv(1024).decode()
 
@@ -41,7 +42,6 @@ def recv_data(conn): # 服务器解析浏览器发送的信息
         print('nonononono')
         print(e)
     else:
-      print('yes')
       code_len = ord(all_data[1]) & 127
       if code_len == 126:
           masks = all_data[4:8]
@@ -180,9 +180,11 @@ def dojob(conn, address, thread_name):
       #   print "没有找到此IP对应的主机用户和密码信息"
 
 
-      user=get_username_and_password(ip)["username"]
+      # user=get_username_and_password(ip)["username"]
+      user='root'
       print("user: %s" % (user))
-      password=get_username_and_password(ip)["password"]
+      # password=get_username_and_password(ip)["password"]
+      password='q9mQ7axgjPaY'
       print("password: %s" % (password))
       #user="root"
       #password="q9mQ7axgjPaY"
@@ -216,7 +218,7 @@ def dojob(conn, address, thread_name):
             cmd='tailf %s |grep %s' % (path,keyword)
         else:
             cmd='tailf %s |grep -C%s  %s' % (path,cnum,keyword)
-
+    cmd = 'tail -n 40 -f /var/log/nginx/access.log.1'
     chan.exec_command(cmd)
 
     while True:

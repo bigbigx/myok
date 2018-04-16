@@ -17,8 +17,7 @@
       <div id="showImage" class="margin-bottom-10">
       <Form ref="formFileItem" :model="formFileItem" :rules="ruleValidate" :label-width="100" >
 
-      <Tabs value="yun_env_init" @on-click="ClearForm">
-        <TabPane label="云环境"  name="yun-env" >
+
         <Form-item label="云环境:" prop="computer_room">
           <Select v-model="formFileItem.computer_room" placeholder="请选择" @on-change="Computer_Room">
             <Option v-for="i in datalist.yun_env_list" :key="i" :value="i" >{{i}}</Option>
@@ -43,35 +42,34 @@
         <Form-item label="主机状态:" prop="serverstatus">
           <Input v-model="formFileItem.serverstatus" disabled placeholder="请输入"></Input>
         </Form-item>
-        </TabPane>
-      <TabPane label="物理机房"  name="idc-env" >
-        <Form-item label="机房:" prop="computer_room">
-          <Select v-model="formFileItem.computer_room" placeholder="请选择" @on-change="Computer_Room">
-            <Option v-for="i in datalist.idc_env_list" :key="i" :value="i" >{{i}}</Option>
-          </Select>
-        </Form-item>
-        <Form-item label="机柜:" prop="area">
-          <Select v-model="formFileItem.area" placeholder="请选择" @on-change="Area" filterable>
-            <Option v-for="i in datalist.area_list" :value="i.area_name" :key="i.area_name">{{ i.area_name }}</Option>
-          </Select>
-        </Form-item>
-        <Form-item label="服务器编号:" prop="server_instance_name">
-          <Select v-model="formFileItem.server_instance_name" placeholder="请选择" @on-change="Server_instance" filterable>
-            <Option v-for="item in datalist.server_instance_list" :value="item.name" :key="item.name">{{ item.name }}</Option>
-          </Select>
-        </Form-item>
-        <Form-item label="主机公网IP:" prop="publicip">
-          <Input v-model="formFileItem.publicip" disabled placeholder="请输入"></Input>
-        </Form-item>
-        <Form-item label="主机内网IP:" prop="pricateip">
-          <Input v-model="formFileItem.privateip" disabled placeholder="请输入"></Input>
-        </Form-item>
-        <Form-item label="主机状态:" prop="serverstatus">
-          <Input v-model="formFileItem.serverstatus" disabled placeholder="请输入"></Input>
-        </Form-item>
-      </TabPane>
-     </Tabs>
 
+        <!--<Form-item label="机房:" prop="computer_room">-->
+          <!--<Select v-model="formFileItem.computer_room" placeholder="请选择" @on-change="Computer_Room">-->
+            <!--<Option v-for="i in datalist.idc_env_list" :key="i" :value="i" >{{i}}</Option>-->
+          <!--</Select>-->
+        <!--</Form-item>-->
+        <!--<Form-item label="机柜:" prop="area">-->
+          <!--<Select v-model="formFileItem.area" placeholder="请选择" @on-change="Area" filterable>-->
+            <!--<Option v-for="i in datalist.area_list" :value="i.area_name" :key="i.area_name">{{ i.area_name }}</Option>-->
+          <!--</Select>-->
+        <!--</Form-item>-->
+        <!--<Form-item label="服务器编号:" prop="server_instance_name">-->
+          <!--<Select v-model="formFileItem.server_instance_name" placeholder="请选择" @on-change="Server_instance" filterable>-->
+            <!--<Option v-for="item in datalist.server_instance_list" :value="item.name" :key="item.name">{{ item.name }}</Option>-->
+          <!--</Select>-->
+        <!--</Form-item>-->
+
+      <Tabs value="yun_env_init" @on-click="ClearForm">
+        <TabPane label="固定文件"  name="yun-env" >
+        <!--<Form-item label="主机公网IP:" prop="publicip">-->
+          <!--<Input v-model="formFileItem.publicip" disabled placeholder="请输入"></Input>-->
+        <!--</Form-item>-->
+        <!--<Form-item label="主机内网IP:" prop="pricateip">-->
+          <!--<Input v-model="formFileItem.privateip" disabled placeholder="请输入"></Input>-->
+        <!--</Form-item>-->
+        <!--<Form-item label="主机状态:" prop="serverstatus">-->
+          <!--<Input v-model="formFileItem.serverstatus" disabled placeholder="请输入"></Input>-->
+        <!--</Form-item>-->
         <Form-item label="文件标题:" prop="file_title">
           <Input v-model="formFileItem.file_title" placeholder="请输入"></Input>
         </Form-item>
@@ -86,7 +84,20 @@
             <Option v-for="type in file_type" :value="type" :key="type">{{ type }}</Option>
           </Select>
         </Form-item>
+        </TabPane>
+      <TabPane label="动态文件"  name="idc-env" >
+        <Form-item label="文件标题:" prop="file_title">
+          <Input v-model="formFileItem.file_title" placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="选择命令:" prop="file_path">
+          <Input v-model="formFileItem.file_path" placeholder="请输入"></Input>
+        </Form-item>
+      <Form-item label="指定文件路径:" prop="file_path">
+          <Input v-model="formFileItem.file_path" placeholder="请输入"></Input>
+        </Form-item>
 
+      </TabPane>
+     </Tabs>
         <!--<Form-item label="文件归属:" prop="file_owner">-->
           <!--<Select v-model="formFileItem.file_owner" placeholder="请选择">-->
             <!--<Option v-for="list in item_user" :value="list.username" :key="list.username">{{ list.username }}</Option>-->

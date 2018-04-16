@@ -26,8 +26,8 @@
     <Modal v-model="show_increamt_flag" :width="1100"  :mask-closable="false" @on-ok="" @on-cancel="show_confirm">
       <!--<Modal v-model="show_increamt_flag" width="78%">-->
        <div class="row">
-        <div class="col-lg-10" >
-              <Input type="textarea" disabled v-model="data_websocket_server" :rows="36" style="width: 100%;height:750px;font-size:20px;color: red;background-color:#0c0c0c;overflow:scroll;"></Input>
+        <div class="col-lg-10 test-cl">
+          <Input type="textarea" ref="textAreaTest" disabled v-model="data_websocket_server" :rows="36" style="width: 100%;height:750px;font-size:20px;"></Input>
         </div>
       </div>
     </Modal>
@@ -60,6 +60,7 @@
     name: 'logger-view',
     data () {
       return {
+        textAreaObj: null,
         columns6: [
           {
             title: '日志说明',
@@ -125,7 +126,7 @@
                     },
                     on: {
                       click: () => {
-                        this.show_increment(params.index)
+                        this.show_tailf(0)
                       }
                     }
                   }, '增量内容'),
@@ -139,7 +140,7 @@
                     },
                     on: {
                       click: () => {
-                        this.show_full_file(params.index)
+                        this.show_tailf(1)
                       }
                     }
                   }, '全量内容'),
@@ -302,6 +303,12 @@
         mycnum: ''
       }
     },
+    watch: {
+      data_websocket_server () {
+        console.log(this.textAreaObj);
+        this.textAreaObj.scrollTop = this.textAreaObj.scrollHeight + 20;
+      }
+    },
     methods: {
       show_confirm () {
         this.confirm_close_log_show = true
@@ -310,37 +317,40 @@
         this.show_increamt_flag = true
       },
       close_socket () {
-        this.websock.close_socket()
-        this.show_increamt_flag = false
+        this.threadPoxi('quit')
+        // this.show_increamt_flag = false
       },
       closeAreaText () {
         this.show_increamt_flag = false
       },
-      show_increment () {
+      show_tailf (type) {
+        // alert(type)
         this.show_increamt_flag = true
-        this.myip = '43.241.232.104'
-        this.mypath = '/var/log/nginx/access.log.1'
-        this.mykeyword = ''
-        this.mycnum = '10'
+        const myip = '43.241.232.104'
+        // const mypath = '/var/log/nginx/access.log.1'
+        const mypath = '/mnt/java/laimi-wms/logs/app.log'
+        const mykeyword = ''
+        const mycnum = '10'
+        // const type = 0
         // this.websocket()
         this.initWebSocket()
-        this.threadPoxi(this.myip, this.mypath, this.mykeyword, this.mycnum, 0)  // 0-- 增量文件  1--全量文件
-      },
-      threadPoxi (myip, mypath, mykeyword, mycnum, type) {  // 实际调用的方法
-        // 参数
         const agentData = 'myip:' + myip + ';mypath:' + mypath + ';mykeyword:' + mykeyword + ';mycnum:' + mycnum + ';type:' + type
+        this.threadPoxi(agentData)  // 0-- 增量文件  1--全量文件
+      },
+      threadPoxi (agentData) {  // 实际调用的方法
+        // 参数
         // 若是ws开启状态
           if (this.websock.readyState === this.websock.OPEN) {
-            alert('OPEN')
+            // alert('OPEN')
             this.websocketsend(agentData)
           } else if (this.websock.readyState === this.websock.CONNECTING) {  // 若是 正在开启状态，则等待300毫秒
-            // alert('CONNECTING')
+            // alert('READING')
             let that = this; // 保存当前对象this
             setTimeout(function () {
               that.websocketsend(agentData)
             }, 300);
           } else { // 若未开启 ，则等待500毫秒
-            alert('NOT OPEN')
+            // alert('NOT OPEN')
             this.initWebSocket();
             let that = this; // 保存当前对象this
             setTimeout(function () {
@@ -369,7 +379,7 @@
         console.log(e, 'msg');
         // const redata = JSON.parse(e.data);
         const redata = e.data;
-        this.data_websocket_server = redata
+        this.data_websocket_server = this.data_websocket_server + redata
 
         // console.log(redata.value, '...receive');
         console.log(redata, '........receive');
@@ -379,11 +389,6 @@
       },
       websocketclose (e) {  // 关闭
         console.log('connection closed (' + e.code + ')');
-      },
-      show_full_file () {
-        this.show_full_file_flag = true
-        this.initWebSocket()
-        this.threadPoxi(this.myip, this.mypath, this.mykeyword, this.mycnum, 1)  // 0-- 增量文件  1--全量文件
       },
       edit_keyword () {
         this.ClearForm
@@ -419,6 +424,7 @@
       }
     },
     mounted () {
+      this.textAreaObj = this.$refs.textAreaTest.$el.getElementsByTagName('textarea')[0];
       axios.get(`${util.url}/filemanager?user=${Cookies.get('user')}&page=1`)
         .then(res => {
           this.applytable = res.data.data
@@ -432,4 +438,11 @@
     }
   }
 </script>
+
+<style>
+  .test-cl textarea {
+    background-color: green !important;
+    color: yellow !important;
+  }
+</style>
 

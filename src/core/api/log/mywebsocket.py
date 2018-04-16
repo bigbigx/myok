@@ -17,6 +17,7 @@ class returnCrossDomain(Thread):
         self.isHandleShake = False
 
     def run(self):  #  增量文件内容
+
         while True:
             if not self.isHandleShake:
                 # 开始握手阶段
@@ -43,115 +44,140 @@ class returnCrossDomain(Thread):
                     self.getDataLength()
                     clientData = self.readClientData()
                     print('客户端数据：' + clientData)
-                    self.sendDataToClient('Connected Successlly')
+                    self.sendDataToClient('Connected Successlly \n')
+                    ssh = paramiko.SSHClient()
                     # 接受客户端的参数，连接ssh,然后执行taif 命令，将结果返回到客户端
-                    msg_list = clientData.split(";")
-                    ip = ''.join(msg_list[0].split(':')[1:])
-                    print(ip)
-                    # user= getUserPwdByIP(ip,'root',1)['username']
-                    user ='root'
-                    # password = getUserPwdByIP(ip,'root',1)['password']
-                    password='q9mQ7axgjPaY'
-                    path = ''.join(msg_list[1].split(':')[1:])
-                    print(path)
-                    keyword = ''.join(msg_list[2].split(':')[1:])
-                    print(keyword)
-                    type = ''.join(msg_list[5].split(':')[1:])
-                    # cnum = ''.join(msg_list[3].split(':')[1:])
-                    # ssh=get_ssh(ip, user, password)
-                    if (type == 0): # 增量文件 使用命令 tail -n 40 -f
-                        ssh = paramiko.SSHClient()
-                        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                        # ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY', timeout=15)
-                        ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY')
-                        try:
-                            ssh_t = ssh.get_transport()
-                            chan = ssh_t.open_session()
-                            chan.get_pty()
-                            chan.setblocking(0)  # 设置非阻塞
-                            cmd = "tail -n 40 -f /var/log/nginx/access.log.1"
-                            if chan.active:
-                                chan.exec_command(cmd)
-                                tmp = chan.recv(1024).decode() + '\n'
-                                # chan.exec_command(cmd)
-                                # print(stdout.readlines())
-                                print(tmp)
-                                # time.sleep(5)
-                                self.sendDataToClient(tmp)
-                                # time.sleep(5)
-                            else:
-                                print('Not active')
-                        except Exception as e:
-                            print('异常')
-                            print(e)
-                            ssh.close()
+                    if clientData != 'quit':
+                        msg_list = clientData.split(";")
+                        ip = ''.join(msg_list[0].split(':')[1:])
+                        print(ip)
+                        # user= getUserPwdByIP(ip,'root',1)['username']
+                        user ='root'
+                        # password = getUserPwdByIP(ip,'root',1)['password']
+                        password='q9mQ7axgjPaY'
+                        path = ''.join(msg_list[1].split(':')[1:])
+                        print(path)
+                        keyword = ''.join(msg_list[2].split(':')[1:])
+                        print(keyword)
 
+                        cnum = ''.join(msg_list[3].split(':')[1:])
+                        type = ''.join(msg_list[4].split(':')[1:])
+                        print(type)
 
-                    elif type == 1:  # 全量内容 ,使用命令cat
-                        ssh = paramiko.SSHClient()
-                        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                        # ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY', timeout=15)
-                        ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY')
-                        try:
-                            ssh_t = ssh.get_transport()
-                            chan = ssh_t.open_session()
-                            chan.get_pty()
-                            chan.setblocking(0)  # 设置非阻塞
-                            cmd = "cat /var/log/nginx/access.log.1"
-                            if chan.active:
-                                chan.exec_command(cmd)
-                                tmp = chan.recv(1024).decode() + '\n'
-                                # chan.exec_command(cmd)
-                                # print(stdout.readlines())
-                                print(tmp)
-                                # time.sleep(5)
-                                self.sendDataToClient(tmp)
-                                # time.sleep(5)
-                            else:
-                                print('Not active')
-                        except Exception as e:
-                            print('异常')
-                            print(e)
-                            ssh.close()
+                        # ssh=get_ssh(ip, user, password)
+                        if type == "0": # 增量文件 使用命令 tail -n 40 -f
+                            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                            ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY', timeout=15)
+                            # ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY')
+                            try:
+                                ssh_t = ssh.get_transport()
+                                chan = ssh_t.open_session()
+                                # chan.get_pty()
+                                # chan.setblocking(0)  # 设置非阻塞
+                                cmd = "tailf /var/log/nginx/access.log.1"
+                                if chan.active:
+                                    chan.exec_command(cmd)
+                                    while True:
+                                        tmp = chan.recv_ready()
+                                        print(tmp)
+                                        while True:
+                                            log_msg = chan.recv(10000).strip().decode() + '\n'  # 接收日志信息
+                                            # log_msg = chan.recv(10000).decode() + '\n'  # 接收日志信息
+                                            print(log_msg)
+                                            self.sendDataToClient(log_msg)
+                                            # break
+                                        if chan.exit_status_ready():
+                                            break
+                                        break
+                                    # print('next')
+                                else:
+                                    print('Not active')
+                            except Exception as e:
+                                print('增量异常')
+                                print(e)
 
-                    else:
-                        print("Oops！ 奇怪的事情，请联系系统管理员")
-                        pass
+                        elif type == "1":  # 全量内容 ,使用命令cat
+                            # ssh = paramiko.SSHClient()
+                            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                            ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY', timeout=15)
+                            # ssh.connect('43.241.232.104', 22, 'root', 'q9mQ7axgjPaY')
+                            try:
+                                ssh_t = ssh.get_transport()
+                                chan = ssh_t.open_session()
+                                # chan.get_pty()
+                                # chan.setblocking(0)  # 设置非阻塞
+                                cmd = "nl /mnt/java/laimi-wms/logs/app.log"
+                                if chan.active:
+                                    chan.exec_command(cmd)
+                                    tmp = chan.recv_ready()
+                                    print(tmp)
+                                    while True:
+                                        tmp = chan.recv(10000).decode() + '\n'
+                                    # chan.exec_command(cmd)
+                                    # print(stdout.readlines())
+                                        print(tmp)
+                                    # time.sleep(5)
+                                        self.sendDataToClient(tmp)
+                                        break
+                                    # if chan.exit_status_ready():
+                                    #     break
+                                    chan.close()
+                                    ssh.close()
+                                    # time.sleep(5)
+                                else:
+                                    print('Not active')
+                            except Exception as e:
+                                print('全量异常')
+                                print(e)
+                                # ssh.close()
+                                # ssh.close()
 
-                        # while 1:
-                        #     if chan.exit_status_ready():
-                        #         break
-                        #
-                        #     try:
-                        #         recv = chan.recv(65536)
-                        #         print(recv)
-                        #     except KeyboardInterrupt:
-                        #         chan.send("\x03")  # 发送 ctrl+c
-                        #         chan.close()
-                        #         ssh.close()   # exit 0
-                        # while True:
-                        #     print(chan.recv_ready())
-                        #     while chan.recv_ready():
-                        #         clientdata1 = self.readClientData()
-                        #         print(clientdata1)
-                        #         if clientdata1 is not None and 'quit' in clientdata1:
-                        #             self.sendDataToClient(' Successlly')
-                        #             break
-                        #         log_msg = chan.recv(10000).strip()  # 接收日志信息
-                        #         # print log_msg
-                        #         self.sendDataToClient(log_msg)
-                        #     if chan.exit_status_ready():
-                        #         break
-                        #     clientdata2 = self.readClientData()
-                        #     if clientdata2 is not None and 'quit' in clientdata2:
-                        #         self.sendDataToClient(' Successlly')
-                        # break
-                    ssh.close()
+                        else:
+                            print("Oops！ 奇怪的事情，请联系系统管理员")
+                            pass
 
+                            # while 1:
+                            #     if chan.exit_status_ready():
+                            #         break
+                            #
+                            #     try:
+                            #         recv = chan.recv(65536)
+                            #         print(recv)
+                            #     except KeyboardInterrupt:
+                            #         chan.send("\x03")  # 发送 ctrl+c
+                            #         chan.close()
+                            #         ssh.close()   # exit 0
+                            # while True:
+                            #     print(chan.recv_ready())
+                            #     while chan.recv_ready():
+                            #         clientdata1 = self.readClientData()
+                            #         print(clientdata1)
+                            #         if clientdata1 is not None and 'quit' in clientdata1:
+                            #             self.sendDataToClient(' Successlly')
+                            #             break
+                            #         log_msg = chan.recv(10000).strip()  # 接收日志信息
+                            #         # print log_msg
+                            #         self.sendDataToClient(log_msg)
+                            #     if chan.exit_status_ready():
+                            #         break
+                            #     clientdata2 = self.readClientData()
+                            #     if clientdata2 is not None and 'quit' in clientdata2:
+                            #         self.sendDataToClient(' Successlly')
+                            # break
+                        # ssh.close()
+                    else :  # 关闭信息
+                        # if clientData is not None and 'quit' in clientData:
+                        print('Begin to Close Connect \n')
+                        self.sendDataToClient('Close Connect \n')
+                        # chan.close()
+                        ssh.close()
+                        print('Close Connect  Successly \n')
 
                 except Exception as e:
                     print('parent')
                     print(e)
+                    # ssh.close()
+        self.con.close()
 
 
     def analyzeReq(self):
@@ -195,9 +221,7 @@ class returnCrossDomain(Thread):
     def readClientData(self):
         if self.masking == 1:
             maskingKey = self.con.recv(4)
-
         data = self.con.recv(self.payDataLength)
-
         if self.masking == 1:
             i = 0
             trueData = ''

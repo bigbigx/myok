@@ -372,17 +372,53 @@ export const appRouter = [
     path: '/mycommand',
     icon: 'social-buffer',
     name: 'my-command',
-    title: '检查命令',
+    title: '命令管理',
     access: 0,
     component: Index,
     children: [
       {
         path: 'my-command',
         name: 'my-command-index',
-        title: '服务器检查',
+        title: '命令配置',
         'icon': 'edit',
         component: resolve => {
           require(['./components/MyCommand/MyCommand.vue'], resolve)
+        }
+      },
+      {
+        path: 'batch-command',
+        name: 'batch-command-index',
+        title: '批量命令',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/MyCommand/BatchCommand.vue'], resolve)
+        }
+      }
+    ]
+  }, {
+    path: '/ops-step',
+    icon: 'social-buffer',
+    name: 'ops-step',
+    title: '运维步骤',
+    access: 0,
+    component: Index,
+    children: [
+      {
+        path: 'ops-step-config',
+        name: 'ops-step-config',
+        title: '步骤配置',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Management/ManageStep.vue'], resolve)
+        }
+      },
+      {
+        path: 'ops-step-history',
+        name: 'ops-step-history',
+        title: '历史步骤',
+        'icon': 'edit',
+        component: resolve => {
+          require(['./components/Management/ManageStepHistory.vue'], resolve)
         }
       }
     ]
