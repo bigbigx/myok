@@ -73,7 +73,12 @@ class execute(baseview.Approverpermissions):
                 return HttpResponse(status=500)
 
     ###执行---检测和执行驳回和执行提交
+
     def put(self, request, args=None):
+        '''
+        @ auth:
+        @ date:
+        '''
         try:
             type = request.data['type']
         except KeyError as e:

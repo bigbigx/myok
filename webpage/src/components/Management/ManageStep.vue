@@ -15,7 +15,7 @@
 
       <Row>
         <Col span="24">
-        <Table border :columns="columns6" :data="applytable" stripe size="small"></Table>
+        <Table border :columns="columns6" :data="ops_step_config_list" stripe size="small"></Table>
         </Col>
       </Row>
       <br>
@@ -181,7 +181,7 @@
           key: 'reject'
         }
       ],
-      sql: [],
+      ops_step_config_list: [],
       pagenumber: 1,
       computer_room: util.computer_room,
       applytable: [],

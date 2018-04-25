@@ -26,8 +26,12 @@ def get_ssh(ip, user, pwd):
 
 def recv_data(conn): # 服务器解析浏览器发送的信息
     try:
+        all_data = conn.recv(1024).decode('unicode_escape','replace')
+        print(conn)
+        # all_data = conn.recv(1024).decode('unicode_escape')
         # all_data = conn.recv(1024).decode('utf-8', 'ignore')
-        all_data = conn.recv(1024).decode('utf-8')
+        # all_data = conn.recv(1024).decode('utf-8', 'ignore')
+        # all_data = conn.recv(1024).decode('utf-8')
         # all_data = conn.recv(1024).decode('base64','strict')
         # all_data = conn.recv(1024).decode()
 
@@ -39,7 +43,7 @@ def recv_data(conn): # 服务器解析浏览器发送的信息
     # print "hello"
     # print dic
     except Exception as e:
-        print('nonononono')
+        print('异常')
         print(e)
     else:
       code_len = ord(all_data[1]) & 127
@@ -72,11 +76,11 @@ def send_data(conn, data):  # 服务器处理发送给浏览器的信息
     token = "\x81"
     length = len(data)
     if length < 126:
-        token += struct.pack("B", length).decode()  # struct为Python中处理二进制数的模块，二进制流为C，或网络流的形式。
+        token += struct.pack("B", length).decode('unicode_escape', 'replace')  # struct为Python中处理二进制数的模块，二进制流为C，或网络流的形式。
     elif length <= 0xFFFF:
-        token += struct.pack("!BH", 126, length).decode()
+        token += struct.pack("!BH", 126, length).decode('unicode_escape', 'replace')
     else:
-        token += struct.pack("!BQ", 127, length).decode()
+        token += struct.pack("!BQ", 127, length).decode('unicode_escape', 'replace')
     data = '%s%s' % (token, data)
     conn.send(data.encode('utf-8'))
     return True
@@ -139,66 +143,67 @@ def dojob(conn, address, thread_name):
   #print goahead
   conn.setblocking(0) # 设置socket为非阻塞
   #user=getUserName(ip)
+  ip="43.241.232.104"
   user="root"
   #password=getPassword(ip)
   password="q9mQ7axgjPaY"
-  ssh = get_ssh('43.241.232.104', 'root', 'q9mQ7axgjPaY')# 连接远程服务器
-  print(ssh)
-  try:
-      ssh_t = ssh.get_transport()
-      chan = ssh_t.open_session()
-      chan.setblocking(0)  # 设置非阻塞
-      chan.exec_command('date')
-  except Exception as e:
-      print(e)
+  # ssh = get_ssh('43.241.232.104', 'root', 'q9mQ7axgjPaY')# 连接远程服务器
+  # print(ssh)
+  # try:
+  #     ssh_t = ssh.get_transport()
+  #     chan = ssh_t.open_session()
+  #     chan.setblocking(0)  # 设置非阻塞
+  #     chan.exec_command('date')
+  # except Exception as e:
+  #     print(e)
 
 
   while True:
 
-    user=""
-    password=""
-    ip=""
-    path=""
-    keyword=""
-    cnum=""
-
-    clientdata11 = recv_data(conn)
-    print(clientdata11)
-    if clientdata11 is not None and 'myip' in clientdata11:#初始化的时候，数据传递过来
-      msg=clientdata11
-      print(msg)
-      send_data(conn, '恭喜，服务端成功接收客户端信息')
-      msg_list=msg.split(";")
-      ip = ''.join(msg_list[0].split(':')[1:])
-      path = ''.join(msg_list[1].split(':')[1:])
-      keyword =  ''.join(msg_list[2].split(':')[1:])
-      cnum =  ''.join(msg_list[3].split(':')[1:])
-
-      if  ip =="" or ip is None:
-          send_data(conn, '抱歉！  IP 地址没有传递过来！')
-      #if get_username_and_password(ip)["status"] == 0:
-      #   print "没有找到此IP对应的主机用户和密码信息"
-
-
-      # user=get_username_and_password(ip)["username"]
-      user='root'
-      print("user: %s" % (user))
-      # password=get_username_and_password(ip)["password"]
-      password='q9mQ7axgjPaY'
-      print("password: %s" % (password))
-      #user="root"
-      #password="q9mQ7axgjPaY"
-    else:
-      send_data(conn, ' -_-  抱歉，服务端没有接收到信息！')
-      break
+    # user=""
+    # password=""
+    # ip=""
+    # path=""
+    # keyword=""
+    # cnum=""
+    #
+    # clientdata11 = recv_data(conn)
+    # print(clientdata11)
+    # if clientdata11 is not None and 'myip' in clientdata11:#初始化的时候，数据传递过来
+    #   msg=clientdata11
+    #   print(msg)
+    #   send_data(conn, '恭喜，服务端成功接收客户端信息')
+    #   msg_list=msg.split(";")
+    #   ip = ''.join(msg_list[0].split(':')[1:])
+    #   path = ''.join(msg_list[1].split(':')[1:])
+    #   keyword =  ''.join(msg_list[2].split(':')[1:])
+    #   cnum =  ''.join(msg_list[3].split(':')[1:])
+    #
+    #   if  ip =="" or ip is None:
+    #       send_data(conn, '抱歉！  IP 地址没有传递过来！')
+    #   #if get_username_and_password(ip)["status"] == 0:
+    #   #   print "没有找到此IP对应的主机用户和密码信息"
+    #
+    #
+    #   # user=get_username_and_password(ip)["username"]
+    #   user='root'
+    #   print("user: %s" % (user))
+    #   # password=get_username_and_password(ip)["password"]
+    #   password='q9mQ7axgjPaY'
+    #   print("password: %s" % (password))
+    #   #user="root"
+    #   #password="q9mQ7axgjPaY"
+    # else:
+    #   send_data(conn, ' -_-  抱歉，服务端没有接收到信息！')
+    #   break
 
 
     ssh = get_ssh(ip,user,password)# 连接远程服务器
-    show_str='''
-           接的IP为:%s , 文件路径为:%s , 搜索关键字为:%s, grep上下行数为:%s 
-          正在获取日志信息，请稍等。。。。。请不要着急！  如果比较急的话，建议提前启动日志窗口！
-     '''  % ( ip,path,keyword,cnum)
-    send_data(conn,show_str)
+    # show_str='''
+    #        接的IP为:%s , 文件路径为:%s , 搜索关键字为:%s, grep上下行数为:%s
+    #       正在获取日志信息，请稍等。。。。。请不要着急！  如果比较急的话，建议提前启动日志窗口！
+    #  '''  % ( ip,path,keyword,cnum)
+    # send_data(conn,show_str)
     #send_data(conn, '连接的IP为:%s , 文件路径为:%s , 搜索关键字为:%s, grep上下行数为:%s ' % ( ip,path,keyword,cnum))
     #send_data(conn,' 正在获取日志信息，请稍等。。。。。请不要着急！  如果比较急的话，建议提前启动日志窗口！ ')
     ssh_t = ssh.get_transport()
@@ -207,21 +212,22 @@ def dojob(conn, address, thread_name):
     #chan.exec_command('tail -n 40  /var/log/nginx/access.log.1| grep "error" ')
     #chan.exec_command('tailf  /var/log/nginx/access.log.1|grep 200')
     cmd=""
-    if keyword is None or keyword.strip()=="":
-        if cnum is None or cnum.strip()=="":
-            cmd='tailf %s' % (path)
-        else:
-            break
-    else:
-        if cnum is None or cnum.strip()=="":
-
-            cmd='tailf %s |grep %s' % (path,keyword)
-        else:
-            cmd='tailf %s |grep -C%s  %s' % (path,cnum,keyword)
-    cmd = 'tail -n 40 -f /var/log/nginx/access.log.1'
+    # if keyword is None or keyword.strip()=="":
+    #     if cnum is None or cnum.strip()=="":
+    #         cmd='tailf %s' % (path)
+    #     else:
+    #         break
+    # else:
+    #     if cnum is None or cnum.strip()=="":
+    #
+    #         cmd='tailf %s |grep %s' % (path,keyword)
+    #     else:
+    #         cmd='tailf %s |grep -C%s  %s' % (path,cnum,keyword)
+    cmd = 'tailf /var/log/nginx/access.log'
     chan.exec_command(cmd)
 
     while True:
+        print('hello world')
         clientdata = recv_data(conn)
         if clientdata is not None and 'quit' in clientdata:# 但浏览器点击stop按钮或close按钮时，断开连接
            print('%s : Socket close with %s:%s' % (thread_name, address[0], address[1]))
@@ -261,7 +267,7 @@ def ws_service():
   try:
 
     #sock.bind(('127.0.0.1', 3310))
-    sock.bind(('0.0.0.0', 3310))
+    sock.bind(('0.0.0.0', 3320))
     sock.listen(1000)
     print('\r\n\r\nWebsocket server start, wait for connect!')
     print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')

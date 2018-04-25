@@ -23,18 +23,18 @@
     </Row>
 
 
-    <Modal v-model="show_increamt_flag" :width="1100"  :mask-closable="false" @on-ok="" @on-cancel="show_confirm">
+    <Modal v-model="show_increamt_flag" :width="1100" :height="400" :mask-closable="false" @on-ok="" @on-cancel="show_confirm">
       <!--<Modal v-model="show_increamt_flag" width="78%">-->
        <div class="row">
         <div class="col-lg-10 test-cl">
-          <Input type="textarea" ref="textAreaTest" disabled v-model="data_websocket_server" :rows="36" style="width: 100%;height:750px;font-size:20px;"></Input>
+          <Input type="textarea" ref="textAreaTest" disabled v-model="data_websocket_server" :rows="30" style="width: 100%;height:750px;font-size:20px;"></Input>
         </div>
       </div>
     </Modal>
      <Modal v-model="show_full_flag" :width="1100"  :mask-closable="false" @on-ok="" @on-cancel="show_confirm_full">
        <div class="row">
         <div class="col-lg-10" >
-              <Input type="textarea" disabled v-model="data_websocket_server_full" :rows="36" style="width: 100%;height:750px;font-size:20px;color: red;background-color:#0c0c0c;overflow:scroll;"></Input>
+              <Input type="textarea" disabled v-model="data_websocket_server_full" :rows="30" style="width: 100%;height:750px;font-size:20px;color: red;background-color:#0c0c0c;overflow:scroll;"></Input>
         </div>
       </div>
     </Modal>
@@ -317,8 +317,26 @@
         this.show_increamt_flag = true
       },
       close_socket () {
-        this.threadPoxi('quit')
-        // this.show_increamt_flag = false
+        // this.threadPoxi('quit')
+        // this.threadPoxi('quit')
+        // alert('quit')
+        // this.websocketsend('quit')
+        // this.websock.close_socket()
+        // alert('enter')
+        // this.close_socket()
+        // this.websock = null
+        this.data_websocket_server = ''
+        const myip = '43.241.232.104'
+        const mypath = '/var/log/nginx/access.log.1'
+        // const mypath = '/mnt/java/laimi-wms/logs/app.log'
+        const mykeyword = ''
+        // const mycnum = '10'
+        // const type = 0
+        // this.websocket()
+        this.MyWebSocket(myip, 'root', mypath, mykeyword, 0)
+        // alert('end')
+        // this.show_increamt_flag
+        // = false
       },
       closeAreaText () {
         this.show_increamt_flag = false
@@ -327,15 +345,16 @@
         // alert(type)
         this.show_increamt_flag = true
         const myip = '43.241.232.104'
-        // const mypath = '/var/log/nginx/access.log.1'
-        const mypath = '/mnt/java/laimi-wms/logs/app.log'
+        const mypath = '/var/log/nginx/access.log.1'
+        // const mypath = '/mnt/java/laimi-wms/logs/app.log'
         const mykeyword = ''
-        const mycnum = '10'
+        // const mycnum = '10'
         // const type = 0
         // this.websocket()
-        this.initWebSocket()
-        const agentData = 'myip:' + myip + ';mypath:' + mypath + ';mykeyword:' + mykeyword + ';mycnum:' + mycnum + ';type:' + type
-        this.threadPoxi(agentData)  // 0-- 增量文件  1--全量文件
+        this.MyWebSocket(myip, 'root', mypath, mykeyword, 1)
+        // this.initWebSocket()
+        // const agentData = 'myip:' + myip + ';mypath:' + mypath + ';mykeyword:' + mykeyword + ';mycnum:' + mycnum + ';type:' + type
+        // this.threadPoxi(agentData)  // 0-- 增量文件  1--全量文件
       },
       threadPoxi (agentData) {  // 实际调用的方法
         // 参数
@@ -358,10 +377,26 @@
             }, 500);
           }
       },
+      MyWebSocket (ip, user, path, key, status) { // 初始化weosocket
+        // ws地址
+        // const wsuri = process.env.WS_API + "/websocket/threadsocket";
+        const wsuri = 'ws://127.0.0.1:3320/C:\\nginx-1.13.9\\logs\\access.log?ip=' + ip + '&user=' + user + '&key=' + key + '&tail=' + status;
+        this.websock = new WebSocket(wsuri);
+        // var _this = this;
+        // this.websock.onmessage = function (event) {
+        //        // _this.test();
+        //       alert(this.websocketonmessage)
+        //    }
+        this.websock.onmessage = this.websocketonmessage;
+        // this.data_websocket_server = this.websocketonmessage;
+        // alert(this.websocketonmessage)
+        console.log(this.websock, 'jj')
+        this.websock.onclose = this.websocketclose;
+      },
       initWebSocket () { // 初始化weosocket
         // ws地址
         // const wsuri = process.env.WS_API + "/websocket/threadsocket";
-        const wsuri = 'ws://127.0.0.1:3310/';
+        const wsuri = 'ws://127.0.0.1:3320/C:\\nginx-1.13.9\\logs\\access.log?tail=1';
         this.websock = new WebSocket(wsuri);
         // var _this = this;
         // this.websock.onmessage = function (event) {

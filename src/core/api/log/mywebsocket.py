@@ -15,9 +15,9 @@ class returnCrossDomain(Thread):
         Thread.__init__(self)
         self.con = connection
         self.isHandleShake = False
+        self.close_flag=False
 
     def run(self):  #  增量文件内容
-
         while True:
             if not self.isHandleShake:
                 # 开始握手阶段
@@ -74,24 +74,24 @@ class returnCrossDomain(Thread):
                                 chan = ssh_t.open_session()
                                 # chan.get_pty()
                                 # chan.setblocking(0)  # 设置非阻塞
-                                cmd = "tailf /var/log/nginx/access.log.1"
-                                if chan.active:
-                                    chan.exec_command(cmd)
-                                    while True:
-                                        tmp = chan.recv_ready()
-                                        print(tmp)
-                                        while True:
-                                            log_msg = chan.recv(10000).strip().decode() + '\n'  # 接收日志信息
+                                cmd = "tailf /var/log/nginx/access.log"
+                                # if chan.active:
+                                chan.exec_command(cmd)
+                                while True:
+                                        # tmp = chan.recv_ready()
+                                        # print(tmp)
+                                   while chan.recv_ready():
+                                         log_msg = chan.recv(10000).strip().decode() + '\n'  # 接收日志信息
                                             # log_msg = chan.recv(10000).decode() + '\n'  # 接收日志信息
-                                            print(log_msg)
-                                            self.sendDataToClient(log_msg)
-                                            # break
-                                        if chan.exit_status_ready():
-                                            break
+                                         print(log_msg)
+                                         self.sendDataToClient(log_msg)
+                                         if self.close_flag:
+                                                print("停止循环")
+                                                break
+                                   if chan.exit_status_ready():
                                         break
+                                break
                                     # print('next')
-                                else:
-                                    print('Not active')
                             except Exception as e:
                                 print('增量异常')
                                 print(e)
@@ -106,26 +106,28 @@ class returnCrossDomain(Thread):
                                 chan = ssh_t.open_session()
                                 # chan.get_pty()
                                 # chan.setblocking(0)  # 设置非阻塞
-                                cmd = "nl /mnt/java/laimi-wms/logs/app.log"
-                                if chan.active:
-                                    chan.exec_command(cmd)
-                                    tmp = chan.recv_ready()
-                                    print(tmp)
-                                    while True:
-                                        tmp = chan.recv(10000).decode() + '\n'
+                                # cmd = "nl /mnt/java/laimi-wms/logs/app.log"
+                                cmd = "tailf /var/log/nginx/access.log"
+                                # if chan.active:
+                                chan.exec_command(cmd)
+                                tmp = chan.recv_ready()
+                                print(tmp)
+                                    # while True:
+                                while chan.recv_ready():
+                                     tmp = chan.recv(10000).decode() + '\n'
                                     # chan.exec_command(cmd)
                                     # print(stdout.readlines())
-                                        print(tmp)
+                                     print(tmp)
                                     # time.sleep(5)
-                                        self.sendDataToClient(tmp)
-                                        break
+                                     self.sendDataToClient(tmp)
+                                     break
                                     # if chan.exit_status_ready():
                                     #     break
-                                    chan.close()
-                                    ssh.close()
+                                chan.close()
+                                ssh.close()
                                     # time.sleep(5)
-                                else:
-                                    print('Not active')
+                                # else:
+                                #     print('Not active')
                             except Exception as e:
                                 print('全量异常')
                                 print(e)
@@ -169,9 +171,9 @@ class returnCrossDomain(Thread):
                         # if clientData is not None and 'quit' in clientData:
                         print('Begin to Close Connect \n')
                         self.sendDataToClient('Close Connect \n')
-                        # chan.close()
                         ssh.close()
                         print('Close Connect  Successly \n')
+                        self.close_flag=True
 
                 except Exception as e:
                     print('parent')
@@ -302,7 +304,7 @@ def main():
     print('start')
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    sock.bind(('127.0.0.1', 3310))
+    sock.bind(('127.0.0.1', 3320))
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.listen(5)
     print(sock)
