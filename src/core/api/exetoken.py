@@ -161,7 +161,7 @@ class exetoken(baseview.AnyLogin):
                                                 print('pass')
                                                 continue
                                             else:
-                                                cur_time = time.strftime('%Y-%m-%d_%H-%M-%S',
+                                                cur_time = time.strftime('%Y-%m-%d_%H-%M-%S-%f',
                                                                          time.localtime(time.time()))
                                                 work_id = c.work_id
                                                 outputpath = 'xls/' + work_id + '-' + cur_time + '.xls'

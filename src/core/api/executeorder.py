@@ -210,7 +210,7 @@ class execute(baseview.Approverpermissions):
                                         print('pass')
                                         continue
                                     else:
-                                        cur_time = time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime(time.time()))
+                                        cur_time = time.strftime('%Y-%m-%d_%H-%M-%S-%f', time.localtime(time.time()))
                                         work_id = c.work_id
                                         outputpath = 'xls/' + work_id + '-' + cur_time + '.xls'
                                         exportexcel.exportExcel(SQL_LIST.ip, SQL_LIST.username, SQL_LIST.password,
