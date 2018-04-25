@@ -162,14 +162,11 @@ def auth(username, password):
     else:
         return False
 
-# import time
-# def get_time_stamp():
-#     ct = time.time()
-#     local_time = time.localtime(ct)
-#     data_head = time.strftime("%Y-%m-%d %H:%M:%S", local_time)
-#     data_secs = (ct - long(ct)) * 1000
-#     time_stamp = "%s.%03d" % (data_head, data_secs)
-#     return time_stamp
-# #
-# if __name__ == '__main__':
-#     myok()
+import datetime
+def get_time_stamp():
+    cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
+    print(cur_time)
+    return cur_time
+#
+if __name__ == '__main__':
+    get_time_stamp()

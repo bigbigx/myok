@@ -10,6 +10,7 @@ from libs import call_inception
 from libs import call_explain
 from libs.serializers import SqlRecord
 import time
+import datetime
 from rest_framework.response import Response
 from django.http import HttpResponse
 from core.models import (
@@ -161,8 +162,9 @@ class exetoken(baseview.AnyLogin):
                                                 print('pass')
                                                 continue
                                             else:
-                                                cur_time = time.strftime('%Y-%m-%d_%H-%M-%S-%f',
-                                                                         time.localtime(time.time()))
+                                                # cur_time = time.strftime('%Y-%m-%d_%H-%M-%S-%f',
+                                                #                          time.localtime(time.time()))
+                                                cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
                                                 work_id = c.work_id
                                                 outputpath = 'xls/' + work_id + '-' + cur_time + '.xls'
                                                 exportexcel.exportExcel(SQL_LIST.ip, SQL_LIST.username,
