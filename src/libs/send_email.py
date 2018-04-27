@@ -13,8 +13,8 @@ conf = util.conf_path()
 from_addr = conf.mail_user
 password = conf.mail_password
 smtp_server = conf.smtp
-login_url="http://ops.51dinghuo.cc"
-# login_url="http://127.0.0.1:88"
+# login_url="http://ops.51dinghuo.cc"
+login_url="http://127.0.0.1:88"
 
 
 
@@ -44,21 +44,21 @@ class send_email(object):
                    '<br><p>状态: 审核通过 </p>' \
                    '<br><p>备注: %s</p>' \
                    '<br><p>登录平台: <a href=%s  target="_blank">点击登录</a></p><p></p>' \
-                   '<a href="%s/api/v1/exe_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">执行SQL</a> ' \
+                   '<a href="%s/api/v1/exe_token?type=1&apply_man=%s&approve_man=%s&workid=%s&mytoken=%s">执行SQL</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
                    '<br><p>使用说明：只要您点击了 "执行SQL" ，即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
-                       mail_data['to_user'],
+                       mail_data['apply_man'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
                        mail_data['note'],
                        login_url,
                        login_url,
-                       mail_data['to_user'],
-                       mail_data['myself'],
+                       mail_data['apply_man'],
+                       mail_data['approve_man'],
                        mail_data['workid'],
                        mail_data['token_pass'])
             msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
@@ -83,7 +83,7 @@ class send_email(object):
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
-                       mail_data['to_user'],
+                       mail_data['apply_man'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'])
             cc_list = mail_data['cc_list']
@@ -127,7 +127,7 @@ class send_email(object):
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
-                       mail_data['to_user'],
+                       mail_data['apply_man'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
                        mail_data['rejected'])
@@ -152,7 +152,7 @@ class send_email(object):
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
-                       mail_data['to_user'],
+                       mail_data['apply_man'],
                        mail_data['rejected'])
             msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
             msg['Subject'] = Header('蜜罐工单状态---SQL执行驳回', 'utf-8').encode()
@@ -176,15 +176,15 @@ class send_email(object):
                    '<br><p>备注: %s</p>' \
                    '<br><p>登录平台: <a href=%s  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: &nbsp&nbsp' \
-                   '<a href="%s/api/v1/audit_token?type=1&to_user=%s&username=%s&workid=%s&mytoken=%s">审核通过</a> ' \
+                   '<a href="%s/api/v1/audit_token?type=1&apply_man=%s&approve_man=%s&workid=%s&mytoken=%s">审核通过</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
-                   '<a href="%s/api/v1/audit_token?&type=0&to_user=%s&username=%s&workid=%s&mytoken=%s">审核驳回</a></p>' \
+                   '<a href="%s/api/v1/audit_token?&type=0&apply_man=%s&approve_man=%s&workid=%s&mytoken=%s">审核驳回</a></p>' \
                    '<br><p>使用说明：只要您点击了 "审核通过" 或者 "审核驳回" ，即可直接审核工单，而不再需要继续登录平台操作；' \
                    '<br>&nbsp&nbsp&nbsp&nbsp&nbsp 同时,工单发起人将会收到审核邮件，以及工单执行人也会收到执行提醒邮件</p>' \
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
-                       mail_data['to_user'],
+                       mail_data['apply_man'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
                        # mail_data['addr'],
@@ -193,13 +193,13 @@ class send_email(object):
                        mail_data['note'],
                        login_url,
                        login_url,
-                       mail_data['to_user'],
-                       mail_data['assigned'],
+                       mail_data['apply_man'],
+                       mail_data['approve_man'],
                        mail_data['workid'],
                        mail_data['token_pass'],
                        login_url,
-                       mail_data['to_user'],
-                       mail_data['assigned'],
+                       mail_data['apply_man'],
+                       mail_data['approve_man'],
                        mail_data['workid'],
                        mail_data['token_reject'])
             msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)

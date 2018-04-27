@@ -27,8 +27,8 @@ import random,string
 # 获取cc用户的清单
 
 def readfile():
-    filename ='/root/myok/src/libs/business.txt'
-    # filename = 'D:\\devops\\myok\\src\\libs\\business.txt'
+    # filename ='/root/myok/src/libs/business.txt'
+    filename = 'D:\\devops\\myok\\src\\libs\\business.txt'
     # exmail_addr = []
     # user_name = []
     result_inner = {'mail': '', 'username': ''}
@@ -167,6 +167,6 @@ def get_time_stamp():
     cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
     print(cur_time)
     return cur_time
-#
-if __name__ == '__main__':
-    get_time_stamp()
+# #
+# if __name__ == '__main__':
+#     get_time_stamp()

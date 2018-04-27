@@ -60,6 +60,7 @@ class SqlOrder(models.Model):
     sql = models.TextField(blank=True) #sql语句
     text = models.CharField(max_length=300) # 工单备注
     assigned = models.CharField(max_length=50, blank=True)# 工单审核人
+    approve_time_new =  models.CharField(max_length=50, blank=True)# 工单审核时间
     backup_sql=models.TextField(blank=True) #s备份ql语句
     reject = models.TextField(blank=True) #驳回说明
     run_type = models.IntegerField(null=True,blank=True) #执行SQL的方式 0 ---inception提交和执行  1--直接连接数据库执行sql

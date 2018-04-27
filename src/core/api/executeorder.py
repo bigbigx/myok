@@ -77,13 +77,15 @@ class execute(baseview.Approverpermissions):
     def put(self, request, args=None):
         try:
             type = request.data['type']
+            approve_man = request.data['approve_man']
+            apply_man = request.data['apply_man']
+            execute_man = 'dba'
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         else:
             if type == 0:  # 执行驳回
                 try:
-                    from_user = request.data['from_user']
-                    to_user = request.data['to_user']
+
                     text = request.data['text']
                     id = request.data['id']
                 except KeyError as e:
@@ -93,7 +95,7 @@ class execute(baseview.Approverpermissions):
                     try:
                         try:
                             data = SqlOrder.objects.filter(id=id).first
-                            conn = conn_sqlite.query(from_user, data.work_id)
+                            conn = conn_sqlite.query(approve_man, data.work_id)
                         except Exception as e:
                             print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -110,16 +112,16 @@ class execute(baseview.Approverpermissions):
                             title = '工单:' + _tmpData['work_id'] + '执行驳回通知'
                             msg_content = '工单详情是：' + _tmpData['text'] + '\n 驳回意见是： ' + text
                             Usermessage.objects.get_or_create(
-                                from_user=from_user,
+                                from_user=approve_man,
                                 time=util.date(),
                                 title=title,
                                 content=msg_content,
-                                to_user=to_user,
+                                to_user=apply_man,
                                 state='unread'
                             )
 
                             content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
-                            mail = Account.objects.filter(username=to_user).first()
+                            approve_man_mail = Account.objects.filter(username=approve_man).first()
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '操作成功，该执行请求已驳回！'
 
@@ -130,14 +132,14 @@ class execute(baseview.Approverpermissions):
                                     if content.url:
                                         util.dingding(
                                             content='工单执行驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
-                                                    % (_tmpData['work_id'], to_user, addr_ip, text), url=content.url)
+                                                    % (_tmpData['work_id'], apply_man, addr_ip, text), url=content.url)
                                 except:
                                     ret_info = '工单执行驳回成功!但是钉钉推送失败,请查看错误日志排查错误.'
 
                             # ----删除执行token 执行驳回
                             try:
 
-                                conn_sqlite.delete(to_user, data.work_id)
+                                conn_sqlite.delete(execute_man, data.work_id)
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -148,15 +150,15 @@ class execute(baseview.Approverpermissions):
                                 pass
                             else:
                                 try:
-                                    if mail.email:
+                                    if approve_man_mail.email:
                                         mess_info = {
                                             'workid': _tmpData['work_id'],
-                                            'to_user': to_user,
+                                            'apply_man': apply_man,
                                             'addr': addr_ip,
                                             'type': "执行驳回",
                                             'status': 'run_back',
                                             'rejected': text}
-                                        put_mess = send_email.send_email(to_addr=mail.email)
+                                        put_mess = send_email.send_email(to_addr=approve_man_mail.email)
                                         put_mess.send_mail(mail_data=mess_info, type=4)
                                 except:
                                     ret_info = '工单执行驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
@@ -170,8 +172,8 @@ class execute(baseview.Approverpermissions):
 
             elif type == 1:  ##开始执行, 邮件发送到发起人，审核人和抄送人员
                 try:
-                    from_user = request.data['from_user']
-                    to_user = request.data['to_user']
+                    # approve_man = request.data['approve_man']
+                    # apply_man = request.data['apply_man']
                     # username = request.data['username']
                     # token=request.data['token']
                     # backup_sql=request.data['backup_sql']
@@ -187,7 +189,7 @@ class execute(baseview.Approverpermissions):
                         sql_value = c.sql
                         workid = c.work_id
                         cc_list = c.cc_list
-                        conn = conn_sqlite.query(from_user, workid)  # 查询token 是否存在
+                        conn = conn_sqlite.query(execute_man, workid)  # 查询token 是否存在
                     except Exception as e:
                         print(e)
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

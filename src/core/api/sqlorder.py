@@ -201,8 +201,8 @@ class sqlorder(baseview.BaseView):
             data = json.loads(request.data['data'])
             tmp_sql = json.loads(request.data['sql'])
             tmp_bak = json.loads(request.data['backup_sql'])
-            user = request.data['user']
-            assigned_man=data['assigned']
+            apply_man = request.data['apply_man']
+            approve_man=data['approve_man']
             type = request.data['type']
             run_type = request.data['run_type']
             cc_list = request.data['cc_list']
@@ -227,7 +227,7 @@ class sqlorder(baseview.BaseView):
                 token = util.generateTokens(32)
                 workId = util.workId()
                 SqlOrder.objects.get_or_create(
-                    username=user,
+                    username=apply_man,
                     date=util.date(),
                     work_id=workId,
                     status=2,
@@ -237,7 +237,7 @@ class sqlorder(baseview.BaseView):
                     text=data['text'],
                     backup=data['backup'],
                     bundle_id=id,
-                    assigned=data['assigned'],
+                    assigned=data['approve_man'],
                     backup_sql=sql_2,
                     base_id=id,
                     run_type=run_type,
@@ -245,7 +245,7 @@ class sqlorder(baseview.BaseView):
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
-                mail = Account.objects.filter(username=data['assigned']).first()
+                approve_man_mail = Account.objects.filter(username=data['approve_man']).first()
                 tag = globalpermissions.objects.filter(authorization='global').first()
                 ret_info = '已提交，请等待管理员审核!'
                 # if tag is None or tag.dingding == 0:  #  发送町町
@@ -262,8 +262,9 @@ class sqlorder(baseview.BaseView):
                 # 保存token
                 try:
                     #value = [(assigned_man, workId, token)]
-                    conn_sqlite.add_one(assigned_man, workId, token)
+                    conn_sqlite.add_one(approve_man, workId, token)
                 except Exception as e:
+                    print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
 
@@ -271,11 +272,11 @@ class sqlorder(baseview.BaseView):
                 if tag is None or tag.email == 0:
                     pass
                 else:
-                    if mail.email:
+                    if approve_man_mail.email:
                         mess_info = {
                             'workid': workId,
                             #'to_user': user,
-                            'to_user': user,
+                            'apply_man': apply_man,
                             'addr': addr_ip,
                             'text': data['text'],
                             'type': "成功发起",
@@ -283,12 +284,12 @@ class sqlorder(baseview.BaseView):
                             'backup_sql':sql_2,
                             'status': 'apply',
                             'cc_list': cc_list,
-                            'assigned': assigned_man,
+                            'approve_man': approve_man,
                             'token_pass': token,    # 定义审核通过URL 的token
                             'token_reject': token,  #定义审核驳回URL 的token
                             'note':content.before}
                         try:
-                            put_mess = send_email.send_email(to_addr=mail.email)
+                            put_mess = send_email.send_email(to_addr=approve_man_mail.email)
                             put_mess.send_mail(mail_data=mess_info, type=2)
                         except Exception as e :
                             #ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
@@ -299,6 +300,7 @@ class sqlorder(baseview.BaseView):
 
                 return Response(ret_info)
             except Exception as e:
+                print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
             

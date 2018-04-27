@@ -311,8 +311,8 @@ export default {
       this.tmp[this.togoing].status = 5
       axios.put(`${util.url}/audit_sql`, {
           'type': 1,
-          'from_user': Cookies.get('user'),
-          'to_user': this.formitem.username,
+          'approver': Cookies.get('user'),
+          'apply_man': this.formitem.username,
           'id': this.formitem.id
         })
         .then(res => {

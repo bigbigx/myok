@@ -68,10 +68,10 @@
             </FormItem>
 
             <FormItem label="指定审核人:" prop="text" >
-              <Select v-model="formItem.assigned" v-if="person==2" >
-                <Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>
+              <Select v-model="formItem.approve_man" v-if="person==2" >
+                <Option v-for="i in this.approve_man" :value="i.username" :key="i.username">{{i.username}}</Option>
               </Select>
-                <Input type="text"  v-model="formItem.assigned"  disabled  v-if="person==0 || person==1"  ></Input>
+                <Input type="text"  v-model="formItem.approve_man"  disabled  v-if="person==0 || person==1"  ></Input>
                <RadioGroup v-model="person" >
                  <Radio label=0 @click.native="chooseapprover(0)"><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
                  <Radio label=1 @click.native="chooseapprover(1)"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
@@ -211,7 +211,7 @@ export default {
         basename: '',
         text: '',
         backup: '1',
-        assigned: 'liuyan',
+        approve_man: '',
         cc_mail_list: [],
         default_ccmail: [],
         quick_choose: 'custom',
@@ -341,7 +341,7 @@ export default {
         ]
       },
       id: null,
-      assigned: [],
+      approve_man: [],
       flag: false,
       single: false,
       cc_mail: false,
@@ -358,11 +358,11 @@ export default {
     chooseapprover (val) {
 
      if (val===0) {
-        this.formItem.assigned = "liuyan";
+        this.formItem.approve_man = "liuyan";
      } else if (val===1) {
-       this.formItem.assigned = 'paul';
+       this.formItem.approve_man = 'paul';
      } else {
-       this.formItem.assigned='';
+       this.formItem.approve_man='';
      }
     },
     show_ccmail_div () {
@@ -658,7 +658,7 @@ export default {
                 'data': JSON.stringify(this.formItem),
                 'sql': JSON.stringify(this.datalist.sqllist_ddl),
                 'backup_sql': JSON.stringify(this.datalist.sqllist_backup),
-                'user': Cookies.get('user'),
+                'apply_man': Cookies.get('user'),
                 'type': 1,
                 'run_type': this.run_type,
                 'cc_list': this.social,
@@ -700,7 +700,7 @@ export default {
       .then(res => {
         console.log('ddddd', res.data)
         this.item = res.data['connection'];
-        this.assigned = res.data['person'];
+        this.approve_man = res.data['person'];
         this.cc_mail_list = res.data['cc_mail_list'];
       })
       .catch(error => {

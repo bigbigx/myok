@@ -22,6 +22,7 @@ from core.models import (
 from libs.serializers import (
     Record
 )
+import datetime
 
 conf = util.conf_path()
 addr_ip = conf.ipaddress
@@ -63,13 +64,18 @@ class audit(baseview.Approverpermissions):
     def put(self, request, args=None):
         try:
             type = request.data['type']
+            data = request.GET.get('data')
+            apply_man = request.GET.get('apply_man')
+            approve_man = data['approve_man']  # 审核人
+            execute_man = 'dba'
+            cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         else:
             if type == 0:  #审核驳回
                 try:
-                    from_user = str(request.data['from_user'])
-                    to_user11 = str(request.data['to_user'])
+                    approve_man = str(request.data['approve_man'])
+                    apply_man = str(request.data['apply_man'])
                     text = request.data['text']
                     id = request.data['id']
                 except KeyError as e:
@@ -79,7 +85,7 @@ class audit(baseview.Approverpermissions):
                     try:
                         data = SqlOrder.objects.filter(id=id).first()
                         try:
-                            conn = conn_sqlite.query(from_user, data.work_id)
+                            conn = conn_sqlite.query(approve_man, data.work_id)
                         except Exception as e:
                             print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -96,22 +102,22 @@ class audit(baseview.Approverpermissions):
                                 title = '工单:' + _tmpData['work_id'] + '审核驳回通知'
                                 msg_content='工单详情是：' + _tmpData['text'] + '\r\n 驳回意见是： ' + text
                                 Usermessage.objects.get_or_create(
-                                    from_user=from_user,
+                                    from_user=approve_man,
                                     time=util.date(),
                                     title=title,
                                     content=msg_content,
-                                    to_user=to_user11,
+                                    to_user=apply_man,
                                     state='unread'
                                 )
 
                                 content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
-                                mail = Account.objects.filter(username=to_user11).first()
+                                apply_man_mail = Account.objects.filter(username=apply_man).first()
                                 tag = globalpermissions.objects.filter(authorization='global').first()
                                 ret_info = '操作成功，该请求已驳回！'
                                 SqlOrder.objects.filter(id=id).update(reject=text)
 
                                 try:
-                                    conn_sqlite.delete(to_user11, data.work_id)
+                                    conn_sqlite.delete(approve_man, data.work_id)
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -126,31 +132,33 @@ class audit(baseview.Approverpermissions):
                                         if content.url:
                                             util.dingding(
                                                 content='工单审核驳回通知\n工单编号:%s\n发起人:%s\n地址:%s\n驳回说明:%s\n状态:驳回'
-                                                %(_tmpData['work_id'],to_user11,addr_ip,text), url=content.url)
+                                                %(_tmpData['work_id'],apply_man,addr_ip,text), url=content.url)
                                     except:
                                         ret_info = '工单审核驳回成功!但是钉钉推送失败,请查看错误日志排查错误.'
                                 if tag is None or tag.email == 0:
                                     pass
                                 else:
                                     try:
-                                        if mail.email:
+                                        if apply_man_mail.email:
                                             mess_info = {
                                                 'workid':_tmpData['work_id'],
-                                                'to_user': to_user11,
+                                                'apply_man': apply_man,
                                                 'addr': addr_ip,
                                                 'type': "审核驳回",
                                                 'status':'back',
                                                 'text': _tmpData['text'],
                                                 'run_sql':data.sql,
                                                 'backup_sql':data.backup_sql,
-                                                'rejected': text}
-                                            put_mess = send_email.send_email(to_addr=mail.email)
+                                                'rejected': text,
+                                                'approve_man': approve_man,
+                                                'note': content.after}
+                                            put_mess = send_email.send_email(to_addr=apply_man_mail.email)
                                             put_mess.send_mail(mail_data=mess_info,type=1)
                                     except:
                                         ret_info = '工单审核驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
                                 # ----删除token
                                 try:
-                                    conn_sqlite.delete(from_user, data.work_id)
+                                    conn_sqlite.delete(approve_man, data.work_id)
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -164,12 +172,11 @@ class audit(baseview.Approverpermissions):
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
 
-            elif type == 1:  #审核通过
+            elif type == 1:
+                '''
+                操作审核--通过
+                '''
                 try:
-                    from_user = request.data['from_user']
-                    to_apply = request.data['to_user']
-                    to_executer = 'dba'
-
                     id = request.data['id']
                 except KeyError as e:
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -180,7 +187,7 @@ class audit(baseview.Approverpermissions):
                         c = SqlOrder.objects.filter(id=id).first()
                         workid = c.work_id
                         try:
-                            conn = conn_sqlite.query(from_user, workid)
+                            conn = conn_sqlite.query(apply_man, workid)
                         except Exception as e:
                             print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -195,18 +202,19 @@ class audit(baseview.Approverpermissions):
 
                             #############################################
                             SqlOrder.objects.filter(id=id).update(status=1)
+                            SqlOrder.objects.filter(work_id=workid).update(approve_time=cur_time)
                             '''
                             通知消息
     
                             '''
                             Usermessage.objects.get_or_create(
-                                from_user=from_user, time=util.date(),
-                                title=title, content=f'该工单已审核通过!       \r\n 工单说明是: {c.text}', to_user=to_apply,
+                                from_user=approve_man, time=util.date(),
+                                title=title, content=f'该工单已审核通过!       \r\n 工单说明是: {c.text}', to_user=apply_man,
                                 state='unread'
                             )
                             Usermessage.objects.get_or_create(
-                                from_user=from_user, time=util.date(),
-                                title=title, content=f'有最新的工单已审核，请执行人执行!       \r\n 工单说明是: {d.username}', to_user=to_apply,
+                                from_user=approve_man, time=util.date(),
+                                title=title, content=f'有最新的工单已审核，请执行人执行!       \r\n 工单说明是: {c.text}', to_user=apply_man,
                                 state='unread'
                             )
 
@@ -217,15 +225,14 @@ class audit(baseview.Approverpermissions):
                             '''
                             data=SqlOrder.objects.filter(id=id).first()
                             content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                            mail = Account.objects.filter(username=to_executer).first()
-                            mail_exe = Account.objects.filter(username=to_apply).first()
+                            mail_execute_man = Account.objects.filter(username=execute_man).first()
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             #ret_info = '操作成功，该请求已同意!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                             ret_info = '该工单已审核通过!'
 
                                # ----删除审核的token
                             try:
-                                conn_sqlite.delete(from_user, data.work_id)
+                                conn_sqlite.delete(approve_man, data.work_id)
                             except Exception as e:
                                 print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -236,7 +243,7 @@ class audit(baseview.Approverpermissions):
                                 # -----增加执行的todken
                             try:
 
-                                conn_sqlite.add_one('dba', data.work_id, newtoken)
+                                conn_sqlite.add_one(execute_man, data.work_id, newtoken)
 
                             except Exception as e:
                                 print(e)
@@ -249,10 +256,10 @@ class audit(baseview.Approverpermissions):
                             else:
 
                                 try:
-                                    if mail.email:
+                                    if mail_execute_man.email:
                                         mess_info = {
                                             'workid': workid,
-                                            'to_user': 'dba',
+                                            'execute_man': execute_man,
                                             #'to_executor': d.username,
                                             'addr': addr_ip,
                                             'text': c.text,
@@ -261,9 +268,9 @@ class audit(baseview.Approverpermissions):
                                             'run_sql':data.sql,
                                             'backup_sql':data.backup_sql,
                                             'token_pass':newtoken,
-                                            'myself':from_user,
+                                            'approve_man':approve_man,
                                             'note': content.after}
-                                        put_mess = send_email.send_email(to_addr=mail.email)
+                                        put_mess = send_email.send_email(to_addr=mail_execute_man.email)
                                         put_mess.send_mail(mail_data=mess_info,type=0)
                                         #put_mess1 = send_email.send_email(to_addr=mail_exe.email)
                                         #put_mess1.send_mail(mail_data=mess_info, type=0)

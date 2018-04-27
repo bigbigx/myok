@@ -3,8 +3,8 @@ import logging
 import os
 
 CUSTOM_ERROR = logging.getLogger('Yearning.core.views')
-# tokendb_path='d:\\token.db'
-tokendb_path='/root/token.db'
+tokendb_path='d:\\token.db'
+# tokendb_path='/root/token.db'
 
 
 def create_table(sql):

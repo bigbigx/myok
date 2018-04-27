@@ -27,15 +27,15 @@ def recv_data(conn): # 服务器解析浏览器发送的信息
   try:
     all_data = conn.recv(1024)
     print("start next")
-    print（all_data）
+    print(all_data)
     if not len(all_data):
         return False
     #dic = simplejson.loads(all_data)
     # print "hello"
     # print dic
-    except:
-        pass
-    else:
+  except Exception as e:
+        print(e)
+  else:
       code_len = ord(all_data[1]) & 127
       if code_len == 126:
           masks = all_data[4:8]

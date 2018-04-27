@@ -36,25 +36,26 @@ class exetoken(baseview.AnyLogin):
     def get(self, request, args=None):
             try:
                 type = int(request.GET.get('type'))
+                token = request.GET.get('mytoken')
+                workid = request.GET.get('workid')
+                approve_man = request.GET.get('approve_man')
+                apply_man = request.GET.get('apply_man')
+                execute_man= 'dba'
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
             else:
                 if type == 0:  # 执行驳回
-                    token = request.GET.get('mytoken')
-                    workid = request.GET.get('workid')
-                    username = request.GET.get('username')
                     text = "手工驳回，详情请联系执行人"
-                    to_user = request.GET.get('to_user')
                     ret_info = ""
                     try:
-                        mail = Account.objects.filter(username=username).first()
-                        mail_exe = Account.objects.filter(username='dba').first()
+                        mail_approve_man = Account.objects.filter(username=approve_man).first()
+                        mail_execute_man = Account.objects.filter(username=execute_man).first()
                         # tag = globalpermissions.objects.filter(authorization='global').first()
 
                         try:
                             #username='dba'
-                            conn = conn_sqlite.query(to_user, workid)
+                            conn = conn_sqlite.query(apply_man, workid)
                         except Exception as e:
                             print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -69,20 +70,20 @@ class exetoken(baseview.AnyLogin):
                                 'bundle_id',
                                 'text'
                             ).first()
-                            reject_remark = '快捷执行驳回，具体驳回原因请联系审核人: ' + mail_exe.email
+                            reject_remark = '快捷执行驳回，具体驳回原因请联系审核人: ' + mail_execute_man.email
                             title = '工单:' + _tmpData['work_id'] + '执行驳回通知'
                             msg_content = '工单详情是：' + _tmpData['text'] + '\n 驳回意见是： ' + text
                             Usermessage.objects.get_or_create(
-                                from_user=username,
+                                from_user=approve_man,
                                 time=util.date(),
                                 title=title,
                                 content=msg_content,
-                                to_user=to_user,
+                                to_user=apply_man,
                                 state='unread'
                             )
                             data = SqlOrder.objects.filter(work_id=workid).first()
                             content = DatabaseList.objects.filter(id=_tmpData['bundle_id']).first()
-                            mail = Account.objects.filter(username=to_user).first()
+                            # mail_apply = Account.objects.filter(username=apply_man).first()
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '<h1>操作成功，该执行请求已驳回！</h1>'
 
@@ -103,16 +104,16 @@ class exetoken(baseview.AnyLogin):
                                 pass
                             else:
                                 try:
-                                    if mail.email:
+                                    if mail_approve_man.email:
                                         mess_info = {
                                             'workid':_tmpData['work_id'],
-                                            'to_user':to_user,
+                                            'to_user':approve_man,
                                             'addr': addr_ip,
                                             'type': "执行驳回",
                                             'text': data.text,
                                             'status':'run_back',
                                             'rejected': reject_remark}
-                                        put_mess = send_email.send_email(to_addr=mail.email)
+                                        put_mess = send_email.send_email(to_addr=mail_approve_man.email)
                                         put_mess.send_mail(mail_data=mess_info,type=4)
                                 except:
                                     ret_info = '<h1>工单执行驳回成功!但是邮箱推送失败,请查看错误日志排查错误.</h1>'
@@ -126,14 +127,11 @@ class exetoken(baseview.AnyLogin):
                         return HttpResponse(ret_info)
 
                 elif type == 1:  #   执行，发送信息和邮件给到工单发起人和审核人和抄送人员
-                        token = request.GET.get('mytoken')
-                        workid = request.GET.get('workid')
-                        username = request.GET.get('username')
-                        to_user = request.GET.get('to_user')
+
                         print("===============++++")
                         ret_info=""
                         try:
-                            mail = Account.objects.filter(username=username).first()
+                            approve_man_mail = Account.objects.filter(username=approve_man).first()
                             #tag = globalpermissions.objects.filter(authorization='global').first()
                             try:
                                 conn = conn_sqlite.queryByToken(token)
@@ -249,7 +247,7 @@ class exetoken(baseview.AnyLogin):
                                             error=i['errormessage'],
                                             base=c.basename,
                                             workid=c.work_id,
-                                            person=username,
+                                            person=approve_man,
                                             # reviewer=c.assigned,
                                             reviewer='dba',
                                             affectrow=i['affected_rows'],
@@ -260,23 +258,23 @@ class exetoken(baseview.AnyLogin):
                                     '''
                                     通知消息
                                     '''
-                                    Usermessage.objects.get_or_create(
-                                        from_user=username, time=util.date(),
-                                        # title=title, content='该工单已执行成功!', to_user=to_user,
-                                        title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=c.username,
-                                        state='unread'
-                                    )
+                                    # Usermessage.objects.get_or_create(
+                                    #     from_user=approve_man, time=util.date(),
+                                    #     # title=title, content='该工单已执行成功!', to_user=to_user,
+                                    #     title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=approve_man,
+                                    #     state='unread'
+                                    # )
 
                                     Usermessage.objects.get_or_create(
-                                        from_user=username, time=util.date(),
+                                        from_user=execute_man, time=util.date(),
                                         # title=title, content='该工单已执行成功!', to_user=to_user,
-                                        title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=to_user,  # 发送给发起人
+                                        title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=apply_man,  # 发送给发起人
                                         state='unread'
                                     )
                                     Usermessage.objects.get_or_create(
-                                        from_user=username, time=util.date(),
+                                        from_user=execute_man, time=util.date(),
                                         # title=title, content='该工单已执行成功!', to_user=to_user,
-                                        title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=username,  # 发给审核人
+                                        title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=approve_man,  # 发给审核人
                                         state='unread'
                                     )
 
@@ -285,8 +283,8 @@ class exetoken(baseview.AnyLogin):
                                     '''
 
                                     content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                                    approve_man_mail = Account.objects.filter(username=to_user).first() #指派人，即审核人
-                                    apply_man_approver = Account.objects.filter(username=username).first()
+                                    approve_man_mail = Account.objects.filter(username=approve_man).first() #指派人，即审核人
+                                    apply_man_mail = Account.objects.filter(username=apply_man).first()
                                     tag = globalpermissions.objects.filter(authorization='global').first()
                                     ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
 
@@ -308,12 +306,11 @@ class exetoken(baseview.AnyLogin):
                                         pass
                                     else:
                                         try:
-                                            if mail.email:
+                                            if approve_man_mail.email: # 发送执行成功的邮件给到审核人
                                                 mess_info = {
                                                     'workid': c.work_id,
-                                                    'to_user': c.username,
-                                                    'approver': to_user,
-                                                    'approve_man': approve_man_mail.email,
+                                                    'approve_man': approve_man,
+                                                    'apply_man': apply_man,
                                                     'run_sql': c.sql,
                                                     'backup_sql': bak_sql,
                                                     'addr': addr_ip,
@@ -324,12 +321,28 @@ class exetoken(baseview.AnyLogin):
                                                     'note': content.after,
                                                     'cc_list': cc_list,
                                                     'file': file_path}
-                                                put_mess = send_email.send_email(to_addr=apply_man_approver.email)
+                                                put_mess = send_email.send_email(to_addr=approve_man_mail.email)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)
                                                 # put_mess1 = send_email.send_email(to_addr=mail_approver.email)
                                                 # put_mess1.send_mail(mail_data=mess_info, type=3)
 
-
+                                            if apply_man_mail.email: # 发送执行成功的邮件给到工单发起人
+                                                mess_info = {
+                                                    'workid': c.work_id,
+                                                    'approve_man': approve_man,
+                                                    'apply_man': apply_man,
+                                                    'run_sql': c.sql,
+                                                    'backup_sql': bak_sql,
+                                                    'addr': addr_ip,
+                                                    'text': c.text,
+                                                    'status': 'run',
+                                                    'type': '执行成功',
+                                                    'backup': backup_status,
+                                                    'note': content.after,
+                                                    'cc_list': cc_list,
+                                                    'file': file_path}
+                                                put_mess = send_email.send_email(to_addr=apply_man_mail.email)
+                                                put_mess.send_mail(mail_data=mess_info, type=3)
 
                                         except Exception as e:
                                             print(e)
@@ -345,7 +358,7 @@ class exetoken(baseview.AnyLogin):
 
                                 try:
 
-                                    conn_sqlite.delete(to_user, workid)
+                                    conn_sqlite.delete(apply_man, workid)
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
