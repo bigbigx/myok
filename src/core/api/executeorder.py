@@ -77,6 +77,7 @@ class execute(baseview.Approverpermissions):
     def put(self, request, args=None):
         try:
             type = request.data['type']
+            basename = request.data['db']
             approve_man = request.data['approve_man']
             apply_man = request.data['apply_man']
             execute_man = 'dba'
@@ -155,6 +156,7 @@ class execute(baseview.Approverpermissions):
                                             'workid': _tmpData['work_id'],
                                             'apply_man': apply_man,
                                             'addr': addr_ip,
+                                            'db': basename,
                                             'type': "执行驳回",
                                             'status': 'run_back',
                                             'rejected': text}
@@ -297,7 +299,7 @@ class execute(baseview.Approverpermissions):
                                     workid=c.work_id,
                                     person=c.username,
                                     # reviewer=c.assigned,
-                                    reviewer=from_user,
+                                    reviewer=execute_man,
                                     affectrow='',
                                     sequence='',
                                     backup_dbname='',
@@ -316,7 +318,7 @@ class execute(baseview.Approverpermissions):
                                         workid=c.work_id,
                                         person=c.username,
                                         # reviewer=c.assigned,
-                                        reviewer=from_user,
+                                        reviewer=execute_man,
                                         affectrow=i['affected_rows'],
                                         sequence=i['sequence'],
                                         backup_dbname=i['backup_dbname'],
@@ -325,22 +327,22 @@ class execute(baseview.Approverpermissions):
                             通知消息
                             '''
                             Usermessage.objects.get_or_create(
-                                from_user=from_user, time=util.date(),
+                                from_user=execute_man, time=util.date(),
                                 # title=title, content='该工单已执行成功!', to_user=to_user,
-                                title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=c.username,
+                                title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=apply_man,
                                 state='unread'
                             )
 
                             Usermessage.objects.get_or_create(
-                                from_user=from_user, time=util.date(),
+                                from_user=execute_man, time=util.date(),
                                 # title=title, content='该工单已执行成功!', to_user=to_user,
-                                title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=to_user,  # 发送给发起人
+                                title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=approve_man,  # 发送给发起人
                                 state='unread'
                             )
                             Usermessage.objects.get_or_create(
-                                from_user=from_user, time=util.date(),
+                                from_user=execute_man, time=util.date(),
                                 # title=title, content='该工单已执行成功!', to_user=to_user,
-                                title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=from_user,  # 发给审核人
+                                title=title, content=f'该工单已执行成功！ 工单说明是: {c.text}', to_user=execute_man,  # 发给审核人
                                 state='unread'
                             )
 
@@ -349,8 +351,8 @@ class execute(baseview.Approverpermissions):
                             '''
 
                             content = DatabaseList.objects.filter(id=c.bundle_id).first()
-                            mail_apply = Account.objects.filter(username=c.username).first()  # 工单发起人
-                            mail_approver = Account.objects.filter(username=to_user).first()  # 指派人，即审核人
+                            apply_man_mail = Account.objects.filter(username=apply_man).first()  # 工单发起人
+                            approve_man_mail = Account.objects.filter(username=approve_man).first()  # 指派人，即审核人
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                             #
@@ -372,12 +374,13 @@ class execute(baseview.Approverpermissions):
                                 pass
                             else:
                                 try:
-                                    if mail_apply.email:
+                                    if approve_man_mail.email and apply_man_mail.email:
                                         mess_info = {
                                             'workid': c.work_id,
-                                            'to_user': c.username,
-                                            'approver': to_user,
-                                            'approve_man': mail_approver.email,
+                                            'apply_man': apply_man,
+                                            'approve_man': approve_man,
+                                            'db': c.basename,
+                                            'approve_man_addr': apply_man_mail.email,
                                             'run_sql': c.sql,
                                             'backup_sql': bak_sql,
                                             'addr': addr_ip,
@@ -386,14 +389,21 @@ class execute(baseview.Approverpermissions):
                                             'type': '执行成功',
                                             'backup': backup_status,
                                             'note': content.after,
-                                            'approver_mail': mail_approver.email,
                                             'cc_list': cc_list,
                                             'file': file_path}
-                                        put_mess = send_email.send_email(to_addr=mail_apply.email)  # 发功给申请人
+                                        mail_address = approve_man_mail.email + "," + apply_man_mail.email
+                                        print(mail_address)
+                                        put_mess = send_email.send_email(to_addr=mail_address)  # 发功给申请人
                                         put_mess.send_mail(mail_data=mess_info, type=3)
+                                    else:
+                                        ret_info = 'the mail address of apply_man or approve_man  is none'
+                                        print(ret_info)
+                                        CUSTOM_ERROR.error(ret_info)
+                                        return HttpResponse(ret_info)
                                 except Exception as e:
+                                    print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
-                                    ret_info = '工单执行成功!但是邮箱推送给工单发起人 %s失败,请查看错误日志排查错误.' %  (c.username)
+                                    ret_info = '工单执行成功!但是邮箱推送给工单审核人 %s失败,请查看错误日志排查错误.' %  (c.username)
 
                             # 删除执行人的token
                             try:

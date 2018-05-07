@@ -57,7 +57,7 @@
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseMylaimi()"  :enabled="this.validate_gen1">我的测试库</Button>-->
               <!--<Button type="default" icon="ios-redo" @click.native="ReChooseDB()"   style="margin-left: 10%" :enabled="this.validate_gen1">重新选择</Button>-->
           </FormItem>
-            <FormItem label="是否备份: ">
+            <FormItem label="是否备份: " prop="text">
               <RadioGroup v-model="formItem.backup">
                 <Radio label="1">是(默认)</Radio>
                 <Radio label="0">否</Radio>
@@ -66,8 +66,17 @@
             <FormItem label="工单说明:" prop="text">
               <Input type="textarea" :rows="6" v-model="formItem.text" placeholder="请输入"></Input>
             </FormItem>
+            <FormItem label="关联系统:" prop="system">
+              <Tooltip placement="top">
+                <Input type="textarea" :rows="1" v-model="formItem.system" placeholder="请输入"></Input>
+                <div slot="content">
+                  <p>点击选择邮件抄送人</p>
+                  <p><i>勾选选人</i></p>
+              </div>
+              </Tooltip>
 
-            <FormItem label="指定审核人:" prop="text" >
+            </FormItem>
+            <FormItem label="指定审核人:" prop="approve_man" >
               <Select v-model="formItem.approve_man" v-if="person==2" >
                 <Option v-for="i in this.approve_man" :value="i.username" :key="i.username">{{i.username}}</Option>
               </Select>
@@ -79,7 +88,7 @@
               </RadioGroup>
             </FormItem>
 
-            <FormItem label="邮件抄送人:" prop="text">
+            <FormItem label="邮件抄送人:" >
               <Tooltip placement="top">
               <Checkbox v-model="cc_mail"  >选择(请点击)</Checkbox><p></p>
                 <div slot="content">
@@ -209,6 +218,7 @@ export default {
         computer_room: '',
         connection_name: '',
         basename: '',
+        system: '',
         text: '',
         backup: '1',
         approve_man: '',
@@ -327,9 +337,27 @@ export default {
           message: '数据库名不得为空',
           trigger: 'change'
         }],
+        system: [{
+            required: true,
+            message: '关联系统不得为空',
+            trigger: 'blur'
+          },
+          {
+            type: 'string',
+            max: 50,
+            message: '最多50个字符，最多25个汉字(不含逗号分号)',
+            trigger: 'blur'
+          }
+        ],
+        approve_man: [{
+            required: true,
+            message: '请选择审核人',
+            trigger: 'blur'
+          }
+        ],
         text: [{
             required: true,
-            message: '说明不得为空',
+            message: '请填写工单说明',
             trigger: 'blur'
           },
           {

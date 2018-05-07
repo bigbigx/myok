@@ -206,6 +206,7 @@ class sqlorder(baseview.BaseView):
             type = request.data['type']
             run_type = request.data['run_type']
             cc_list = request.data['cc_list']
+            basename = data['basename']
             id = request.data['id']
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -287,6 +288,7 @@ class sqlorder(baseview.BaseView):
                             'approve_man': approve_man,
                             'token_pass': token,    # 定义审核通过URL 的token
                             'token_reject': token,  #定义审核驳回URL 的token
+                            'db': basename,
                             'note':content.before}
                         try:
                             put_mess = send_email.send_email(to_addr=approve_man_mail.email)

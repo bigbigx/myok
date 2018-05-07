@@ -66,6 +66,7 @@ class audit(baseview.Approverpermissions):
             type = request.data['type']
             data = request.GET.get('data')
             apply_man = request.GET.get('apply_man')
+            basename = request.GET.get('db')
             approve_man = data['approve_man']  # 审核人
             execute_man = 'dba'
             cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
@@ -150,6 +151,7 @@ class audit(baseview.Approverpermissions):
                                                 'run_sql':data.sql,
                                                 'backup_sql':data.backup_sql,
                                                 'rejected': text,
+                                                'db': basename,
                                                 'approve_man': approve_man,
                                                 'note': content.after}
                                             put_mess = send_email.send_email(to_addr=apply_man_mail.email)
@@ -202,7 +204,7 @@ class audit(baseview.Approverpermissions):
 
                             #############################################
                             SqlOrder.objects.filter(id=id).update(status=1)
-                            SqlOrder.objects.filter(work_id=workid).update(approve_time=cur_time)
+                            # SqlOrder.objects.filter(work_id=workid).update(approve_time=cur_time)
                             '''
                             通知消息
     
@@ -268,7 +270,9 @@ class audit(baseview.Approverpermissions):
                                             'run_sql':data.sql,
                                             'backup_sql':data.backup_sql,
                                             'token_pass':newtoken,
+                                            'db': basename,
                                             'approve_man':approve_man,
+                                            'apply_man': apply_man,
                                             'note': content.after}
                                         put_mess = send_email.send_email(to_addr=mail_execute_man.email)
                                         put_mess.send_mail(mail_data=mess_info,type=0)

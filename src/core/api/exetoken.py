@@ -38,6 +38,7 @@ class exetoken(baseview.AnyLogin):
                 type = int(request.GET.get('type'))
                 token = request.GET.get('mytoken')
                 workid = request.GET.get('workid')
+                basename = request.GET.get('db')
                 approve_man = request.GET.get('approve_man')
                 apply_man = request.GET.get('apply_man')
                 execute_man= 'dba'
@@ -49,8 +50,8 @@ class exetoken(baseview.AnyLogin):
                     text = "手工驳回，详情请联系执行人"
                     ret_info = ""
                     try:
-                        mail_approve_man = Account.objects.filter(username=approve_man).first()
-                        mail_execute_man = Account.objects.filter(username=execute_man).first()
+                        approve_man_mail = Account.objects.filter(username=approve_man).first()
+                        execute_man_mail = Account.objects.filter(username=execute_man).first()
                         # tag = globalpermissions.objects.filter(authorization='global').first()
 
                         try:
@@ -70,7 +71,7 @@ class exetoken(baseview.AnyLogin):
                                 'bundle_id',
                                 'text'
                             ).first()
-                            reject_remark = '快捷执行驳回，具体驳回原因请联系审核人: ' + mail_execute_man.email
+                            reject_remark = '快捷执行驳回，具体驳回原因请联系审核人: ' + execute_man_mail.email
                             title = '工单:' + _tmpData['work_id'] + '执行驳回通知'
                             msg_content = '工单详情是：' + _tmpData['text'] + '\n 驳回意见是： ' + text
                             Usermessage.objects.get_or_create(
@@ -104,16 +105,31 @@ class exetoken(baseview.AnyLogin):
                                 pass
                             else:
                                 try:
-                                    if mail_approve_man.email:
+                                    if approve_man_mail.email:
                                         mess_info = {
                                             'workid':_tmpData['work_id'],
-                                            'to_user':approve_man,
+                                            'approve_man':approve_man,
                                             'addr': addr_ip,
                                             'type': "执行驳回",
+                                            'db': basename,
                                             'text': data.text,
                                             'status':'run_back',
                                             'rejected': reject_remark}
-                                        put_mess = send_email.send_email(to_addr=mail_approve_man.email)
+                                        put_mess = send_email.send_email(to_addr=approve_man_mail.email)
+                                        put_mess.send_mail(mail_data=mess_info,type=4)
+
+
+                                    if execute_man_mail.email:
+                                        mess_info = {
+                                            'workid':_tmpData['work_id'],
+                                            'approve_man':approve_man,
+                                            'addr': addr_ip,
+                                            'type': "执行驳回",
+                                            'text': data.text,
+                                            'db': basename,
+                                            'status':'run_back',
+                                            'rejected': reject_remark}
+                                        put_mess = send_email.send_email(to_addr=execute_man_mail.email)
                                         put_mess.send_mail(mail_data=mess_info,type=4)
                                 except:
                                     ret_info = '<h1>工单执行驳回成功!但是邮箱推送失败,请查看错误日志排查错误.</h1>'
@@ -131,7 +147,6 @@ class exetoken(baseview.AnyLogin):
                         print("===============++++")
                         ret_info=""
                         try:
-                            approve_man_mail = Account.objects.filter(username=approve_man).first()
                             #tag = globalpermissions.objects.filter(authorization='global').first()
                             try:
                                 conn = conn_sqlite.queryByToken(token)
@@ -219,8 +234,6 @@ class exetoken(baseview.AnyLogin):
                                             SqlOrder.objects.filter(work_id=workid).update(status=4)
 
 
-
-
                                 except Exception as e:
                                     print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -306,7 +319,7 @@ class exetoken(baseview.AnyLogin):
                                         pass
                                     else:
                                         try:
-                                            if approve_man_mail.email: # 发送执行成功的邮件给到审核人
+                                            if approve_man_mail.email and apply_man_mail.email: # 发送执行成功的邮件给到审核人和发起人
                                                 mess_info = {
                                                     'workid': c.work_id,
                                                     'approve_man': approve_man,
@@ -314,6 +327,7 @@ class exetoken(baseview.AnyLogin):
                                                     'run_sql': c.sql,
                                                     'backup_sql': bak_sql,
                                                     'addr': addr_ip,
+                                                    'db': c.basename,
                                                     'text': c.text,
                                                     'status': 'run',
                                                     'type': '执行成功',
@@ -321,28 +335,17 @@ class exetoken(baseview.AnyLogin):
                                                     'note': content.after,
                                                     'cc_list': cc_list,
                                                     'file': file_path}
-                                                put_mess = send_email.send_email(to_addr=approve_man_mail.email)
+                                                mail_address = approve_man_mail.email + "," +apply_man_mail.email
+                                                print(mail_address)
+                                                put_mess = send_email.send_email(to_addr=mail_address)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)
                                                 # put_mess1 = send_email.send_email(to_addr=mail_approver.email)
                                                 # put_mess1.send_mail(mail_data=mess_info, type=3)
-
-                                            if apply_man_mail.email: # 发送执行成功的邮件给到工单发起人
-                                                mess_info = {
-                                                    'workid': c.work_id,
-                                                    'approve_man': approve_man,
-                                                    'apply_man': apply_man,
-                                                    'run_sql': c.sql,
-                                                    'backup_sql': bak_sql,
-                                                    'addr': addr_ip,
-                                                    'text': c.text,
-                                                    'status': 'run',
-                                                    'type': '执行成功',
-                                                    'backup': backup_status,
-                                                    'note': content.after,
-                                                    'cc_list': cc_list,
-                                                    'file': file_path}
-                                                put_mess = send_email.send_email(to_addr=apply_man_mail.email)
-                                                put_mess.send_mail(mail_data=mess_info, type=3)
+                                            else:
+                                                ret_info = 'the mail address of apply_man or approve_man  is none'
+                                                print(ret_info)
+                                                CUSTOM_ERROR.error(ret_info)
+                                                return HttpResponse(ret_info)
 
                                         except Exception as e:
                                             print(e)

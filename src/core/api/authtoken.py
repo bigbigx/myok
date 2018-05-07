@@ -29,6 +29,7 @@ class authtoken(baseview.AnyLogin):
             type = int(request.GET.get('type'))
             apply_man = request.GET.get('apply_man') # 发起人
             approve_man = request.GET.get('approve_man') # 审核人
+            basename = request.GET.get('db')
             execute_man = 'dba'  #执行人
             execute_group= 'executer'
             cur_time = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S.%f')
@@ -104,6 +105,7 @@ class authtoken(baseview.AnyLogin):
                                             'backup_sql': data.backup_sql,
                                             'token_pass': token,
                                             'rejected': reject_remark,
+                                            'db': basename,
                                             'approve_man': approve_man,
                                             'note': content.after}
                                         put_mess = send_email.send_email(to_addr=mail_apply_man.email)
@@ -127,7 +129,6 @@ class authtoken(baseview.AnyLogin):
                         token = request.GET.get('mytoken')
                         newtoken = util.generateTokens(32)
                         workid = request.GET.get('workid')
-                        print("===============++++")
                         ret_info=""
                         try:
                             #tag = globalpermissions.objects.filter(authorization='global').first()
@@ -142,7 +143,7 @@ class authtoken(baseview.AnyLogin):
                             if conn:  #如果存在该token，下一步就是直接执行，执行完后还要删除此条数据库token 数据
                                 # 执行审核通过的业务
                                 SqlOrder.objects.filter(work_id=workid).update(status=1)
-                                SqlOrder.objects.filter(work_id=workid).update(approve_time=cur_time)
+                                # SqlOrder.objects.filter(work_id=workid).update(approve_time=cur_time)
                                 c = SqlOrder.objects.filter(work_id=workid).first()
                                 d = Account.objects.filter(group=execute_group).first()
                                 content = DatabaseList.objects.filter(id=c.bundle_id).first()
@@ -201,7 +202,9 @@ class authtoken(baseview.AnyLogin):
                                                 'run_sql': data.sql,
                                                 'backup_sql': data.backup_sql,
                                                 'token_pass': newtoken,
-                                                'myself': approve_man,
+                                                'db': basename,
+                                                'approve_man': approve_man,
+                                                'apply_man': apply_man,
                                                 'note': content.after}
                                             put_mess = send_email.send_email(to_addr=execute_man_mail.email)
                                             put_mess.send_mail(mail_data=mess_info, type=0)

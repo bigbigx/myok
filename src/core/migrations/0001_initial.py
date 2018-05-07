@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
                 ('department', models.CharField(max_length=40)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
+                ('workgroup_id',models.CharField(max_length=30, blank=True)),
             ],
             options={
                 'verbose_name': 'user',
@@ -94,9 +95,15 @@ class Migration(migrations.Migration):
                 ('bundle_id', models.IntegerField(db_index=True, null=True)),
                 ('date', models.CharField(blank=True, max_length=100)),
                 ('basename', models.CharField(blank=True, max_length=50)),
+                ('base_id',models.IntegerField(blank=True,null=True)),  # 数据库的编号
                 ('sql', models.TextField(blank=True)),
                 ('text', models.CharField(max_length=100)),
                 ('assigned', models.CharField(blank=True, max_length=50)),
+                ('backup_sql',models.TextField(blank=True, null=True)),  # s备份ql语句
+                ('reject', models.TextField(blank=True, null=True)),  # 驳回说明
+                ('cc_list',models.CharField(max_length=500, blank=True, null=True)),  # 邮件抄送人
+                ('run_type',models.IntegerField(default=0)),  # 运行类型
+                # ('text', models.CharField(max_length=300)),
             ],
         ),
         migrations.CreateModel(
