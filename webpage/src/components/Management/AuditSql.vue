@@ -6,20 +6,20 @@
 <div>
   <Row>
     <Card>
-      <p slot="title">
-        <Icon type="person"></Icon>
+      <p style="height: 30px;" slot="title">
+        <Icon size="20" type="person"></Icon>
         审核工单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_2">刷新</Button>
+        <Button  type="primary" shape="circle" style="margin-left: 80%" @click="_Refresh_2">刷新</Button>
       </p>
       <Row>
         <Col span="24">
-        <Poptip
-          confirm
-          title="您确认删除这些工单信息吗?"
-          @on-ok="delrecordData"
-          >
-        <Button type="primary" icon="trash-a"style="margin-left: -1%">删除记录</Button>
-        </Poptip>
+        <!--<Poptip-->
+          <!--confirm-->
+          <!--title="您确认删除这些工单信息吗?"-->
+          <!--@on-ok="delrecordData"-->
+          <!--&gt;-->
+        <!--<Button type="primary" icon="trash-a"style="margin-left: -1%">删除记录</Button>-->
+        <!--</Poptip>-->
         <Table border :columns="columns6" :data="tmp" stripe ref="selection" @on-selection-change="delrecordList"></Table>
         <br>
         <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="20" ref="page"></Page>
@@ -38,6 +38,15 @@
       </FormItem>
       <FormItem label="工单编号:">
         <span>{{ formitem.work_id }}</span>
+      </FormItem>
+      <!--<FormItem label="应用系统">-->
+        <!--<span>{{ formitem.system}}</span>-->
+      <!--</FormItem>-->
+      <FormItem label="工单说明:">
+        <span>{{ formitem.text }}</span>
+      </FormItem>
+      <FormItem label="影响应用系统:">
+        <span>{{ formitem.affectd_system }}</span>
       </FormItem>
       <FormItem label="提交时间:">
         <span>{{ formitem.date }}</span>
@@ -63,6 +72,14 @@
       <FormItem label="执行SQL:">
         <p v-for="i in sql">{{ i }}</p>
       </FormItem>
+      <!--<FormItem label="审核同意备注:">-->
+        <!--<Tooltip placement="top">-->
+        <!--<input  type="textarea" :rows="3" v-model="formitem.pass_remark" placeholder="同意发布"></input>-->
+        <!--<div slot="content">-->
+                  <!--<p>请填写审核同意备注</p>-->
+        <!--</div>-->
+        <!--</Tooltip>-->
+      <!--</FormItem>-->
     </Form>
     <div slot="footer">
       <Button @click="cancel_button">取消</Button>
@@ -78,6 +95,15 @@
     </p>
     <Input v-model="reject.textarea" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写驳回说明"></Input>
   </Modal>
+
+    <Modal v-model="pass.pass" @on-ok="passtext">
+    <p slot="header" style="color:#f60;font-size: 16px">
+      <Icon type="information-circled"></Icon>
+      <span>SQL工单同意备注</span>
+    </p>
+    <Input v-model="pass.textarea" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写同意备注"></Input>
+  </Modal>
+
 </div>
 </template>
 <script>
@@ -89,24 +115,31 @@ export default {
   data () {
     return {
       columns6: [
+        // {
+        //   type: 'selection',
+        //   width: 60,
+        //   align: 'center'
+        // },
         {
-          type: 'selection',
-          width: 60,
-          align: 'center'
-        },
-        {
-          title: '工单编号:',
+          title: '工单编号',
           key: 'work_id',
           sortable: true,
           sortType: 'desc',
+          width: 160
+        },
+        {
+          title: '工单标题',
+          key: 'text',
           width: 200
         },
         {
-          title: '工单标题:',
-          key: 'text'
+          title: '应用系统',
+          key: 'affectd_system',
+          sortable: true,
+          width: 130
         },
         {
-          title: '提交时间:',
+          title: '提交时间',
           key: 'date',
           sortable: true,
           width: 150
@@ -115,13 +148,13 @@ export default {
           title: '提交人',
           key: 'username',
           sortable: true,
-          width: 150
+          width: 100
         },
         {
-          title: '指派审核人',
+          title: '审核人',
           key: 'assigned',
           sortable: true,
-          width: 150
+          width: 100
         },
         {
           title: '状态',
@@ -200,19 +233,31 @@ export default {
         },
         {
           title: '审核备注',
-          key: 'reject'
+          key: 'reject',
+          width: 180,
+        },
+        {
+          title: '审核时间',
+          key: 'approvetime',
+          width: 150,
+        },
+        {
+          title: '执行时间',
+          key: 'runtime',
+          width: 150,
         },
         {
           title: '操作',
           key: 'action',
           width: 100,
           align: 'center',
+          fixed: 'right',
           render: (h, params) => {
             return h('div', [
               h('Button', {
                 props: {
                   size: 'small',
-                  type: 'text'
+                  type: 'primary'
                 },
                 on: {
                   click: () => {
@@ -233,6 +278,9 @@ export default {
         username: '',
         dataadd: '',
         database: '',
+        affectd_system: '',
+        // pass_remark: '',
+        text: '',
         att: '',
         id: null
       },
@@ -273,7 +321,11 @@ export default {
       dataId: [],
       reject: {
         reje: false,
-        textarea: ''
+        textarea: '驳回'
+      },
+      pass: {
+        pass: false,
+        textarea: '同意'
       },
       tmp: [],
       pagenumber: 1,
@@ -306,13 +358,14 @@ export default {
     cancel_button () {
       this.modal2 = false
     },
-    put_button () {
+    passtext () {
       this.modal2 = false
       this.tmp[this.togoing].status = 5
       axios.put(`${util.url}/audit_sql`, {
           'type': 1,
-          'approver': Cookies.get('user'),
+          'approve_man': Cookies.get('user'),
           'apply_man': this.formitem.username,
+          'pass_remark': this.pass.textarea,
           'id': this.formitem.id
         })
         .then(res => {
@@ -331,12 +384,17 @@ export default {
       this.modal2 = false
       this.reject.reje = true
     },
+    put_button () {
+      this.modal2 = false
+      this.pass.pass = true
+    },
     rejecttext () {
       axios.put(`${util.url}/audit_sql`, {
           'type': 0,
-          'from_user': Cookies.get('user'),
+          'approve_man': Cookies.get('user'),
           'text': this.reject.textarea,
-          'to_user': this.formitem.username,
+          'apply_man': this.formitem.username,
+          'basename': this.formItem.basename,
           'id': this.formitem.id
         })
         .then(res => {

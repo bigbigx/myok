@@ -81,12 +81,12 @@ class execute(baseview.Approverpermissions):
             approve_man = request.data['approve_man']
             apply_man = request.data['apply_man']
             execute_man = 'dba'
+            cur_time_run = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         else:
             if type == 0:  # 执行驳回
                 try:
-
                     text = request.data['text']
                     id = request.data['id']
                 except KeyError as e:
@@ -298,6 +298,7 @@ class execute(baseview.Approverpermissions):
                                     base=c.basename,
                                     workid=c.work_id,
                                     person=c.username,
+                                    runtime=cur_time_run,
                                     # reviewer=c.assigned,
                                     reviewer=execute_man,
                                     affectrow='',
@@ -379,21 +380,27 @@ class execute(baseview.Approverpermissions):
                                             'workid': c.work_id,
                                             'apply_man': apply_man,
                                             'approve_man': approve_man,
+                                            'execute_man': execute_man,
+                                            'apply_time': c.date,
+                                            'executetime': cur_time_run,
                                             'db': c.basename,
                                             'approve_man_addr': apply_man_mail.email,
                                             'run_sql': c.sql,
+                                            'approvetime': c.approvetime,
                                             'backup_sql': bak_sql,
                                             'addr': addr_ip,
                                             'text': c.text,
+                                            'system': c.affectd_system,
                                             'status': 'run',
                                             'type': '执行成功',
                                             'backup': backup_status,
                                             'note': content.after,
                                             'cc_list': cc_list,
                                             'file': file_path}
-                                        mail_address = approve_man_mail.email + "," + apply_man_mail.email
+                                        mail_address = approve_man_mail.email + ";" + apply_man_mail.email
+                                        print("execute sql successlly")
                                         print(mail_address)
-                                        put_mess = send_email.send_email(to_addr=mail_address)  # 发功给申请人
+                                        put_mess = send_email.send_email(to_addr=mail_address)  # 发送给申请人
                                         put_mess.send_mail(mail_data=mess_info, type=3)
                                     else:
                                         ret_info = 'the mail address of apply_man or approve_man  is none'
@@ -453,3 +460,5 @@ class execute(baseview.Approverpermissions):
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return Response({'status': '500'})
+
+

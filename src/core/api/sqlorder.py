@@ -122,6 +122,7 @@ class sqlorder(baseview.BaseView):
                            res_bak = test.Check(sql=sql_bak)
                         return Response({'result_ddl': res_ddl,'result_bak': res_bak, 'status': 200})
                 except Exception as e:
+                    print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return Response({'status': '500'})
 
@@ -203,11 +204,19 @@ class sqlorder(baseview.BaseView):
             tmp_bak = json.loads(request.data['backup_sql'])
             apply_man = request.data['apply_man']
             approve_man=data['approve_man']
+            system = data['system']
             type = request.data['type']
             run_type = request.data['run_type']
-            cc_list = request.data['cc_list']
             basename = data['basename']
             id = request.data['id']
+            cc_list = request.data['cc_list']
+            # try:
+            #     cc_str = []
+            #     for item in cc_list:
+            #         cc_list.append(item)
+            #     print(cc_str)
+            # except Exception as e:
+            #     print(e)
         except KeyError as e:
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             return HttpResponse(status=500)
@@ -240,9 +249,11 @@ class sqlorder(baseview.BaseView):
                     bundle_id=id,
                     assigned=data['approve_man'],
                     backup_sql=sql_2,
+                    reject="",
                     base_id=id,
                     run_type=run_type,
-                    cc_list=cc_list
+                    cc_list=cc_list,
+                    affectd_system=system
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
@@ -280,6 +291,7 @@ class sqlorder(baseview.BaseView):
                             'apply_man': apply_man,
                             'addr': addr_ip,
                             'text': data['text'],
+                            'system': system,
                             'type': "成功发起",
                             'run_sql':sql_1,
                             'backup_sql':sql_2,
@@ -299,8 +311,8 @@ class sqlorder(baseview.BaseView):
                             ret_info = '工单提交成功!但是邮箱推送失败,请查看错误日志排查错误.'
                             return HttpResponse(ret_info)
 
-
-                return Response(ret_info)
+                cc_mail_list = util.readfile()
+                return Response({"ret":ret_info,"cc_mail_list": cc_mail_list})
             except Exception as e:
                 print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

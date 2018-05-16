@@ -42,6 +42,7 @@ class exetoken(baseview.AnyLogin):
                 approve_man = request.GET.get('approve_man')
                 apply_man = request.GET.get('apply_man')
                 execute_man= 'dba'
+                cur_time_run = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
@@ -143,8 +144,6 @@ class exetoken(baseview.AnyLogin):
                         return HttpResponse(ret_info)
 
                 elif type == 1:  #   执行，发送信息和邮件给到工单发起人和审核人和抄送人员
-
-                        print("===============++++")
                         ret_info=""
                         try:
                             #tag = globalpermissions.objects.filter(authorization='global').first()
@@ -191,7 +190,6 @@ class exetoken(baseview.AnyLogin):
                                 except Exception as e:
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     return HttpResponse(status=500)  # 备份失败退出
-
                                 try:
                                     SqlOrder.objects.filter(work_id=workid).update(status=5)  # 执行中
 
@@ -247,6 +245,7 @@ class exetoken(baseview.AnyLogin):
 
                                     # 同时修改时间戳
                                     #cur_time = int(time.time())
+                                    SqlOrder.objects.filter(work_id=workid).update(runtime=cur_time_run)  # 修改sqlorder的运行时间
                                     '''
                                         遍历返回结果插入到执行记录表中
                                     '''
@@ -328,6 +327,11 @@ class exetoken(baseview.AnyLogin):
                                                     'backup_sql': bak_sql,
                                                     'addr': addr_ip,
                                                     'db': c.basename,
+                                                    'approvetime': c.approvetime,
+                                                    'executetime': cur_time_run,
+                                                    'execute_man': execute_man,
+                                                    'apply_time': c.date,
+                                                    'system': c.affectd_system,
                                                     'text': c.text,
                                                     'status': 'run',
                                                     'type': '执行成功',
@@ -335,7 +339,7 @@ class exetoken(baseview.AnyLogin):
                                                     'note': content.after,
                                                     'cc_list': cc_list,
                                                     'file': file_path}
-                                                mail_address = approve_man_mail.email + "," +apply_man_mail.email
+                                                mail_address = approve_man_mail.email + ";" +apply_man_mail.email
                                                 print(mail_address)
                                                 put_mess = send_email.send_email(to_addr=mail_address)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)

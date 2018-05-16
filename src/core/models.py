@@ -13,13 +13,13 @@ class Account(AbstractUser):
     #group = models.CharField(max_length=40)   #权限组 guest/admin
     group = models.CharField(max_length=40)   #权限组 guest/approver/executer/admin
     department = models.CharField(max_length=40) #部门
-    workgroup_id = models.CharField(max_length=40,blank=True)  # 工作分组，跟group属性不一样，group是角色分组
+    # workgroup_id = models.CharField(max_length=50, blank=True)  # 工作分组，跟group属性不一样，group是角色分组
 
-class AccountGroup(models.Model):
-    GroupName = models.CharField(max_length=80)
-    GroupID = models.CharField(max_length=40)
-    PermissonID= models.CharField(max_length=300)  # 权限编号，可以多个，以逗号分割
-    status = models.IntegerField(blank=True) #  0 -- 禁用  1 --启用
+# class AccountGroup(models.Model):
+#     GroupName = models.CharField(max_length=80)
+#     GroupID = models.CharField(max_length=40)
+#     PermissonID= models.CharField(max_length=300)  # 权限编号，可以多个，以逗号分割
+#     status = models.IntegerField(blank=True) #  0 -- 禁用  1 --启用
 
 class SqlDictionary(models.Model):
     '''
@@ -178,9 +178,14 @@ class SqlOrder(models.Model):
     base_id = models.IntegerField(blank=True,null=True)  # 数据库的编号
     sql = models.TextField(blank=True) #sql语句
     text = models.CharField(max_length=300) # 工单备注
+    affectd_system = models.CharField(max_length=300,blank=True) # 被影响到的应用系统
     assigned = models.CharField(max_length=50, blank=True)# 工单审核人
+    execut_man = models.CharField(max_length=50, blank=True)# 工单执行人
+    approvetime = models.CharField(max_length=50, blank=True)# 工单审核时间
+    runtime = models.CharField(max_length=50, blank=True)# 工单执行时间
     backup_sql=models.TextField(blank=True,null=True) #s备份ql语句
     reject = models.TextField(blank=True,null=True) #驳回说明
+    pass_remark = models.TextField(blank=True,null=True) #审核同意备注
     cc_list = models.CharField(max_length=500, blank=True,null=True)# 邮件抄送人
     run_type = models.IntegerField(default=0)# 运行类型
 

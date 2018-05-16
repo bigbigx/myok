@@ -47,7 +47,9 @@
                   <RadioGroup v-model="formItem.quick_choose">
                               <Radio label="laimi_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi','port':'32112'})" ><Icon type="social-android"></Icon><span>线上laimi库</span></Radio>
                               <Radio label="activity_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_activity','port':'32021'})"><Icon type="social-android"></Icon><span>线上activity库</span></Radio>
-                              <Radio label="old_salesman_online"  @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_salesman','port':'23764'})"><Icon type="social-android"></Icon><span>线上老供应商salesman库</span></Radio>
+                              <Radio label="erp_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_erp','port':'32453'})"><Icon type="social-android"></Icon><span>线上erp库</span></Radio>
+                              <Radio label="new_salesman_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'salesman','port':'13306'})"><Icon type="social-android"></Icon><span>线上新salesman库</span></Radio>
+                              <!--<Radio label="old_salesman_online"  @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_salesman','port':'23764'})"><Icon type="social-android"></Icon><span>线上老供应商salesman库</span></Radio>-->
                               <Radio label="laimi_test" @click.native="ChooseDatabase({'url':'101.236.45.42','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>美团云测试库</span></Radio>
                               <Radio label="my_laimi_test" @click.native="ChooseDatabase({'url':'101.236.41.66 ','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>我的测试库</span></Radio>
                               <!--<Radio label="custom" @click.native="ReChooseDB()"><Icon type="social-android"></Icon><span>自定义选库</span></Radio>-->
@@ -57,7 +59,7 @@
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseMylaimi()"  :enabled="this.validate_gen1">我的测试库</Button>-->
               <!--<Button type="default" icon="ios-redo" @click.native="ReChooseDB()"   style="margin-left: 10%" :enabled="this.validate_gen1">重新选择</Button>-->
           </FormItem>
-            <FormItem label="是否备份: " prop="text">
+            <FormItem label="是否备份: " prop="backup">
               <RadioGroup v-model="formItem.backup">
                 <Radio label="1">是(默认)</Radio>
                 <Radio label="0">否</Radio>
@@ -66,15 +68,14 @@
             <FormItem label="工单说明:" prop="text">
               <Input type="textarea" :rows="6" v-model="formItem.text" placeholder="请输入"></Input>
             </FormItem>
-            <FormItem label="关联系统:" prop="system">
+            <FormItem label="应用系统名称:" prop="system">
               <Tooltip placement="top">
                 <Input type="textarea" :rows="1" v-model="formItem.system" placeholder="请输入"></Input>
                 <div slot="content">
-                  <p>点击选择邮件抄送人</p>
-                  <p><i>勾选选人</i></p>
+                  <p>请填写受影响的应用系统内容</p>
+                  <p><i>如erp、tms、wms、salesman等系统</i></p>
               </div>
               </Tooltip>
-
             </FormItem>
             <FormItem label="指定审核人:" prop="approve_man" >
               <Select v-model="formItem.approve_man" v-if="person==2" >
@@ -82,9 +83,19 @@
               </Select>
                 <Input type="text"  v-model="formItem.approve_man"  disabled  v-if="person==0 || person==1"  ></Input>
                <RadioGroup v-model="person" >
-                 <Radio label=0 @click.native="chooseapprover(0)"><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
-                 <Radio label=1 @click.native="chooseapprover(1)"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
-                 <Radio label=2 @click.native="chooseapprover(2)"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
+                <Tooltip placement="top">
+                <div slot="content">
+                  <p>将提交给刘艳审核</p>
+                 </div>
+                 <Radio label="0" @click.native="chooseapprover('0')"><Icon type="social-apple"></Icon><span>常规审核人</span></Radio>
+                 </Tooltip>
+                 <Tooltip placement="top">
+                <div slot="content">
+                  <p>将紧急提交江理彬执行,不经过paul审核</p>
+                 </div>
+                 <Radio label="1" @click.native="chooseapprover('1')"><Icon type="social-apple"></Icon><span>紧急审核人</span></Radio>
+                 </Tooltip>
+                   <Radio label="2" @click.native="chooseapprover('2')"><Icon type="social-apple"></Icon><span>手工选人</span></Radio>
               </RadioGroup>
             </FormItem>
 
@@ -221,6 +232,7 @@ export default {
         system: '',
         text: '',
         backup: '1',
+        // approve_man: 'liuyan',
         approve_man: '',
         cc_mail_list: [],
         default_ccmail: [],
@@ -339,7 +351,7 @@ export default {
         }],
         system: [{
             required: true,
-            message: '关联系统不得为空',
+            message: '受影响的应用系统不得为空',
             trigger: 'blur'
           },
           {
@@ -352,6 +364,12 @@ export default {
         approve_man: [{
             required: true,
             message: '请选择审核人',
+            trigger: 'blur'
+          }
+        ],
+        backup: [{
+            required: true,
+            message: '请选择是否备份',
             trigger: 'blur'
           }
         ],
@@ -373,7 +391,7 @@ export default {
       flag: false,
       single: false,
       cc_mail: false,
-      person: 0,
+      person: "2",
       validate_result: false,
       validate_cc_mail: false,
       choose_db: false,
@@ -384,10 +402,9 @@ export default {
   },
   methods: {
     chooseapprover (val) {
-
-     if (val===0) {
+     if (val==='0') {
         this.formItem.approve_man = "liuyan";
-     } else if (val===1) {
+     } else if (val==='1') {
        this.formItem.approve_man = 'paul';
      } else {
        this.formItem.approve_man='';
@@ -695,11 +712,17 @@ export default {
               .then(res => {
                 this.$Notice.success({
                   title: '成功',
-                  desc: res.data
+                  desc: res.data.ret
                 })
                 // this.validate_gen = !this.validate_gen
                 this.validate_gen = true
+                console.log('jianglb', res.data)
+                this.cc_address_list = res.data.cc_address_list
                 this.ClearForm()
+                this.person = "2"
+                this.cc_mail = false
+                this.formItem.quick_choose = ""
+                this.choose_db = false
               })
               .catch(error => {
                 util.ajanxerrorcode(this, error)
@@ -721,12 +744,14 @@ export default {
       this.social=[];
       this.Testresults_backup_explain='';
       this.Testresults_explain='';
+      // this.formItem.system='';
+      // this.formItem.text='';
     }
   },
   mounted () {
     axios.put(`${util.url}/workorder/connection`)
       .then(res => {
-        console.log('ddddd', res.data)
+        // console.log('ddddd', res.data)
         this.item = res.data['connection'];
         this.approve_man = res.data['person'];
         this.cc_mail_list = res.data['cc_mail_list'];

@@ -6,20 +6,20 @@
 <div>
   <Row>
     <Card>
-      <p slot="title">
-        <Icon type="person"></Icon>
+      <p style="height: 30px;" slot="title">
+        <Icon size="20" type="person"></Icon>
         执行工单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_3">刷新</Button>
+        <Button  type="primary" shape="circle" style="margin-left: 80%" @click="_Refresh_3">刷新</Button>
       </p>
       <Row>
         <Col span="24">
-        <Poptip
-          confirm
-          title="您确认删除这些工单信息吗?"
-          @on-ok="delrecordData"
-          >
-        <Button type="text" style="margin-left: -1%">删除记录</Button>
-        </Poptip>
+        <!--<Poptip-->
+          <!--confirm-->
+          <!--title="您确认删除这些工单信息吗?"-->
+          <!--@on-ok="delrecordData"-->
+          <!--&gt;-->
+        <!--<Button type="text" style="margin-left: -1%">删除记录</Button>-->
+        <!--</Poptip>-->
         <Table border :columns="columns6" :data="tmp" stripe ref="selection" @on-selection-change="delrecordList"></Table>
         <br>
         <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="20" ref="page"></Page>
@@ -36,11 +36,14 @@
       <FormItem label="id:">
         <span>{{ formitem.id }}</span>
       </FormItem>
-      <FormItem label="工单编号">
+      <FormItem label="工单编号:">
         <span>{{ formitem.work_id }}</span>
       </FormItem>
-      <FormItem label="工单说明">
+      <FormItem label="工单说明:">
         <span>{{ formitem.text }}</span>
+      </FormItem>
+      <FormItem label="影响应用系统:">
+        <span>{{ formitem.affectd_system }}</span>
       </FormItem>
       <FormItem label="提交时间:">
         <span>{{ formitem.date }}</span>
@@ -48,11 +51,11 @@
       <FormItem label="提交人:">
         <span>{{ formitem.username }}</span>
       </FormItem>
-      <FormItem label="审核时间:">
-        <span>{{ formitem.approve_time }}</span>
-      </FormItem>
       <FormItem label="审核人:">
         <span>{{ formitem.assigned }}</span>
+      </FormItem>
+      <FormItem label="审核时间:">
+        <span>{{ formitem.approvetime }}</span>
       </FormItem>
       <FormItem label="机房:">
         <span>{{ formitem.computer_room }}</span>
@@ -98,22 +101,28 @@ export default {
   data () {
     return {
       columns6: [
-        {
-          type: 'selection',
-          width: 60,
-          align: 'center'
-        },
+        // {
+        //   type: 'selection',
+        //   width: 60,
+        //   align: 'center'
+        // },
         {
           title: '工单编号:',
           key: 'work_id',
           sortable: true,
           sortType: 'desc',
-          width: 150
+          width: 160
         },
         {
           title: '工单标题:',
           key: 'text',
           width: 200
+        },
+        {
+          title: '应用系统',
+          key: 'affectd_system',
+          sortable: true,
+          width: 130
         },
         {
           title: '提交时间:',
@@ -124,13 +133,6 @@ export default {
         {
           title: '提交人',
           key: 'username',
-          sortable: true,
-          width: 150
-        },
-
-        {
-          title: '审核时间:',
-          key: 'approve_time',
           sortable: true,
           width: 150
         },
@@ -222,20 +224,27 @@ export default {
           }
         },
         {
+          title: '审核时间',
+          key: 'approvetime',
+          width: 150,
+        },
+        {
           title: '审核备注',
-          key: 'action'
+          key: 'reject',
+          width: 180,
         },
         {
           title: '操作',
           key: 'action',
           width: 100,
           align: 'center',
+          fixed: 'right',
           render: (h, params) => {
             return h('div', [
               h('Button', {
                 props: {
                   size: 'small',
-                  type: 'text'
+                  type: 'primary'
                 },
                 on: {
                   click: () => {
@@ -251,14 +260,15 @@ export default {
       sql: null,
       backup_sql: null,
       formitem: {
-        workid: '',
+        work_id: '',
         date: '',
         username: '',
         dataadd: '',
         database: '',
+        affectd_system: '',
         att: '',
         assigned: '',
-        approve_time: '',
+        approvetime: '',
         id: null
       },
       summit: false,
@@ -339,8 +349,9 @@ export default {
       this.tmp[this.togoing].status = 5
       axios.put(`${util.url}/execute_sql`, {
           'type': 1,
-          'from_user': Cookies.get('user'),
-          'to_user': this.formitem.assigned,
+          'apply_man': this.formitem.username,
+          'approve_man': this.formitem.assigned,
+          'db': this.formitem.basename,
           'id': this.formitem.id
         })
         .then(res => {

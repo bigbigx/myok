@@ -48,8 +48,10 @@ class addressing(baseview.BaseView):
                     WHERE core_sqlorder.username = '%s'ORDER BY core_sqlorder.id DESC "
                     % username)[start:end]
                 data = util.ser(info)
+                print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
+                print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
 

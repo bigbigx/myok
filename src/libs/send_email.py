@@ -32,18 +32,21 @@ class send_email(object):
         msg = MIMEMultipart('alternative')
         msg['From'] = self._format_addr('蜜罐管理员 <%s>' % from_addr)
 
-
         # msg['Subject'] = Header('蜜罐运维-工单消息推送', 'utf-8').encode()
 
         if type == 0:  # 审核同意，同意后邮件只发送到工单执行人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
-                   '<br><p>工单发起人: %s</p>' \
+                   '<br><p>工单申请人: %s</p>' \
+                   '<br><p>工单申请时间: %s</p>' \
+                   '<br><p>工单审核人: %s</p>' \
+                   '<br><p>工单审核时间: %s</p>' \
                    '<br><p>数据库: %s</p>' \
-                   '<br><p>执行SQL: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
-                   '<br><p>状态: 审核通过 </p>' \
-                   '<br><p>备注: %s</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>受影响的应用系统: %s</p>' \
+                   '<br><p>审核状态: 审核通过 </p>' \
+                   '<br><p>审核说明: %s </p>' \
                    '<br><p>登录平台: <a href=%s  target="_blank">点击登录</a></p><p></p>' \
                    '<a href="%s/api/v1/exe_token?type=1&apply_man=%s&approve_man=%s&workid=%s&mytoken=%s">执行SQL</a> ' \
                    '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ' \
@@ -53,10 +56,14 @@ class send_email(object):
                        mail_data['text'],
                        mail_data['workid'],
                        mail_data['apply_man'],
+                       mail_data['apply_time'],
+                       mail_data['approve_man'],
+                       mail_data['approvetime'],
                        mail_data['db'],
-                       mail_data['run_sql'],
                        mail_data['backup_sql'],
-                       mail_data['note'],
+                       mail_data['run_sql'],
+                       mail_data['system'],
+                       mail_data['pass_remark'],
                        login_url,
                        login_url,
                        mail_data['apply_man'],
@@ -79,22 +86,48 @@ class send_email(object):
         elif type == 3:  # 执行成功，邮件发送到工单发起人和工单审核人
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
-                   '<br><p>工单发起人: %s</p>' \
+                   '<br><p>工单申请人: %s</p>' \
+                   '<br><p>工单申请时间: %s</p>' \
+                   '<br><p>工单审核人: %s</p>' \
+                   '<br><p>工单审核时间: %s</p>' \
+                   '<br><p>工单执行人: %s</p>' \
+                   '<br><p>工单执行时间: %s</p>' \
                    '<br><p>数据库: %s</p>' \
-                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>受影响的应用系统: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>状态: SQL执行完成 </p>' \
+                   '<br><p>说明: 有备份SQL语句,请查看附件excel,执行顺序和附件时间顺序一致，请按顺序编号下载备份数据 </p>' \
                    '</body></html>' % (
                        mail_data['text'],
                        mail_data['workid'],
                        mail_data['apply_man'],
+                       mail_data['apply_time'],
+                       mail_data['approve_man'],
+                       mail_data['approvetime'],
+                       mail_data['execute_man'],
+                       mail_data['executetime'],
                        mail_data['db'],
+                       mail_data['system'],
                        mail_data['run_sql'],
-                       mail_data['backup_sql'])
+                       mail_data['backup_sql']
+                       )
             cc_list = mail_data['cc_list']
-            # approver_mail = mail_data['approve_man']
-            cc_address_list = util.myok(cc_list)
+            print(cc_list)
+            cc_address_list = []
+            receive_man = []
+            if cc_list == []:
+                receive_man = [self.to_addr]  # to and cc
+                print(receive_man)
+            else:
+                cc_address_list = util.myok(cc_list)
+                receive_man = [self.to_addr] + cc_address_list
+                print(receive_man)
+
+                # approver_mail = mail_data['approve_man']
+            # cc_address_list = util.myok(cc_list)
             msg['To'] = self._format_addr('Dear 用户 <%s>' % (self.to_addr))
-            msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_list))
+            msg['Cc'] = self._format_addr('Dear 用户 <%s>' % ','.join(cc_address_list))
             msg['Subject'] = Header('蜜罐工单状态---SQL执行完成', 'utf-8').encode()
             contents = MIMEText(text, 'html', 'utf-8')
             for i in mail_data['file']:
@@ -109,12 +142,9 @@ class send_email(object):
             server = smtplib.SMTP_SSL(smtp_server, port=465)
             server.set_debuglevel(1)
             server.login(from_addr, password)
-            if cc_address_list==['']:
-                print(1)
-                server.sendmail(from_addr, [self.to_addr] , msg.as_string())
-            else:
-                print(2)
-                server.sendmail(from_addr, [self.to_addr]  + cc_address_list, msg.as_string())
+            # server.sendmail(from_addr, [self.to_addr] + [cc_str], msg.as_string())
+
+            server.sendmail(from_addr, receive_man, msg.as_string())
             # server.sendmail(from_addr, [self.to_addr]+[approver_mail] + cc_address_list, msg.as_string())
             server.quit()
 
@@ -125,6 +155,7 @@ class send_email(object):
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>执行SQL: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
+                   '<br><p>受影响的应用系统: %s</p>' \
                    '<br><p>状态: 审核驳回 (注意：请登录平台进行sql调整)</p>' \
                    '<br><p>驳回说明: %s</p>' \
                    '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
@@ -134,6 +165,7 @@ class send_email(object):
                        mail_data['apply_man'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
+                       mail_data['system'],
                        mail_data['rejected'])
             msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
             msg['Subject'] = Header('蜜罐运维工单状态反馈---SQL审核驳回', 'utf-8').encode()
@@ -170,15 +202,16 @@ class send_email(object):
             server.sendmail(from_addr, [self.to_addr], msg.as_string())
             server.quit()
 
-        else:  # 提交成功，邮件只发送到审核人
-            text = '<html><body><h1>工单标题：%s</h1>' \
+        else:  # 提交成功，邮件只发送到审核人,抄送到相关人员
+            cc_list = mail_data['cc_list']
+            text = '<html><body><h1> 工单标题：%s  </h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
                    '<br><p>数据库: %s</p>' \
                    '<br><p>执行SQL: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
-                   '<br><p>状态: 成功发起</p>' \
-                   '<br><p>备注: %s</p>' \
+                   '<br><p>受影响的应用系统: %s</p>' \
+                   '<br><p>状态: 成功申请工单</p>' \
                    '<br><p>登录平台: <a href=%s  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: (注意：点击审核同意，不会马上执行SQL) &nbsp&nbsp' \
                    '<a href="%s/api/v1/audit_token?type=1&db=%s&apply_man=%s&approve_man=%s&workid=%s&mytoken=%s">审核通过</a> ' \
@@ -193,10 +226,10 @@ class send_email(object):
                        mail_data['db'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
+                       mail_data['system'],
                        # mail_data['addr'],
                        # mail_data['orderID'],
                        # mail_data['tokens'],
-                       mail_data['note'],
                        login_url,
                        login_url,
                        mail_data['db'],
@@ -210,14 +243,32 @@ class send_email(object):
                        mail_data['approve_man'],
                        mail_data['workid'],
                        mail_data['token_reject'])
+
+            # cc_text = '<html><body><h1>工单标题：%s</h1>' \
+            #        '<br><p>工单号: %s</p>' \
+            #        '<br><p>工单发起人: %s</p>' \
+            #        '<br><p>数据库: %s</p>' \
+            #        '<br><p>执行SQL: %s</p>' \
+            #        '<br><p>备份SQL: %s</p>' \
+            #        '<br><p>受影响的应用系统: %s</p>' \
+            #        '<br><p>状态: 成功申请工单,等待审核和执行</p>' \
+            #        '</body></html>' % (
+            #            mail_data['text'],
+            #            mail_data['workid'],
+            #            mail_data['apply_man'],
+            #            mail_data['db'],
+            #            mail_data['run_sql'],
+            #            mail_data['backup_sql'],
+            #            mail_data['system'],
+            #            )
             msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
             msg['Subject'] = Header('蜜罐工单状态---SQL成功申请', 'utf-8').encode()
             contents = MIMEText(text, 'html', 'utf-8')
             msg.attach(contents)
-            # server = smtplib.SMTP(smtp_server, 25)
             server = smtplib.SMTP_SSL(smtp_server, port=465)
             server.set_debuglevel(1)
             server.login(from_addr, password)
-            # server.sendmail(from_addr, [self.to_addr] + cc_list, msg.as_string())
             server.sendmail(from_addr, [self.to_addr], msg.as_string())
             server.quit()
+
+            # mail to cc person:

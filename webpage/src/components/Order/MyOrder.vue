@@ -6,14 +6,19 @@
 <div>
   <Row>
     <Card>
-      <p slot="title">
-        <Icon type="person"></Icon>
+      <p style="height: 30px;" slot="title">
+        <Icon size="20" type="person"></Icon>
         我的工单
-        <Button  type="ghost" shape="circle" style="margin-left: 80%" @click="_Refresh_1">刷新</Button>
-
+        <Button  type="primary" shape="circle" style="margin-left: 80%" @click="_Refresh_1">刷新</Button>
       </p>
 
       <Row>
+        <!--<Col class="demo-spin-col" span="8">-->
+            <!--<Spin fix>-->
+                <!--<Icon type="load-c" size=18 class="demo-spin-icon-load"></Icon>-->
+                <!--<div>Loading</div>-->
+            <!--</Spin>-->
+        <!--</Col>-->
         <Col span="24">
         <Table border :columns="columns6" :data="applytable" stripe size="small"></Table>
         </Col>
@@ -34,32 +39,44 @@ export default {
     return {
       columns6: [
         {
-          title: '工单编号:',
+          title: '工单编号',
           key: 'work_id',
-          sortable: true
+          sortable: true,
+          width: 160
         },
         {
-          title: '工单标题:',
-          key: 'text'
+          title: '工单标题',
+          key: 'text',
+          width: 200
         },
         {
-          title: '提交时间:',
+          title: '应用系统',
+          key: 'affectd_system',
+          sortable: true,
+          width: 130
+        },
+        {
+          title: '提交时间',
           key: 'date',
-          sortable: true
+          sortable: true,
+          width: 145
         },
         {
           title: '提交人',
           key: 'username',
-          sortable: true
+          sortable: true,
+          width: 100
         },
         {
-          title: '指派审核人',
+          title: '审核人',
           key: 'assigned',
-          sortable: true
+          sortable: true,
+          width: 100
         },
         {
           title: '状态',
           key: 'status',
+          width: 150,
           render: (h, params) => {
             const row = params.row
             let color = ''
@@ -130,18 +147,32 @@ export default {
         },
         {
           title: '审核备注',
-          key: 'reject'
+          key: 'reject',
+          width: 155
+        },
+        {
+          title: '审核时间',
+          key: 'approvetime',
+          width: 150,
+        },
+        {
+          title: '执行时间',
+          key: 'runtime',
+          width: 150,
         },
         {
           title: '操作',
           key: 'action',
           align: 'center',
+          fixed: 'right',
+          width: 100,
           render: (h, params) => {
             return h('div', [
               h('Button', {
                 props: {
                   size: 'small',
-                  type: 'text'
+                  type: 'primary'
+                  // color:'blue'
                 },
                 on: {
                   click: () => {
@@ -201,3 +232,18 @@ export default {
 }
 </script>
 <!-- remove delete request -->
+<style>
+    .demo-spin-icon-load{
+        animation: ani-demo-spin 1s linear infinite;
+    }
+    @keyframes ani-demo-spin {
+        from { transform: rotate(0deg);}
+        50%  { transform: rotate(180deg);}
+        to   { transform: rotate(360deg);}
+    }
+    .demo-spin-col{
+        height: 100px;
+        position: relative;
+        border: 1px solid #eee;
+    }
+</style>

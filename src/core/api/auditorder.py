@@ -56,27 +56,27 @@ class audit(baseview.Approverpermissions):
                     '''%username
                 )[start:end]
                 data = util.ser(info)
+                print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
+                print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
 
     def put(self, request, args=None):
         try:
             type = request.data['type']
-            data = request.GET.get('data')
-            apply_man = request.GET.get('apply_man')
-            basename = request.GET.get('db')
-            approve_man = data['approve_man']  # 审核人
+            # basename = str(request.data['basename'])
             execute_man = 'dba'
-            cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
+            cur_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         except KeyError as e:
+            print(e)
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         else:
             if type == 0:  #审核驳回
                 try:
-                    approve_man = str(request.data['approve_man'])
-                    apply_man = str(request.data['apply_man'])
+                    approve_man = request.data['approve_man']
+                    apply_man = request.data['apply_man']
                     text = request.data['text']
                     id = request.data['id']
                 except KeyError as e:
@@ -115,7 +115,8 @@ class audit(baseview.Approverpermissions):
                                 apply_man_mail = Account.objects.filter(username=apply_man).first()
                                 tag = globalpermissions.objects.filter(authorization='global').first()
                                 ret_info = '操作成功，该请求已驳回！'
-                                SqlOrder.objects.filter(id=id).update(reject=text)
+                                SqlOrder.objects.filter(id=id).update(reject=text) # 记录审核驳回说明
+                                SqlOrder.objects.filter(id=id).update(approvetime=cur_time)  # 记录审核驳回时间
 
                                 try:
                                     conn_sqlite.delete(approve_man, data.work_id)
@@ -151,7 +152,7 @@ class audit(baseview.Approverpermissions):
                                                 'run_sql':data.sql,
                                                 'backup_sql':data.backup_sql,
                                                 'rejected': text,
-                                                'db': basename,
+                                                'db': data.basename,
                                                 'approve_man': approve_man,
                                                 'note': content.after}
                                             put_mess = send_email.send_email(to_addr=apply_man_mail.email)
@@ -179,8 +180,12 @@ class audit(baseview.Approverpermissions):
                 操作审核--通过
                 '''
                 try:
+                    apply_man = request.data['apply_man']
+                    approve_man = request.data['approve_man']  # 审核人
+                    pass_remark = request.data['pass_remark']
                     id = request.data['id']
                 except KeyError as e:
+                    print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
                 else:
@@ -189,7 +194,7 @@ class audit(baseview.Approverpermissions):
                         c = SqlOrder.objects.filter(id=id).first()
                         workid = c.work_id
                         try:
-                            conn = conn_sqlite.query(apply_man, workid)
+                            conn = conn_sqlite.query(approve_man, workid)
                         except Exception as e:
                             print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -197,7 +202,6 @@ class audit(baseview.Approverpermissions):
                             return Response(status=500)
                         if conn :
                            # SqlOrder.objects.filter(id=id).update(status=3)
-
                             d = Account.objects.filter(group='executer').first()
                             title = f'工单:{c.work_id}审核通过通知'
                             #修改审核状态
@@ -231,7 +235,8 @@ class audit(baseview.Approverpermissions):
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             #ret_info = '操作成功，该请求已同意!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                             ret_info = '该工单已审核通过!'
-
+                            SqlOrder.objects.filter(id=id).update(approvetime=cur_time)  # 记录审核通过时间
+                            SqlOrder.objects.filter(id=id).update(pass_remark=pass_remark)  # 记录审核同意的备注
                                # ----删除审核的token
                             try:
                                 conn_sqlite.delete(approve_man, data.work_id)
@@ -265,14 +270,18 @@ class audit(baseview.Approverpermissions):
                                             #'to_executor': d.username,
                                             'addr': addr_ip,
                                             'text': c.text,
+                                            'system': c.affectd_system,
+                                            'approvetime': c.approvetime,
+                                            'apply_time': c.date,
                                             'type': "审核成功",
                                             'status':'approve',
                                             'run_sql':data.sql,
                                             'backup_sql':data.backup_sql,
                                             'token_pass':newtoken,
-                                            'db': basename,
+                                            'db': data.basename,
                                             'approve_man':approve_man,
                                             'apply_man': apply_man,
+                                            'pass_remark': pass_remark,
                                             'note': content.after}
                                         put_mess = send_email.send_email(to_addr=mail_execute_man.email)
                                         put_mess.send_mail(mail_data=mess_info,type=0)

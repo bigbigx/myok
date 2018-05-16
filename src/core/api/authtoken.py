@@ -32,7 +32,7 @@ class authtoken(baseview.AnyLogin):
             basename = request.GET.get('db')
             execute_man = 'dba'  #执行人
             execute_group= 'executer'
-            cur_time = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S.%f')
+            cur_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         except Exception as e:
             print(e)
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -80,6 +80,7 @@ class authtoken(baseview.AnyLogin):
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             content = DatabaseList.objects.filter(id=data.bundle_id).first()
                             SqlOrder.objects.filter(work_id=workid).update(reject=reject_remark)
+                            SqlOrder.objects.filter(id=id).update(approvetime=cur_time)  # 记录审核驳回时间
                             try:
                                 conn_sqlite.deleteByToken(token)
                             except Exception as e:
@@ -152,7 +153,7 @@ class authtoken(baseview.AnyLogin):
                                     'bundle_id',
                                     'text',
                                 ).first()
-                                reject_remark = '快捷审核通过，通过原因请联系审核人'
+                                pass_remark = '快捷审核通过，通过原因请联系审核人'
                                 title = '工单:' + _tmpData['work_id'] + '审核通过通知'
                                 execute_man_mail = Account.objects.filter(username=execute_man).first()
                                 msg_content = '工单详情是：' + _tmpData['text'] + '\r\n'
@@ -166,7 +167,7 @@ class authtoken(baseview.AnyLogin):
                                 )
                                 data = SqlOrder.objects.filter(work_id=workid).first()
                                 tag = globalpermissions.objects.filter(authorization='global').first()
-
+                                SqlOrder.objects.filter(work_id=workid).update(approvetime=cur_time)  # 记录审核通过时间
                                 # ----删除token
                                 try:
                                     conn_sqlite.delete(approve_man, workid)
@@ -201,6 +202,9 @@ class authtoken(baseview.AnyLogin):
                                                 'status': 'approve',
                                                 'run_sql': data.sql,
                                                 'backup_sql': data.backup_sql,
+                                                'approvetime': c.approvetime,
+                                                'pass_remark': pass_remark,
+                                                'system': c.affectd_system,
                                                 'token_pass': newtoken,
                                                 'db': basename,
                                                 'approve_man': approve_man,

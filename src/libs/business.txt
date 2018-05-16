@@ -1,9 +1,9 @@
-419331434@qq.com    江理彬QQ
-zhengkesheng@zskuaixiao.com   郑科胜企业
-970974688@qq.com  郑科胜QQ
-liaojun@zskuaixiao.com 廖军
-paulwong@zskuaixiao.com 王鹏
-jscp@zskuaixiao.com 技术产品中心
+jianglibin@zskuaixiao.com    运维江理彬
 leo@zskuaixiao.com 业务谢志辉
 zhangjicheng@zskuaixiao.com 业务张继成
 tianjilong@zskuaixiao.com  业务田继龙
+liuyan@zskuaixiao.com   测试组长刘艳
+mairongxin@zskuaixiao.com  电商组开发组长麦荣鑫
+suhongxin@zskuaixiao.com  仓配组开发组长苏洪鑫
+liaojun@zskuaixiao.com 实施廖军
+paulwong@zskuaixiao.com 架构师王鹏
