@@ -234,17 +234,17 @@ export default {
         {
           title: '审核备注',
           key: 'reject',
-          width: 180,
+          width: 180
         },
         {
           title: '审核时间',
           key: 'approvetime',
-          width: 150,
+          width: 150
         },
         {
           title: '执行时间',
           key: 'runtime',
-          width: 150,
+          width: 150
         },
         {
           title: '操作',

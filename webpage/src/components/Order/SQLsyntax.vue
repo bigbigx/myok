@@ -49,6 +49,7 @@
                               <Radio label="activity_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_activity','port':'32021'})"><Icon type="social-android"></Icon><span>线上activity库</span></Radio>
                               <Radio label="erp_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_erp','port':'32453'})"><Icon type="social-android"></Icon><span>线上erp库</span></Radio>
                               <Radio label="new_salesman_online" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'salesman','port':'13306'})"><Icon type="social-android"></Icon><span>线上新salesman库</span></Radio>
+                              <Radio label="shopcart" @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_shopcart','port':'32454'})"><Icon type="social-android"></Icon><span>线上shopcart库</span></Radio>
                               <!--<Radio label="old_salesman_online"  @click.native="ChooseDatabase({'url':'114.215.28.111','basename':'laimi_salesman','port':'23764'})"><Icon type="social-android"></Icon><span>线上老供应商salesman库</span></Radio>-->
                               <Radio label="laimi_test" @click.native="ChooseDatabase({'url':'101.236.45.42','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>美团云测试库</span></Radio>
                               <Radio label="my_laimi_test" @click.native="ChooseDatabase({'url':'101.236.41.66 ','basename':'laimi_test','port':'3306'})" ><Icon type="social-android"></Icon><span>我的测试库</span></Radio>
@@ -331,7 +332,7 @@ export default {
         connection_name_list: [],
         basenamelist: [],
         sqllist: [],
-        computer_roomlist: util.computer_room,
+        computer_roomlist: util.computer_room
       },
       ruleValidate: {
         computer_room: [{
@@ -391,7 +392,7 @@ export default {
       flag: false,
       single: false,
       cc_mail: false,
-      person: "2",
+      person: '2',
       validate_result: false,
       validate_cc_mail: false,
       choose_db: false,
@@ -402,12 +403,12 @@ export default {
   },
   methods: {
     chooseapprover (val) {
-     if (val==='0') {
-        this.formItem.approve_man = "liuyan";
-     } else if (val==='1') {
+     if (val === '0') {
+        this.formItem.approve_man = 'liuyan';
+     } else if (val === '1') {
        this.formItem.approve_man = 'paul';
      } else {
-       this.formItem.approve_man='';
+       this.formItem.approve_man = '';
      }
     },
     show_ccmail_div () {
@@ -468,7 +469,7 @@ export default {
               this.formItem.connection_name = res.data['connection_name_custom'];
               this.formItem.basename = res.data['laimi_db'];
               this.id = [res.data['id']];
-              this.datalist.connection_name_list=[];
+              this.datalist.connection_name_list = [];
               this.$nextTick(() => {
                 this.flag = false;
               });
@@ -493,7 +494,7 @@ export default {
       this.formItem.connection_name = null;
       this.formItem.basename = null;
       this.datalist.basenamelist = [];
-      this.datalist.connection_name_list =[];
+      this.datalist.connection_name_list = [];
     },
     DataBaseName (index) {
       if (index) {
@@ -525,21 +526,21 @@ export default {
       this.$refs['formItem'].validate((valid) => {
         if (valid) {
           if (this.formItem.textarea_ddl_dml || this.formItem.textarea_backup) {
-            let tmpddl2 = '';
-            let tmpddl = '';
-            let tmpbak = '';
-            let tmpbak2 = '';
+            let tmpddl2 = ''
+            // let tmpddl = ''
+            // let tmpbak = ''
+            let tmpbak2 = ''
             if (this.formItem.textarea_backup) {
               tmpbak2 = this.formItem.textarea_backup.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
               // tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             } else {
-              tmpbak = ''
+              // tmpbak = ''
             }
             if (this.formItem.textarea_ddl_dml) {
               tmpddl2 = this.formItem.textarea_ddl_dml.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
               // tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
             } else {
-              tmpddl = ''
+              // tmpddl = ''
             }
             console.log(this.formItem)
             axios.put(`${util.url}/sqlsyntax/explain`, {
@@ -719,9 +720,9 @@ export default {
                 console.log('jianglb', res.data)
                 this.cc_address_list = res.data.cc_address_list
                 this.ClearForm()
-                this.person = "2"
+                this.person = '2'
                 this.cc_mail = false
-                this.formItem.quick_choose = ""
+                this.formItem.quick_choose = ''
                 this.choose_db = false
               })
               .catch(error => {
@@ -741,9 +742,9 @@ export default {
       this.formItem.textarea_backup = '';
       this.Testresults = '';
       this.Testresults_backup = '';
-      this.social=[];
-      this.Testresults_backup_explain='';
-      this.Testresults_explain='';
+      this.social = [];
+      this.Testresults_backup_explain = '';
+      this.Testresults_explain = '';
       // this.formItem.system='';
       // this.formItem.text='';
     }

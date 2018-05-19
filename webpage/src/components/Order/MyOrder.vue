@@ -153,12 +153,12 @@ export default {
         {
           title: '审核时间',
           key: 'approvetime',
-          width: 150,
+          width: 150
         },
         {
           title: '执行时间',
           key: 'runtime',
-          width: 150,
+          width: 150
         },
         {
           title: '操作',
