@@ -156,6 +156,11 @@ export default {
           width: 180
         },
         {
+          title: '执行人',
+          key: 'execute_man',
+          width: 180
+        },
+        {
           title: '执行时间',
           key: 'runtime',
           width: 180

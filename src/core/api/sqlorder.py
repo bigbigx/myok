@@ -122,7 +122,7 @@ class sqlorder(baseview.BaseView):
                            res_bak = test.Check(sql=sql_bak)
                         return Response({'result_ddl': res_ddl,'result_bak': res_bak, 'status': 200})
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return Response({'status': '500'})
 
@@ -159,7 +159,7 @@ class sqlorder(baseview.BaseView):
                     }
             # except KeyError as e:
             except Exception as e:
-                print(e)
+                #print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
                 res_ddl_list = []
@@ -219,7 +219,7 @@ class sqlorder(baseview.BaseView):
             cc_list = request.data['cc_list']
 
         except KeyError as e:
-            print(e)
+            #print(e)
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             return HttpResponse(status=500)
         else:
@@ -280,7 +280,7 @@ class sqlorder(baseview.BaseView):
                     #value = [(approve_man, workId, token)]
                     conn_sqlite.add_one(approve_man, workId, token)
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
 
@@ -320,7 +320,7 @@ class sqlorder(baseview.BaseView):
                 cc_mail_list = util.readfile()
                 return Response({"ret":ret_info,"cc_mail_list": cc_mail_list})
             except Exception as e:
-                print(e)
+                #print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
             

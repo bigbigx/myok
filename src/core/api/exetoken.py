@@ -59,7 +59,7 @@ class exetoken(baseview.AnyLogin):
                             #username='dba'
                             conn = conn_sqlite.query(apply_man, workid)
                         except Exception as e:
-                            print(e)
+                            #print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                             ret_info = "sqlite数据库后台异常，请联系系统管理员"
                             return Response(status=500)
@@ -95,7 +95,7 @@ class exetoken(baseview.AnyLogin):
 
                                 conn_sqlite.deleteByToken(token)
                             except Exception as e:
-                                print(e)
+                                #print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info="sqlite数据库后台异常，请联系系统管理员"
                                 return Response(status=500)
@@ -150,7 +150,7 @@ class exetoken(baseview.AnyLogin):
                             try:
                                 conn = conn_sqlite.queryByToken(token)
                             except Exception as e:
-                                print(e)
+                                #print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info="sqlite数据库后台异常，请联系系统管理员"
                                 return HttpResponse(ret_info)
@@ -233,7 +233,7 @@ class exetoken(baseview.AnyLogin):
 
 
                                 except Exception as e:
-                                    print(e)
+                                    #print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     SqlOrder.objects.filter(work_id=workid).update(status=1)  # 状态回滚
                                     return HttpResponse(status=500)
@@ -246,6 +246,7 @@ class exetoken(baseview.AnyLogin):
                                     # 同时修改时间戳
                                     #cur_time = int(time.time())
                                     SqlOrder.objects.filter(work_id=workid).update(runtime=cur_time_run)  # 修改sqlorder的运行时间
+                                    SqlOrder.objects.filter(work_id=workid).update(execute_man=execute_man) # 更新执行人信息到sqlorder表
                                     '''
                                         遍历返回结果插入到执行记录表中
                                     '''
@@ -326,6 +327,8 @@ class exetoken(baseview.AnyLogin):
                                                     'run_sql': c.sql,
                                                     'backup_sql': bak_sql,
                                                     'addr': addr_ip,
+                                                    'computer_room': c.computer_room,
+                                                    'connection_name': c.connection_name,
                                                     'db': c.basename,
                                                     'approvetime': c.approvetime,
                                                     'executetime': cur_time_run,
@@ -352,7 +355,7 @@ class exetoken(baseview.AnyLogin):
                                                 return HttpResponse(ret_info)
 
                                         except Exception as e:
-                                            print(e)
+                                            #print(e)
                                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                             ret_info = '工单执行成功!但是邮箱推送失败,请查看错误日志排查错误.'
                                             return HttpResponse(ret_info)
@@ -367,7 +370,7 @@ class exetoken(baseview.AnyLogin):
 
                                     conn_sqlite.delete(apply_man, workid)
                                 except Exception as e:
-                                    print(e)
+                                    #print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     #ret_info="sqlite数据库后台异常，请联系系统管理员"
                                     return HttpResponse(status=500)

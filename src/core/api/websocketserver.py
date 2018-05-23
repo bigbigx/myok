@@ -19,7 +19,7 @@ def get_ssh(ip, user, pwd):
     ssh.connect(ip, 22, user, pwd, timeout=15)
     return ssh
   except Exception as e:
-    print(e)
+    #print(e)
     return "False"
 
 
@@ -34,7 +34,8 @@ def recv_data(conn): # 服务器解析浏览器发送的信息
     # print "hello"
     # print dic
   except Exception as e:
-        print(e)
+      pass
+        #print(e)
   else:
       code_len = ord(all_data[1]) & 127
       if code_len == 126:

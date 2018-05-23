@@ -51,7 +51,7 @@ class addressing(baseview.BaseView):
                 print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
-                print(e)
+                #print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                 return HttpResponse(status=500)
 
@@ -96,7 +96,7 @@ class addressing(baseview.BaseView):
                                 continue
                         return Response({'msg': '连接名没有找到对应的数据库'}, status=202)
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return Response({'err_msg': str(e)})
 
@@ -118,7 +118,7 @@ class addressing(baseview.BaseView):
                         res = f.basename()
                         return Response(res)
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                     return HttpResponse(status=500)
 

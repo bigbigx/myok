@@ -169,6 +169,14 @@ export const appRouter = [
           require(['./components/Management/UserInfo.vue'], resolve)
         }
       }, {
+        path: 'management-auth',
+        name: 'management-auth',
+        title: '用户权限分配',
+        'icon': 'person-stalker',
+        component: resolve => {
+          require(['./components/Management/UserAuth.vue'], resolve)
+        }
+      }, {
         path: 'management-database',
         name: 'management-database',
         title: '数据库',

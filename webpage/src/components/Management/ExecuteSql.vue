@@ -45,11 +45,11 @@
       <FormItem label="影响应用系统:">
         <span>{{ formitem.system }}</span>
       </FormItem>
-      <FormItem label="提交时间:">
-        <span>{{ formitem.date }}</span>
-      </FormItem>
       <FormItem label="提交人:">
         <span>{{ formitem.username }}</span>
+      </FormItem>
+      <FormItem label="提交时间:">
+        <span>{{ formitem.date }}</span>
       </FormItem>
       <FormItem label="审核人:">
         <span>{{ formitem.approve_man }}</span>
@@ -111,12 +111,12 @@ export default {
           key: 'work_id',
           sortable: true,
           sortType: 'desc',
-          width: 160
+          width: 180
         },
         {
           title: '工单标题:',
           key: 'text',
-          width: 200
+          width: 230
         },
         {
           title: '应用系统',
@@ -125,24 +125,29 @@ export default {
           width: 130
         },
         {
-          title: '提交时间:',
-          key: 'date',
-          sortable: true,
-          width: 150
-        },
-        {
           title: '提交人',
           key: 'username',
           sortable: true,
           width: 150
         },
         {
+          title: '提交时间:',
+          key: 'date',
+          sortable: true,
+          width: 200
+        },
+
+        {
           title: '审核人',
           key: 'approve_man',
           sortable: true,
           width: 150
         },
-
+        {
+          title: '审核时间',
+          key: 'approvetime',
+          width: 200
+        },
         {
           title: '状态',
           key: 'status',
@@ -224,14 +229,9 @@ export default {
           }
         },
         {
-          title: '审核时间',
-          key: 'approvetime',
-          width: 150
-        },
-        {
           title: '审核备注',
           key: 'reject',
-          width: 180
+          width: 200
         },
         {
           title: '操作',
@@ -269,6 +269,8 @@ export default {
         att: '',
         approve_man: '',
         approvetime: '',
+        computer_room: '',
+        connection_name: '',
         id: null
       },
       summit: false,
@@ -416,6 +418,7 @@ export default {
     mou_data (vl = 1) {
       axios.get(`${util.url}/execute_sql?page=${vl}&username=${Cookies.get('user')}`)
         .then(res => {
+          console.log(res.data.data, 'jianglibin')
           this.tmp = res.data.data
           this.pagenumber = res.data.page.alter_number
         })

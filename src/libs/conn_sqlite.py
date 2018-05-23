@@ -24,7 +24,7 @@ def add_one(username,workid,token):
         cursor.execute(insert_sql,param)
         conn.commit()
     except Exception as e:
-        print(e)
+        #print(e)
         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
     cursor.close()
     conn.close()
@@ -38,7 +38,7 @@ def add_many(value : [],table_namme):
         conn.commit()
         conn.close()
     except Exception as e:
-        print(e)
+        #print(e)
         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         conn.rollback()
     cursor.close()
@@ -52,7 +52,7 @@ def deleteByToken(token):
         cursor.execute("delete from token_db_new where token ='%s' " % (token))
         conn.commit()
     except Exception as e:
-        print(e)
+        #print(e)
         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         conn.rollback()
     cursor.close()
@@ -65,7 +65,7 @@ def delete(username, workid):
         cursor.execute("delete from token_db_new where username ='%s' and workid ='%s'" % (username, workid))
         conn.commit()
     except Exception as e:
-        print(e)
+        #print(e)
         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
         conn.rollback()
     cursor.close()

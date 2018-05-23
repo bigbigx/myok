@@ -68,6 +68,7 @@ class execute(baseview.Approverpermissions):
                     '''
                 )[start:end]
                 data = util.ser(info)
+                print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -98,7 +99,7 @@ class execute(baseview.Approverpermissions):
                             data = SqlOrder.objects.filter(id=id).first
                             conn = conn_sqlite.query(approve_man, data.work_id)
                         except Exception as e:
-                            print(e)
+                            #print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                             ret_info = "sqlite数据库后台异常，请联系系统管理员"
                             return Response(status=500)
@@ -142,7 +143,7 @@ class execute(baseview.Approverpermissions):
 
                                 conn_sqlite.delete(execute_man, data.work_id)
                             except Exception as e:
-                                print(e)
+                                #print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 # ret_info="sqlite数据库后台异常，请联系系统管理员"
                                 return HttpResponse(status=500)
@@ -193,7 +194,7 @@ class execute(baseview.Approverpermissions):
                         cc_list = c.cc_list
                         conn = conn_sqlite.query(execute_man, workid)  # 查询token 是否存在
                     except Exception as e:
-                        print(e)
+                        #print(e)
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         ret_info = "sqlite数据库后台异常，请联系系统管理员"
                         return HttpResponse(ret_info)
@@ -273,6 +274,7 @@ class execute(baseview.Approverpermissions):
                                         SqlOrder.objects.filter(id=id).update(status=4)
 
                         except Exception as e:
+                            #print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                             print(f'{e.__class__.__name__}: {e}')
                             SqlOrder.objects.filter(id=id).update(status=1)  # 状态回滚
@@ -281,7 +283,8 @@ class execute(baseview.Approverpermissions):
                             '''
                                 修改该工单编号的state状态 ---修改为执行成功状态
                             '''
-
+                            SqlOrder.objects.filter(id=id).update(runtime=cur_time_run)
+                            SqlOrder.objects.filter(id=id).update(execute_man=execute_man)  # 更新执行人信息到sqlorder表
                             # 同时修改时间戳
                             # cur_time=int(time.time())
                             '''
@@ -324,6 +327,7 @@ class execute(baseview.Approverpermissions):
                                         sequence=i['sequence'],
                                         backup_dbname=i['backup_dbname'],
                                     )
+
                             ''' 
                             通知消息
                             '''
@@ -383,6 +387,8 @@ class execute(baseview.Approverpermissions):
                                             'execute_man': execute_man,
                                             'apply_time': c.date,
                                             'executetime': cur_time_run,
+                                            'computer_room': c.computer_room,
+                                            'connection_name': c.connection_name,
                                             'db': c.basename,
                                             'approve_man_addr': apply_man_mail.email,
                                             'run_sql': c.sql,
@@ -404,11 +410,10 @@ class execute(baseview.Approverpermissions):
                                         put_mess.send_mail(mail_data=mess_info, type=3)
                                     else:
                                         ret_info = 'the mail address of apply_man or approve_man  is none'
-                                        print(ret_info)
                                         CUSTOM_ERROR.error(ret_info)
                                         return HttpResponse(ret_info)
                                 except Exception as e:
-                                    print(e)
+                                    #print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     ret_info = '工单执行成功!但是邮箱推送给工单审核人 %s失败,请查看错误日志排查错误.' %  (c.username)
 
@@ -416,7 +421,7 @@ class execute(baseview.Approverpermissions):
                             try:
                                 conn_sqlite.delete('dba', workid)
                             except Exception as e:
-                                print(e)
+                                #print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info = "sqlite数据库后台异常，请联系系统管理员"
                                 return HttpResponse(ret_info)

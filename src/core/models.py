@@ -182,7 +182,7 @@ class SqlOrder(models.Model):
     text = models.CharField(max_length=300) # 工单备注
     system = models.CharField(max_length=300,blank=True) # 被影响到的应用系统
     approve_man = models.CharField(max_length=50, blank=True)# 工单审核人
-    execut_man = models.CharField(max_length=50, blank=True)# 工单执行人
+    execute_man = models.CharField(max_length=50, blank=True)# 工单执行人
     approvetime = models.CharField(max_length=50, blank=True)# 工单审核时间
     runtime = models.CharField(max_length=50, blank=True)# 工单执行时间
     backup_sql=models.TextField(blank=True,null=True) #s备份ql语句

@@ -41,6 +41,8 @@ class send_email(object):
                    '<br><p>工单申请时间: %s</p>' \
                    '<br><p>工单审核人: %s</p>' \
                    '<br><p>工单审核时间: %s</p>' \
+                   '<br><p>机房: %s</p>' \
+                   '<br><p>连接名: %s</p>' \
                    '<br><p>数据库: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
                    '<br><p>执行SQL: %s</p>' \
@@ -59,6 +61,8 @@ class send_email(object):
                        mail_data['apply_time'],
                        mail_data['approve_man'],
                        mail_data['approvetime'],
+                       mail_data['computer_room'],
+                       mail_data['connection_name'],
                        mail_data['db'],
                        mail_data['backup_sql'],
                        mail_data['run_sql'],
@@ -92,6 +96,8 @@ class send_email(object):
                    '<br><p>工单审核时间: %s</p>' \
                    '<br><p>工单执行人: %s</p>' \
                    '<br><p>工单执行时间: %s</p>' \
+                   '<br><p>机房: %s</p>' \
+                   '<br><p>连接名: %s</p>' \
                    '<br><p>数据库: %s</p>' \
                    '<br><p>受影响的应用系统: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
@@ -107,6 +113,8 @@ class send_email(object):
                        mail_data['approvetime'],
                        mail_data['execute_man'],
                        mail_data['executetime'],
+                       mail_data['computer_room'],
+                       mail_data['connection_name'],
                        mail_data['db'],
                        mail_data['system'],
                        mail_data['run_sql'],
@@ -116,7 +124,7 @@ class send_email(object):
             print(cc_list)
             cc_address_list = []
             receive_man = []
-            if cc_list == []:
+            if cc_list == [] or cc_list == '[]':
                 receive_man = [self.to_addr]  # to and cc
                 print(receive_man)
             else:

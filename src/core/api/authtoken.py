@@ -34,7 +34,7 @@ class authtoken(baseview.AnyLogin):
             execute_group= 'executer'
             cur_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         except Exception as e:
-            print(e)
+            #print(e)
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             ret_info = '<h1> 访问服务器异常</h1>'
             return HttpResponse(ret_info)
@@ -52,7 +52,7 @@ class authtoken(baseview.AnyLogin):
                         try:
                             conn = conn_sqlite.query(apply_man, workid)
                         except Exception as e:
-                            print(e)
+                            #print(e)
                             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                             ret_info = "sqlite数据库后台异常，请联系系统管理员"
                             return HttpResponse(ret_info)
@@ -84,7 +84,7 @@ class authtoken(baseview.AnyLogin):
                             try:
                                 conn_sqlite.deleteByToken(token)
                             except Exception as e:
-                                print(e)
+                                #print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info = "sqlite数据库后台异常，请联系系统管理员"
                                 return HttpResponse(ret_info)
@@ -112,7 +112,7 @@ class authtoken(baseview.AnyLogin):
                                         put_mess = send_email.send_email(to_addr=mail_apply_man.email)
                                         put_mess.send_mail(mail_data=mess_info, type=1)
                                 except Exception as e:
-                                    print(e)
+                                    #print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     ret_info = '工单审核通过!但是邮箱推送失败,请查看错误日志排查错误.'
                                     return HttpResponse(ret_info)
@@ -136,7 +136,7 @@ class authtoken(baseview.AnyLogin):
                             try:
                                 conn = conn_sqlite.query(approve_man, workid)
                             except Exception as e:
-                                print(e)
+                                #print(e)
                                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                 ret_info="sqlite数据库后台异常，请联系系统管理员"
                                 return HttpResponse(ret_info)
@@ -165,15 +165,16 @@ class authtoken(baseview.AnyLogin):
                                     to_user=apply_man,
                                     state='unread'
                                 )
+
                                 data = SqlOrder.objects.filter(work_id=workid).first()
                                 tag = globalpermissions.objects.filter(authorization='global').first()
                                 SqlOrder.objects.filter(work_id=workid).update(approvetime=cur_time)  # 记录审核通过时间
-                                SqlOrder.objects.filter(id=id).update(reject=pass_remark)  # 记录审核同意的备注
+                                SqlOrder.objects.filter(work_id=workid).update(reject=pass_remark)  # 记录审核同意的备注
                                 # ----删除token
                                 try:
                                     conn_sqlite.delete(approve_man, workid)
                                 except Exception as e:
-                                    print(e)
+                                    #print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     ret_info = "sqlite数据库后台异常，请联系系统管理员"
                                     return HttpResponse(ret_info)
@@ -184,7 +185,7 @@ class authtoken(baseview.AnyLogin):
                                     conn_sqlite.add_one(execute_man, data.work_id, newtoken)
 
                                 except Exception as e:
-                                    print(e)
+                                    #print(e)
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     ret_info = "sqlite数据库后台异常，请联系系统管理员"
 
@@ -203,18 +204,21 @@ class authtoken(baseview.AnyLogin):
                                                 'status': 'approve',
                                                 'run_sql': data.sql,
                                                 'backup_sql': data.backup_sql,
-                                                'approvetime': c.approvetime,
+                                                'approvetime': cur_time,
                                                 'pass_remark': pass_remark,
+                                                'computer_room': data.computer_room,
+                                                'connection_name': data.connection_name,
                                                 'system': c.system,
                                                 'token_pass': newtoken,
                                                 'db': basename,
                                                 'approve_man': approve_man,
                                                 'apply_man': apply_man,
+                                                'apply_time': c.date,
                                                 'note': content.after}
                                             put_mess = send_email.send_email(to_addr=execute_man_mail.email)
                                             put_mess.send_mail(mail_data=mess_info, type=0)
                                     except Exception as e:
-                                        print(e)
+                                        #print(e)
                                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                         ret_info = '工单审核通过!但是邮箱推送失败,请查看错误日志排查错误.'
                                         return HttpResponse(ret_info)
@@ -229,7 +233,7 @@ class authtoken(baseview.AnyLogin):
                                 ret_info='<h1>您已成功进行审核，无需进行二次操作</h1>'
                                 return HttpResponse(ret_info)
                         except Exception as e:
-                            print(e)
+                            #print(e)
                             ret_info='<h1> 访问服务器异常</h1>'
                             return HttpResponse(ret_info)
 
