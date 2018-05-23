@@ -145,7 +145,7 @@ export default {
           key: 'work_id',
           sortable: true,
           sortType: 'desc',
-          width: 160
+          width: 180
         },
         {
           title: '工单标题',
