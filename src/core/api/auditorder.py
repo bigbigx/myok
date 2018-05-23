@@ -56,7 +56,7 @@ class audit(baseview.Approverpermissions):
                     '''%username
                 )[start:end]
                 data = util.ser(info)
-                print(data)
+                #print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
                 #print(e)
