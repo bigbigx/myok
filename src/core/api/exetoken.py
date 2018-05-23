@@ -343,14 +343,14 @@ class exetoken(baseview.AnyLogin):
                                                     'cc_list': cc_list,
                                                     'file': file_path}
                                                 mail_address = approve_man_mail.email + ";" +apply_man_mail.email
-                                                print(mail_address)
+                                                #print(mail_address)
                                                 put_mess = send_email.send_email(to_addr=mail_address)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)
                                                 # put_mess1 = send_email.send_email(to_addr=mail_approver.email)
                                                 # put_mess1.send_mail(mail_data=mess_info, type=3)
                                             else:
                                                 ret_info = 'the mail address of apply_man or approve_man  is none'
-                                                print(ret_info)
+                                                #print(ret_info)
                                                 CUSTOM_ERROR.error(ret_info)
                                                 return HttpResponse(ret_info)
 

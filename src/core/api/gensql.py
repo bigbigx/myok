@@ -48,7 +48,7 @@ class addressing(baseview.BaseView):
                     WHERE core_sqlorder.username = '%s'ORDER BY core_sqlorder.id DESC "
                     % username)[start:end]
                 data = util.ser(info)
-                print(data)
+                #print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
                 #print(e)
@@ -89,7 +89,7 @@ class addressing(baseview.BaseView):
                     ) as f:
                         base_list = f.basename()
                         for i in base_list:
-                            print(i)
+                            #print(i)
                             if (basename == i):
                                  return Response({'id': {'id':_connection.id},'computer_room_custom':_connection.computer_room,'connection_name_custom': _connection.connection_name,'laimi_db':i})
                             else:

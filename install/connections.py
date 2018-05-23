@@ -116,20 +116,20 @@ def dump_packet(data): # pragma: no cover
         return '.'
 
     try:
-        print("packet length:", len(data))
+        #print("packet length:", len(data))
         for i in range(1, 6):
             f = sys._getframe(i)
-            print("call[%d]: %s (line %d)" % (i, f.f_code.co_name, f.f_lineno))
-        print("-" * 66)
+            #print("call[%d]: %s (line %d)" % (i, f.f_code.co_name, f.f_lineno))
+        #print("-" * 66)
     except ValueError:
         pass
     dump_data = [data[i:i+16] for i in range_type(0, min(len(data), 256), 16)]
     for d in dump_data:
-        print(' '.join(map(lambda x: "{:02X}".format(byte2int(x)), d)) +
+        #print(' '.join(map(lambda x: "{:02X}".format(byte2int(x)), d)) +
               '   ' * (16 - len(d)) + ' ' * 2 +
               ''.join(map(lambda x: "{}".format(is_ascii(x)), d)))
-    print("-" * 66)
-    print()
+    #print("-" * 66)
+    #print()
 
 
 def _scramble(password, message):

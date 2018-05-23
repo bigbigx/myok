@@ -135,7 +135,7 @@ class sqlorder(baseview.BaseView):
             try:
                 type = int(request.data['type'])
                 id = request.data['id']
-                print(id)
+                #print(id)
                 base = request.data['base']
                 tmp_sql = request.data['sql']
                 # check_sql = request.data['check_sql']
@@ -149,7 +149,7 @@ class sqlorder(baseview.BaseView):
                 # sql_bak_1 = check_sql.split('&&&')[1]
                 #base_id = request.data['base_id']
                 data = DatabaseList.objects.filter(id=id).first()
-                print(data)
+                #print(data)
                 info = {
                     'host': data.ip,
                     'user': data.username,

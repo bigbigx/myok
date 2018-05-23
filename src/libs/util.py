@@ -165,7 +165,7 @@ def auth(username, password):
 import datetime
 def get_time_stamp():
     cur_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
-    print(cur_time)
+    #print(cur_time)
     return cur_time
 # #
 # if __name__ == '__main__':

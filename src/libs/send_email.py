@@ -121,16 +121,16 @@ class send_email(object):
                        mail_data['backup_sql']
                        )
             cc_list = mail_data['cc_list']
-            print(cc_list)
+            #print(cc_list)
             cc_address_list = []
             receive_man = []
             if cc_list == [] or cc_list == '[]':
                 receive_man = [self.to_addr]  # to and cc
-                print(receive_man)
+                #print(receive_man)
             else:
                 cc_address_list = util.myok(cc_list)
                 receive_man = [self.to_addr] + cc_address_list
-                print(receive_man)
+                #print(receive_man)
 
                 # approver_mail = mail_data['approve_man']
             # cc_address_list = util.myok(cc_list)
@@ -212,7 +212,7 @@ class send_email(object):
             server = smtplib.SMTP_SSL(smtp_server, port=465)
             server.set_debuglevel(1)
             server.login(from_addr, password)
-            print([self.to_addr])
+            #print([self.to_addr])
             # server.sendmail(from_addr, [self.to_addr] + cc_list, msg.as_string())
             server.sendmail(from_addr, [self.to_addr], msg.as_string())
             server.quit()

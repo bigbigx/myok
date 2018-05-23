@@ -68,7 +68,7 @@ class execute(baseview.Approverpermissions):
                     '''
                 )[start:end]
                 data = util.ser(info)
-                print(data)
+                #print(data)
                 return Response({'page': pagenumber, 'data': data})
             except Exception as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -405,7 +405,7 @@ class execute(baseview.Approverpermissions):
                                             'file': file_path}
                                         mail_address = approve_man_mail.email + ";" + apply_man_mail.email
                                         print("execute sql successlly")
-                                        print(mail_address)
+                                        #print(mail_address)
                                         put_mess = send_email.send_email(to_addr=mail_address)  # 发送给申请人
                                         put_mess.send_mail(mail_data=mess_info, type=3)
                                     else:
