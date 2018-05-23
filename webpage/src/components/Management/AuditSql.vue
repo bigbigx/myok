@@ -46,7 +46,7 @@
         <span>{{ formitem.text }}</span>
       </FormItem>
       <FormItem label="影响应用系统:">
-        <span>{{ formitem.affectd_system }}</span>
+        <span>{{ formitem.system }}</span>
       </FormItem>
       <FormItem label="提交时间:">
         <span>{{ formitem.date }}</span>
@@ -62,9 +62,6 @@
       </FormItem>
       <FormItem label="数据库库名:">
         <span>{{ formitem.basename }}</span>
-      </FormItem>
-      <FormItem label="工单说明:">
-        <span>{{ formitem.text }}</span>
       </FormItem>
       <FormItem label="备份SQL:">
         <p v-for="j in backup_sql">{{ j }}</p>
@@ -88,12 +85,21 @@
     </div>
   </Modal>
 
-  <Modal v-model="reject.reje" @on-ok="rejecttext">
+  <Modal v-model="reject.reje" @on-ok="rejecttext" >
+  <!--<Modal v-model="reject.reje" >-->
     <p slot="header" style="color:#f60;font-size: 16px">
       <Icon type="information-circled"></Icon>
       <span>SQL工单驳回理由说明</span>
     </p>
-    <Input v-model="reject.textarea" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写驳回说明"></Input>
+    <Form ref="rejectItemForm" :model="reject" :rules="ruleValidate"  :label-width="80">
+    <!--<Form  ref="rejectItemForm"  :rules="ruleValidate"  :label-width="80">-->
+      <FormItem   label="驳回意见:" prop="reject_text">
+        <Input  v-model="reject.reject_text"  type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写驳回说明"></Input>
+      </FormItem>
+      <!--<FormItem >-->
+              <!--<Button type="success" icon="ios-redo" @click.native="rejecttext()"   :disabled="this.validate_gen_reject">确定</Button>-->
+      <!--</FormItem>-->
+    </Form>
   </Modal>
 
     <Modal v-model="pass.pass" @on-ok="passtext">
@@ -101,8 +107,12 @@
       <Icon type="information-circled"></Icon>
       <span>SQL工单同意备注</span>
     </p>
-    <Input v-model="pass.textarea" type="textarea" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写同意备注"></Input>
-  </Modal>
+    <Form ref="passItemForm" :model="pass" :rules="ruleValidate"  :label-width="80">
+      <FormItem   label="同意意见:" prop="pass_text">
+        <Input v-model="pass.pass_text" type="textarea" :rules="ruleValidate"  prop="pass_text" :autosize="{minRows: 15,maxRows: 15}" placeholder="请填写同意备注"></Input>
+      </FormItem>
+    </Form>
+    </Modal>
 
 </div>
 </template>
@@ -113,7 +123,17 @@ import util from '../../libs/util'
 export default {
   name: 'Sqltable',
   data () {
+     //  const validateMobile = (rule, value, callback) => {
+     //
+     //            if (!Number.isInteger(+value)) {
+     //                callback(new Error('请输入数字值'));
+     //            } else {
+     //                callback();
+     //            }
+     // },
     return {
+      validate_gen_reject: true,
+
       columns6: [
         // {
         //   type: 'selection',
@@ -134,7 +154,7 @@ export default {
         },
         {
           title: '应用系统',
-          key: 'affectd_system',
+          key: 'system',
           sortable: true,
           width: 130
         },
@@ -152,7 +172,7 @@ export default {
         },
         {
           title: '审核人',
-          key: 'assigned',
+          key: 'approve_man',
           sortable: true,
           width: 100
         },
@@ -269,6 +289,24 @@ export default {
           }
         }
       ],
+      ruleValidate: {
+        reject_text: [{
+          required: true,
+          message: '请填写驳回意见',
+          trigger: 'blur'
+        },
+        {
+            type: 'string',
+            max: 150,
+            message: '最多150个字',
+            trigger: 'blur'
+          }],
+        pass_text: [{
+          required: true,
+          message: '请填写同意意见',
+          trigger: 'change'
+        }]
+      },
       modal2: false,
       sql: null,
       backup_sql: null,
@@ -278,7 +316,7 @@ export default {
         username: '',
         dataadd: '',
         database: '',
-        affectd_system: '',
+        system: '',
         // pass_remark: '',
         text: '',
         att: '',
@@ -321,11 +359,11 @@ export default {
       dataId: [],
       reject: {
         reje: false,
-        textarea: '驳回'
+        reject_text: '驳回'
       },
       pass: {
         pass: false,
-        textarea: '同意'
+        pass_text: '同意'
       },
       tmp: [],
       pagenumber: 1,
@@ -359,26 +397,37 @@ export default {
       this.modal2 = false
     },
     passtext () {
-      this.modal2 = false
-      this.tmp[this.togoing].status = 5
-      axios.put(`${util.url}/audit_sql`, {
-          'type': 1,
-          'approve_man': Cookies.get('user'),
-          'apply_man': this.formitem.username,
-          'pass_remark': this.pass.textarea,
-          'id': this.formitem.id
-        })
-        .then(res => {
-          this.$Notice.success({
-            title: '审核成功',
-            desc: res.data
+      this.$refs['passItemForm'].validate((valid) => {
+        console.log(valid)
+        if (valid) {
+          this.modal2 = false
+          this.tmp[this.togoing].status = 5
+          axios.put(`${util.url}/audit_sql`, {
+            'type': 1,
+            'approve_man': Cookies.get('user'),
+            'apply_man': this.formitem.username,
+            'pass_remark': this.pass.pass_text,
+            'id': this.formitem.id
           })
-          this.mou_data()
-          this.$refs.page.currentPage = 1
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
+            .then(res => {
+              this.$Notice.success({
+                title: '审核成功',
+                desc: res.data
+              })
+              this.mou_data()
+              this.$refs.page.currentPage = 1
+              this.pass.pass_text = ''
+            })
+            .catch(error => {
+              util.ajanxerrorcode(this, error)
+            })
+        } else {
+          this.$Notice.error({
+              title: '警告',
+              desc: '请填写同意意见'
+            })
+        }
+      })
     },
     out_button () {
       this.modal2 = false
@@ -389,24 +438,35 @@ export default {
       this.pass.pass = true
     },
     rejecttext () {
-      axios.put(`${util.url}/audit_sql`, {
-          'type': 0,
-          'approve_man': Cookies.get('user'),
-          'text': this.reject.textarea,
-          'apply_man': this.formitem.username,
-          'basename': this.formItem.basename,
-          'id': this.formitem.id
-        })
-        .then(res => {
-          this.$Notice.warning({
-            title: res.data
-          })
-          this.mou_data()
-          this.$refs.page.currentPage = 1
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
+      this.$refs['rejectItemForm'].validate((valid) => {
+        console.log(valid)
+        if (valid) {
+            axios.put(`${util.url}/audit_sql`, {
+                'type': 0,
+                'approve_man': Cookies.get('user'),
+                'text': this.reject.reject_text,
+                'apply_man': this.formitem.username,
+                'basename': this.formitem.basename,
+                'id': this.formitem.id
+              })
+              .then(res => {
+                this.$Notice.warning({
+                  title: res.data
+                })
+                this.mou_data()
+                this.$refs.page.currentPage = 1
+                this.reject.reject_text = ''
+              })
+              .catch(error => {
+                util.ajanxerrorcode(this, error)
+              })
+        } else {
+          this.$Notice.error({
+              title: '警告',
+              desc: '请填写驳回意见'
+            })
+        }
+      })
     },
     test_button () {
       axios.put(`${util.url}/audit_sql`, {

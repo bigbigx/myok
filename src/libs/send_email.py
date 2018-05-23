@@ -153,9 +153,12 @@ class send_email(object):
             text = '<html><body><h1>工单标题：%s</h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
+                   '<br><p>机房: %s</p>' \
+                   '<br><p>连接名: %s</p>' \
+                   '<br><p>数据库: %s</p>' \
+                   '<br><p>受影响的应用系统: %s</p>' \
                    '<br><p>执行SQL: %s</p>' \
                    '<br><p>备份SQL: %s</p>' \
-                   '<br><p>受影响的应用系统: %s</p>' \
                    '<br><p>状态: 审核驳回 (注意：请登录平台进行sql调整)</p>' \
                    '<br><p>驳回说明: %s</p>' \
                    '<br><p>登录平台: <a href="http://ops.51dinghuo.cc"  target="_blank">点击登录</a></p>' \
@@ -163,9 +166,12 @@ class send_email(object):
                        mail_data['text'],
                        mail_data['workid'],
                        mail_data['apply_man'],
+                       mail_data['computer_room'],
+                       mail_data['connection_name'],
+                       mail_data['db'],
+                       mail_data['system'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
-                       mail_data['system'],
                        mail_data['rejected'])
             msg['To'] = self._format_addr('Dear 用户 <%s>' % self.to_addr)
             msg['Subject'] = Header('蜜罐运维工单状态反馈---SQL审核驳回', 'utf-8').encode()
@@ -198,6 +204,7 @@ class send_email(object):
             server = smtplib.SMTP_SSL(smtp_server, port=465)
             server.set_debuglevel(1)
             server.login(from_addr, password)
+            print([self.to_addr])
             # server.sendmail(from_addr, [self.to_addr] + cc_list, msg.as_string())
             server.sendmail(from_addr, [self.to_addr], msg.as_string())
             server.quit()
@@ -207,11 +214,13 @@ class send_email(object):
             text = '<html><body><h1> 工单标题：%s  </h1>' \
                    '<br><p>工单号: %s</p>' \
                    '<br><p>工单发起人: %s</p>' \
+                   '<br><p>机房: %s</p>' \
+                   '<br><p>连接名: %s</p>' \
                    '<br><p>数据库: %s</p>' \
-                   '<br><p>执行SQL: %s</p>' \
-                   '<br><p>备份SQL: %s</p>' \
                    '<br><p>受影响的应用系统: %s</p>' \
                    '<br><p>状态: 成功申请工单</p>' \
+                   '<br><p>执行SQL: %s</p>' \
+                   '<br><p>备份SQL: %s</p>' \
                    '<br><p>登录平台: <a href=%s  target="_blank">点击登录</a></p>' \
                    '<br><p>请审核人操作: (注意：点击审核同意，不会马上执行SQL) &nbsp&nbsp' \
                    '<a href="%s/api/v1/audit_token?type=1&db=%s&apply_man=%s&approve_man=%s&workid=%s&mytoken=%s">审核通过</a> ' \
@@ -223,10 +232,12 @@ class send_email(object):
                        mail_data['text'],
                        mail_data['workid'],
                        mail_data['apply_man'],
+                       mail_data['computer_room'],
+                       mail_data['connection_name'],
                        mail_data['db'],
+                       mail_data['system'],
                        mail_data['run_sql'],
                        mail_data['backup_sql'],
-                       mail_data['system'],
                        # mail_data['addr'],
                        # mail_data['orderID'],
                        # mail_data['tokens'],

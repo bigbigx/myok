@@ -40,12 +40,18 @@
             <h3 style="margin-left: 35%">蜜罐运维平台SQL审核工单</h3>
           </div>
           <p class="step-content"></p>
-          <Form  ref="formItem" :model="formItem" class="step-form" :label-width="100">
+          <Form  ref="formItem" :model="formItem" :rules="ruleValidate"  class="step-form" :label-width="100">
             <FormItem label="工单ID:">
               <p>{{formItem.id}}</p>
             </FormItem>
-            <FormItem label="用户名:">
+            <FormItem label="受影响应用系统:">
+              <p>{{formItem.system}}</p>
+            </FormItem>
+            <FormItem label="提交人:">
               <p>{{formItem.username}}</p>
+            </FormItem>
+            <FormItem label="审核人:">
+              <p>{{formItem.approve_man}}</p>
             </FormItem>
             <FormItem label="机房:">
               <p>{{formItem.computer_room}}</p>
@@ -59,7 +65,7 @@
             <FormItem label="数据库编号:">
               <p>{{formItem.base_id}}</p>
             </FormItem>
-            <FormItem label="执行SQL:">
+            <FormItem label="执行SQL:" prop="sql">
               <template v-if="sqltype===0">
               <Input v-model="sql" type="textarea" :rows="8"></Input>
               </template>
@@ -78,31 +84,42 @@
             <FormItem label="工单提交说明:">
               <Input v-model="formItem.text" placeholder="最多不超过20个字"></Input>
             </FormItem>
-            <FormItem label="是否备份">
-              <RadioGroup v-model="formItem.backup">
-                <Radio label="1">是</Radio>
-                <Radio label="0">否</Radio>
-              </RadioGroup>
-            </FormItem>
+            <!--<FormItem label="是否备份">-->
+              <!--<RadioGroup v-model="formItem.backup">-->
+                <!--<Radio label="1">是</Radio>-->
+                <!--<Radio label="0">否</Radio>-->
+              <!--</RadioGroup>-->
+            <!--</FormItem>-->
           </Form>
         </Card>
       </Row>
       <div>
-         <p align:center>执行SQL检测结果</p>
+         <p align:center>执行SQL 检测结果</p>
          <Table :columns="columnsName" :data="Testresults_ddl" highlight-row></Table>
       </div>
       <div>
-         <p align:center>备份SQL检测结果</p>
+         <p align:center>执行SQL Explain结果</p>
+         <Table :columns="columnsName_explain" :data="Testresults_ddl_explain" highlight-row></Table>
+      </div>
+      <div>
+         <p align:center>备份SQL 检测结果</p>
          <Table :columns="columnsName" :data="Testresults_backup" highlight-row></Table>
       </div>
+      <div>
+         <p align:center>备份SQL Explain结果</p>
+         <Table :columns="columnsName_explain" :data="Testresults_backup_explain" highlight-row></Table>
+      </div>
+
       <div slot="footer">
          <Row>
             <Col span="12" style="text-align: left;">
                  <Button type="default" @click="cancel_button">取消</Button>
+           <Button type="default" icon="trash-a" @click.native="_Beauty" style="margin-left: 10%">美化</Button>
             </Col>
             <Col span="12">
-                <Button type="default" icon="trash-a" @click.native="_Beauty" style="margin-left: 10%">美化</Button>
+
                 <Button type="warning" icon="android-search" @click.native="_Test" style="margin-left: 10%">检测</Button>
+                <Button type="warning" icon="android-search" @click.native="_Explain" style="margin-left: 10%">Explain</Button>
                 <Button type="success" icon="ios-redo" @click.native="_Putorder" style="margin-left: 10%"  :disabled="this.validate_gen_new">提交</Button>
             </Col>
          </Row>
@@ -121,7 +138,7 @@ export default {
   name: 'myorder-list',
   data () {
     return {
-      validate_gen: true,
+      validate_gen_new: true,
       tabcolumns: [
         {
           title: 'sql语句',
@@ -134,8 +151,53 @@ export default {
           width: 550
         }
       ],
+      columnsName_explain: [
+        {
+          title: 'SelectType',
+          key: 'select_type'
+        },
+        {
+          title: 'Table',
+          key: 'table'
+        },
+        {
+          title: 'Type',
+          key: 'type'
+        },
+        {
+          title: 'Possiblekeys',
+          key: 'possiblekeys'
+        },
+        {
+          title: 'Key',
+          key: 'key'
+        },
+        {
+          title: 'KeyLen',
+          key: 'key_len'
+        },
+        {
+          title: 'Ref',
+          key: 'ref'
+        },
+        {
+          title: 'Rows',
+          key: 'rows'
+        },
+        {
+          title: 'Extra',
+          key: 'extra'
+        }
+      ],
       TableDataNew: [],
       sql: '',
+      ruleValidate: {
+        sql: [{
+          required: true,
+          message: '执行SQL不得为空',
+          trigger: 'blur'
+        }]
+      },
       backup_sql: '',
       openswitch: false,
       single: false,
@@ -145,6 +207,7 @@ export default {
         connection_name: '',
         basename: '',
         username: '',
+        approve_man: '',
         bundle_id: null
       },
       columnsName: [
@@ -184,10 +247,14 @@ export default {
       ],
       Testresults: [],
       Testresults_backup: [],
+      Testresults_ddl: [],
+      Testresults_ddl_explain: [],
+      Testresults_backup_explain: [],
       ddlsql: [],
       baksql: [],
       sqltype: null,
-      dmlorddl: null
+      dmlorddl: null,
+      run_type: 0
     }
   },
   methods: {
@@ -205,6 +272,86 @@ export default {
     },
     cancel_button () {
       this.reloadsql = false
+    },
+    _Explain () {
+      this.$refs['formItem'].validate((valid) => {
+        console.log(valid, 'jianglb')
+        if (valid) {
+          if (this.formItem.backup_sql || this.formItem.sql) {
+            let tmpddl2 = ''
+            // let tmpddl = ''
+            // let tmpbak = ''
+            let tmpbak2 = ''
+            if (this.formItem.backup_sql) {
+              tmpbak2 = this.formItem.backup_sql.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+              // tmpbak = this.formItem.textarea_backup.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+              // tmpbak = ''
+            }
+            if (this.formItem.sql) {
+              tmpddl2 = this.formItem.sql.replace(/--.*\n/g, '').replace(/\n/g, ' ').replace(/(;|；)$/gi, '').replace(/；/g, ';')
+              // tmpddl = this.formItem.textarea_ddl_dml.replace(/(;|；)$/gi, '').replace(/；/g, ';')
+            } else {
+              // tmpddl = ''
+            }
+            // console.log(tmpddl2 + '&&&' + tmpbak2, 'test')
+            axios.put(`${util.url}/sqlsyntax/explain`, {
+              'id': this.formItem.base_id,
+              'base': this.formItem.basename,
+              'type': 1,
+              'sql': tmpddl2 + '&&&' + tmpbak2
+            }).then(res => {
+                console.log(res.data, 'newtest')
+                if (res.data.status === 200) {
+                  this.Testresults_ddl_explain = res.data.result_ddl_explain
+                  this.Testresults_backup_explain = res.data.result_bak_explain
+                  this.Testresults_backup_explain_error = '';
+                  this.Testresults_explain_error = '';
+                  this.validate_gen_new = false;
+                  this.run_type = 1;
+                } else if (res.data.status === 202) {
+                   console.log(res.data, 'new1')
+                    this.$Notice.error({
+                    title: '执行语句错误',
+                    desc: res.data.data_ddl,
+                    duration: 15
+                 })
+                   // this.Testresults_explain = '';
+                   this.Testresults_explain_error = res.data.err_msg;
+                   // this.Testresults_backup_explain_error = '';
+                   this.validate_gen_new = true;
+                } else if (res.data.status === 203) {
+                  // console.log(res.data, 'new1')
+                  this.$Notice.error({
+                    title: '备份语句错误',
+                    desc: res.data.data_bak,
+                    duration: 15
+                 })
+                   this.Testresults_backup_explain = '';
+                   this.Testresults_backup_explain_error = res.data.err_msg;
+                   this.Testresults_explain_error = '';
+                   this.validate_gen_new = true;
+                } else {
+                  this.$Notice.error({
+                   title: '错误-1',
+                   desc: '未知的错误'
+                 })
+                  this.validate_gen_new = true;
+               }
+              })
+              .catch((error) => {
+                alert('error')
+                  this.$Notice.error({
+                    title: '错误',
+                    desc: error
+                  })
+              })
+          } else {
+            this.$Message.error('请填写sql语句后再测试!');
+          }
+        }
+      })
+
     },
     _Beauty () {
       axios.put(`${util.url}/sqlsyntax/beautify`, {
@@ -316,8 +463,10 @@ export default {
           'data': JSON.stringify(this.formItem),
           'sql': JSON.stringify(_tmpsql),
           'backup_sql': JSON.stringify(_tmpsqlbak),
-          'user': Cookies.get('user'),
+          'apply_man': Cookies.get('user'),
           'type': this.dmlorddl,
+          'run_type': this.run_type,
+          'cc_list': [],
           'id': this.formItem.bundle_id
         })
           .then(() => {
@@ -336,7 +485,7 @@ export default {
           'data': JSON.stringify(this.formItem),
           'sql': JSON.stringify(this.ddlsql),
           'backup_sql': JSON.stringify(this.baksql),
-          'user': Cookies.get('user'),
+          'apply_man': Cookies.get('user'),
           'type': this.dmlorddl,
           'id': this.formItem.bundle_id
         })

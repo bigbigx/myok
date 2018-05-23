@@ -43,7 +43,7 @@
         <span>{{ formitem.text }}</span>
       </FormItem>
       <FormItem label="影响应用系统:">
-        <span>{{ formitem.affectd_system }}</span>
+        <span>{{ formitem.system }}</span>
       </FormItem>
       <FormItem label="提交时间:">
         <span>{{ formitem.date }}</span>
@@ -52,7 +52,7 @@
         <span>{{ formitem.username }}</span>
       </FormItem>
       <FormItem label="审核人:">
-        <span>{{ formitem.assigned }}</span>
+        <span>{{ formitem.approve_man }}</span>
       </FormItem>
       <FormItem label="审核时间:">
         <span>{{ formitem.approvetime }}</span>
@@ -120,7 +120,7 @@ export default {
         },
         {
           title: '应用系统',
-          key: 'affectd_system',
+          key: 'system',
           sortable: true,
           width: 130
         },
@@ -138,7 +138,7 @@ export default {
         },
         {
           title: '审核人',
-          key: 'assigned',
+          key: 'approve_man',
           sortable: true,
           width: 150
         },
@@ -265,9 +265,9 @@ export default {
         username: '',
         dataadd: '',
         database: '',
-        affectd_system: '',
+        system: '',
         att: '',
-        assigned: '',
+        approve_man: '',
         approvetime: '',
         id: null
       },
@@ -350,7 +350,7 @@ export default {
       axios.put(`${util.url}/execute_sql`, {
           'type': 1,
           'apply_man': this.formitem.username,
-          'approve_man': this.formitem.assigned,
+          'approve_man': this.formitem.approve_man,
           'db': this.formitem.basename,
           'id': this.formitem.id
         })
@@ -375,7 +375,7 @@ export default {
           'type': 0,
           'from_user': Cookies.get('user'),
           'text': this.reject.textarea,
-          'to_user': this.formitem.assigned,
+          'to_user': this.formitem.approve_man,
           'id': this.formitem.id
         })
         .then(res => {

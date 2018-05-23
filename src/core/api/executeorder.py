@@ -47,7 +47,7 @@ class execute(baseview.Approverpermissions):
             return HttpResponse(status=500)
         else:
             try:
-                # pagenumber = SqlOrder.objects.filter(assigned=username).aggregate(alter_number=Count('id'))
+                # pagenumber = SqlOrder.objects.filter(approve_man=username).aggregate(alter_number=Count('id'))
                 pagenumber = SqlOrder.objects.filter(status=1).aggregate(alter_number=Count('id'))
                 start = (int(page) - 1) * 20
                 end = int(page) * 20
@@ -299,7 +299,7 @@ class execute(baseview.Approverpermissions):
                                     workid=c.work_id,
                                     person=c.username,
                                     runtime=cur_time_run,
-                                    # reviewer=c.assigned,
+                                    # reviewer=c.approve_man,
                                     reviewer=execute_man,
                                     affectrow='',
                                     sequence='',
@@ -318,7 +318,7 @@ class execute(baseview.Approverpermissions):
                                         base=c.basename,
                                         workid=c.work_id,
                                         person=c.username,
-                                        # reviewer=c.assigned,
+                                        # reviewer=c.approve_man,
                                         reviewer=execute_man,
                                         affectrow=i['affected_rows'],
                                         sequence=i['sequence'],
@@ -390,7 +390,7 @@ class execute(baseview.Approverpermissions):
                                             'backup_sql': bak_sql,
                                             'addr': addr_ip,
                                             'text': c.text,
-                                            'system': c.affectd_system,
+                                            'system': c.system,
                                             'status': 'run',
                                             'type': '执行成功',
                                             'backup': backup_status,

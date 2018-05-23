@@ -130,10 +130,12 @@ class sqlorder(baseview.BaseView):
             pass
 
 
+
         elif args == 'explain':  # explain检测，将explain的检测发送到前端
             try:
                 type = int(request.data['type'])
                 id = request.data['id']
+                print(id)
                 base = request.data['base']
                 tmp_sql = request.data['sql']
                 # check_sql = request.data['check_sql']
@@ -147,6 +149,7 @@ class sqlorder(baseview.BaseView):
                 # sql_bak_1 = check_sql.split('&&&')[1]
                 #base_id = request.data['base_id']
                 data = DatabaseList.objects.filter(id=id).first()
+                print(data)
                 info = {
                     'host': data.ip,
                     'user': data.username,
@@ -154,7 +157,9 @@ class sqlorder(baseview.BaseView):
                     'db': base,
                     'port': data.port
                     }
-            except KeyError as e:
+            # except KeyError as e:
+            except Exception as e:
+                print(e)
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             else:
                 res_ddl_list = []
@@ -203,21 +208,18 @@ class sqlorder(baseview.BaseView):
             tmp_sql = json.loads(request.data['sql'])
             tmp_bak = json.loads(request.data['backup_sql'])
             apply_man = request.data['apply_man']
-            approve_man=data['approve_man']
+            approve_man = data['approve_man']
             system = data['system']
             type = request.data['type']
             run_type = request.data['run_type']
             basename = data['basename']
+            computer_room = data['computer_room']
+            connection_name = data['connection_name']
             id = request.data['id']
             cc_list = request.data['cc_list']
-            # try:
-            #     cc_str = []
-            #     for item in cc_list:
-            #         cc_list.append(item)
-            #     print(cc_str)
-            # except Exception as e:
-            #     print(e)
+
         except KeyError as e:
+            print(e)
             CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             return HttpResponse(status=500)
         else:
@@ -241,19 +243,21 @@ class sqlorder(baseview.BaseView):
                     date=util.date(),
                     work_id=workId,
                     status=2,
-                    basename=data['basename'],
+                    basename=basename,
+                    computer_room=computer_room,
+                    connection_name=connection_name,
                     sql=sql_1,
                     type=type,
                     text=data['text'],
                     backup=data['backup'],
                     bundle_id=id,
-                    assigned=data['approve_man'],
+                    approve_man=data['approve_man'],
                     backup_sql=sql_2,
                     reject="",
                     base_id=id,
                     run_type=run_type,
                     cc_list=cc_list,
-                    affectd_system=system
+                    system=system
                     )
 #
                 content = DatabaseList.objects.filter(id=id).first()
@@ -273,7 +277,7 @@ class sqlorder(baseview.BaseView):
                 #             ret_info = '工单提交成功!但是钉钉推送失败,请查看错误日志排查错误.'
                 # 保存token
                 try:
-                    #value = [(assigned_man, workId, token)]
+                    #value = [(approve_man, workId, token)]
                     conn_sqlite.add_one(approve_man, workId, token)
                 except Exception as e:
                     print(e)
@@ -297,6 +301,8 @@ class sqlorder(baseview.BaseView):
                             'backup_sql':sql_2,
                             'status': 'apply',
                             'cc_list': cc_list,
+                            'computer_room': computer_room,
+                            'connection_name': connection_name,
                             'approve_man': approve_man,
                             'token_pass': token,    # 定义审核通过URL 的token
                             'token_reject': token,  #定义审核驳回URL 的token

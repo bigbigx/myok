@@ -114,8 +114,8 @@
             <Input v-model="formItem.text" placeholder="最多不超过20个字"></Input>
           </FormItem>
           <FormItem label="指定审核人:">
-            <Select v-model="formItem.assigned">
-              <Option v-for="i in this.assigned" :value="i.username" :key="i.username">{{i.username}}</Option>
+            <Select v-model="formItem.approve_man">
+              <Option v-for="i in this.approve_man" :value="i.username" :key="i.username">{{i.username}}</Option>
             </Select>
           </FormItem>
           <FormItem label="是否备份">
@@ -290,12 +290,12 @@ export default {
         basename: '',
         tablename: '',
         backup: 0,
-        assigned: ''
+        approve_man: ''
       },
       id: null,
       tabs: 'order1',
       optionData: ['varchar', 'int', 'char', 'tinytext', 'text', 'mediumtext', 'longtext', 'tinyint', 'smallint', 'mediumint', 'bigint'],
-      assigned: []
+      approve_man: []
     }
   },
   methods: {
@@ -351,7 +351,7 @@ export default {
       axios.put(`${util.url}/workorder/connection`)
         .then(res => {
           this.item = res.data['connection']
-          this.assigned = res.data['person']
+          this.approve_man = res.data['person']
         })
         .catch(error => {
           util.ajanxerrorcode(this, error)

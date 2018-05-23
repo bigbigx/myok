@@ -43,7 +43,7 @@ class audit(baseview.Approverpermissions):
             return HttpResponse(status=500)
         else:
             try:
-                pagenumber = SqlOrder.objects.filter(assigned=username).aggregate(alter_number=Count('id'))
+                pagenumber = SqlOrder.objects.filter(approve_man=username).aggregate(alter_number=Count('id'))
                 start = (int(page) - 1) * 20
                 end = int(page) * 20
                 info = SqlOrder.objects.raw(
@@ -51,7 +51,7 @@ class audit(baseview.Approverpermissions):
                     select core_sqlorder.*,core_databaselist.connection_name, \
                     core_databaselist.computer_room from core_sqlorder \
                     INNER JOIN core_databaselist on \
-                    core_sqlorder.bundle_id = core_databaselist.id where core_sqlorder.assigned = '%s'\
+                    core_sqlorder.bundle_id = core_databaselist.id where core_sqlorder.approve_man = '%s'\
                     ORDER BY core_sqlorder.id desc
                     '''%username
                 )[start:end]
@@ -145,11 +145,14 @@ class audit(baseview.Approverpermissions):
                                             mess_info = {
                                                 'workid':_tmpData['work_id'],
                                                 'apply_man': apply_man,
+                                                'system': data.system,
                                                 'addr': addr_ip,
                                                 'type': "审核驳回",
                                                 'status':'back',
                                                 'text': _tmpData['text'],
                                                 'run_sql':data.sql,
+                                                'computer_room': data.computer_room,
+                                                'connection_name':data.connection_name,
                                                 'backup_sql':data.backup_sql,
                                                 'rejected': text,
                                                 'db': data.basename,
@@ -157,7 +160,8 @@ class audit(baseview.Approverpermissions):
                                                 'note': content.after}
                                             put_mess = send_email.send_email(to_addr=apply_man_mail.email)
                                             put_mess.send_mail(mail_data=mess_info,type=1)
-                                    except:
+                                    except  Exception as e:
+                                        print(e)
                                         ret_info = '工单审核驳回成功!但是邮箱推送失败,请查看错误日志排查错误.'
                                 # ----删除token
                                 try:
@@ -169,7 +173,7 @@ class audit(baseview.Approverpermissions):
                                     return HttpResponse(ret_info)
                                 return Response(ret_info)
                         else:
-                            ret_info = '<h1>您已成功进行审核驳回，无需进行二次操作</h1>'
+                            ret_info = '您已成功进行审核驳回，无需进行二次操作'
                             return HttpResponse(ret_info)
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
@@ -236,7 +240,8 @@ class audit(baseview.Approverpermissions):
                             #ret_info = '操作成功，该请求已同意!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                             ret_info = '该工单已审核通过!'
                             SqlOrder.objects.filter(id=id).update(approvetime=cur_time)  # 记录审核通过时间
-                            SqlOrder.objects.filter(id=id).update(pass_remark=pass_remark)  # 记录审核同意的备注
+                            # SqlOrder.objects.filter(id=id).update(pass_remark=pass_remark)  # 记录审核同意的备注
+                            SqlOrder.objects.filter(id=id).update(reject=pass_remark)  # 记录审核同意的备注
                                # ----删除审核的token
                             try:
                                 conn_sqlite.delete(approve_man, data.work_id)
@@ -270,7 +275,7 @@ class audit(baseview.Approverpermissions):
                                             #'to_executor': d.username,
                                             'addr': addr_ip,
                                             'text': c.text,
-                                            'system': c.affectd_system,
+                                            'system': c.system,
                                             'approvetime': c.approvetime,
                                             'apply_time': c.date,
                                             'type': "审核成功",
@@ -294,11 +299,12 @@ class audit(baseview.Approverpermissions):
 
                             return Response(ret_info)
                         else:
-                            ret_info = '<h1>您已成功进行审核通过，无需进行二次操作</h1>'
+                            ret_info = '您已成功进行审核通过，无需进行二次操作'
                             return HttpResponse(ret_info)
                     except Exception as e:
                         CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                         return HttpResponse(status=500)
+
 
             elif type == 'test':
                 try:

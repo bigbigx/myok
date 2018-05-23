@@ -174,12 +174,14 @@ class SqlOrder(models.Model):
     backup = models.SmallIntegerField(blank=True)  # 工单是否备份 0 not backup 1 backup
     bundle_id = models.IntegerField(db_index=True, null=True) # Matching with Database_list id Field
     date = models.CharField(max_length=100, blank=True) # 提交日期
+    computer_room = models.CharField(max_length=100, blank=True) # 机房名称
+    connection_name = models.CharField(max_length=100, blank=True) # 连接名
     basename = models.CharField(max_length=50, blank=True) #数据库名
     base_id = models.IntegerField(blank=True,null=True)  # 数据库的编号
     sql = models.TextField(blank=True) #sql语句
     text = models.CharField(max_length=300) # 工单备注
-    affectd_system = models.CharField(max_length=300,blank=True) # 被影响到的应用系统
-    assigned = models.CharField(max_length=50, blank=True)# 工单审核人
+    system = models.CharField(max_length=300,blank=True) # 被影响到的应用系统
+    approve_man = models.CharField(max_length=50, blank=True)# 工单审核人
     execut_man = models.CharField(max_length=50, blank=True)# 工单执行人
     approvetime = models.CharField(max_length=50, blank=True)# 工单审核时间
     runtime = models.CharField(max_length=50, blank=True)# 工单执行时间

@@ -51,15 +51,15 @@ export default {
         },
         {
           title: '应用系统',
-          key: 'affectd_system',
+          key: 'system',
           sortable: true,
-          width: 130
+          width: 150
         },
         {
           title: '提交时间',
           key: 'date',
           sortable: true,
-          width: 145
+          width: 180
         },
         {
           title: '提交人',
@@ -69,7 +69,7 @@ export default {
         },
         {
           title: '审核人',
-          key: 'assigned',
+          key: 'approve_man',
           sortable: true,
           width: 100
         },
@@ -148,17 +148,17 @@ export default {
         {
           title: '审核备注',
           key: 'reject',
-          width: 155
+          width: 200
         },
         {
           title: '审核时间',
           key: 'approvetime',
-          width: 150
+          width: 180
         },
         {
           title: '执行时间',
           key: 'runtime',
-          width: 150
+          width: 180
         },
         {
           title: '操作',

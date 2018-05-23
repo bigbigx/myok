@@ -60,11 +60,18 @@
               <!--<Button type="default" icon="ios-redo" @click.native="ChooseMylaimi()"  :enabled="this.validate_gen1">我的测试库</Button>-->
               <!--<Button type="default" icon="ios-redo" @click.native="ReChooseDB()"   style="margin-left: 10%" :enabled="this.validate_gen1">重新选择</Button>-->
           </FormItem>
-            <FormItem label="是否备份: " prop="backup">
-              <RadioGroup v-model="formItem.backup">
+            <FormItem label="是否备份: " prop="backup" >
+              <Tooltip placement="top">
+              <RadioGroup v-model="formItem.backup" >
                 <Radio label="1">是(默认)</Radio>
-                <Radio label="0">否</Radio>
+                <Radio label="0" @click.native="SwitchBackupOrNot">否</Radio>
               </RadioGroup>
+                <div slot="content">
+                  <p>请注意： 如果勾选了"否" ,</p>
+                  <p>备份语句编辑框的SQL将会被清空</p>
+                  <p>请注意备份SQL的保存</p>
+              </div>
+              </Tooltip>
             </FormItem>
             <FormItem label="工单说明:" prop="text">
               <Input type="textarea" :rows="6" v-model="formItem.text" placeholder="请输入"></Input>
@@ -278,28 +285,23 @@ export default {
       columnsName_explain: [
         {
           title: 'SelectType',
-          key: 'select_type',
-          width: '100'
+          key: 'select_type'
         },
         {
           title: 'Table',
-          key: 'table',
-          width: '100'
+          key: 'table'
         },
         {
           title: 'Type',
-          key: 'type',
-          width: '100'
+          key: 'type'
         },
         {
           title: 'Possiblekeys',
-          key: 'possiblekeys',
-          width: '150'
+          key: 'possiblekeys'
         },
         {
           title: 'Key',
-          key: 'key',
-          width: '80'
+          key: 'key'
         },
         {
           title: 'KeyLen',
@@ -307,18 +309,15 @@ export default {
         },
         {
           title: 'Ref',
-          key: 'ref',
-          width: '130'
+          key: 'ref'
         },
         {
           title: 'Rows',
-          key: 'rows',
-          width: '80'
+          key: 'rows'
         },
         {
           title: 'Extra',
-          key: 'extra',
-          width: '130'
+          key: 'extra'
         }
       ],
       Testresults: [],
@@ -402,6 +401,12 @@ export default {
     }
   },
   methods: {
+    SwitchBackupOrNot () {
+       // if (this.formItem.backup === 0 ) {
+       //    this.formItem.textarea_backup = ''
+       // }
+       this.formItem.textarea_backup = '';
+    },
     chooseapprover (val) {
      if (val === '0') {
         this.formItem.approve_man = 'liuyan';
