@@ -152,7 +152,9 @@ class HostUserPwd(models.Model):
 
 class Config(models.Model):
     name = models.CharField(max_length=50, blank=True)  # 配置名称
-    type = models.CharField(max_length=50, blank=True)  # 配置类型
+    type = models.IntegerField(default=1, blank=True)  # 配置类型编号  1--平台模块 2--系统配置
+    flow_or_not = models.IntegerField(default=1, blank=True)  # 配置类型编号  1----需要走流程  0---不需要走流程
+    type_name = models.CharField(max_length=50, blank=True)  # 配置类型
     status = models.CharField(max_length=50, blank=True) #配置启用状态
     remark = models.CharField(max_length=50, blank=True) # 配置
 

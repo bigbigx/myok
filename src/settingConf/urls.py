@@ -45,6 +45,9 @@ from core.api.authtoken import (
 from core.api.exetoken import (
     exetoken
 )
+from core.api.config import (
+    config
+)
 
 from core.api.record import recordorder
 from core.api.sqlorder import sqlorder
@@ -74,6 +77,7 @@ urlpatterns = [
     url(r'^api/v1/download', downloadFile),
     url(r'^api-token-auth/', login_auth.as_view()),
     url(r'^api/v1/audit_token', authtoken.as_view()),
-    url(r'^api/v1/exe_token', exetoken.as_view())
+    url(r'^api/v1/exe_token', exetoken.as_view()),
+    url(r'^api/v1/config', config.as_view())
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -13,8 +13,8 @@ conf = util.conf_path()
 from_addr = conf.mail_user
 password = conf.mail_password
 smtp_server = conf.smtp
-login_url="http://ops.51dinghuo.cc"
-# login_url="http://127.0.0.1:88"
+# login_url="http://ops.51dinghuo.cc"
+login_url="http://127.0.0.1:88"
 
 
 

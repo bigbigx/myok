@@ -41,7 +41,7 @@ class exetoken(baseview.AnyLogin):
                 basename = request.GET.get('db')
                 approve_man = request.GET.get('approve_man')
                 apply_man = request.GET.get('apply_man')
-                execute_man= 'dba'
+                execute_man = 'dba'
                 cur_time_run = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             except KeyError as e:
                 CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')

@@ -36,13 +36,13 @@
           <Input v-model="userinfo.email" placeholder="请输入"></Input>
         </FormItem>
         <FormItem label="平台模块:" prop="module">
-
         <Transfer
-        :data="desc_data"
-        :target-keys="targetKeys"
-        :render-format="render"
-        :filter-method="filterMethod"
-        @on-change="handleChange1"></Transfer>
+          :data="module_list"
+          :target-keys="targetKeys"
+          :render-format="myrender"
+          @on-change="handleChange">
+          <!--:filter-method="filterMethod"-->
+        </Transfer>
           </FormItem>
         <br><br>
         <Button type="primary" @click.native="Registered" style="margin-left: 35%">注册</Button>
@@ -63,7 +63,6 @@
     <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
   </Card>
   </Col>
-
   <Modal v-model="editPasswordModal" :closable='false' :mask-closable=false :width="500">
     <h3 slot="header" style="color:#2D8CF0">修改用户密码</h3>
     <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
@@ -145,6 +144,7 @@ import axios from 'axios'
 import '../../assets/tablesmargintop.css'
 import util from '../../libs/util'
 export default {
+  name: 'userinfo',
   data () {
     const valideRePassword = (rule, value, callback) => { // eslint-disable-line no-unused-vars
       if (value !== this.editPasswordForm.newPass) {
@@ -161,8 +161,8 @@ export default {
       }
     };
     return {
-      desc_data: this.getMockData(),
-      targetKeys: this.getTargetKeys(),
+      module_list: [],
+      targetKeys: [],
       columns6: [
         {
           title: '用户名',
@@ -293,6 +293,7 @@ export default {
         }
       ],
       data5: [],
+
       pagenumber: 1,
       // 新建用户
       userinfo: {
@@ -415,31 +416,43 @@ export default {
       confirmuser: '',
       deluserModal: false
     }
-  },
+  },/*
+  computed: {
+    desc_data () {
+      return this.module_list.map(item => {
+        return item.name
+      })
+    }
+  },*/
   methods: {
-    // 注册用户时选择平台模块的获取源和目标的数据源
+    /*// 注册用户时选择平台模块的获取源和目标的数据源
     getMockData () {
                 let mockData = [];
-                mymodules = getModuleList
-                for (let i = 1; i <= mymodules.length; i++) {
+                my_data =  this.module_list
+                console.log(my_data, 'test')
+                for (let i = 1; i <= my_data.length; i++) {
                     mockData.push({
-                        key: i.name.toString(),
-                        label: i,
+                        key: my_data[i],
+                        label: 'Content ' + i,
                         description: 'The desc of content  ' + i,
                         disabled: Math.random() * 3 < 1
                     });
                 }
                 return mockData;
-            },
-            getTargetKeys () {
+            },*/
+    /*getTargetKeys () {
                 return this.getMockData()
                         .filter(() => Math.random() * 2 > 1)
                         .map(item => item.key);
+                // data1 = this.getMockData().map(item => item.key)
+                // alert(data1)
+                // console.log(data1, 'data-jianglb')
+                // return this.module_list.map(item => item.key)
+            },*/
+    myrender (item) {
+                return item.name;
             },
-            render (item) {
-                return item.label;
-            },
-            handleChange1 (newTargetKeys, direction, moveKeys) {
+    handleChange (newTargetKeys, direction, moveKeys) {
                 console.log(newTargetKeys);
                 console.log(direction);
                 console.log(moveKeys);
@@ -484,6 +497,7 @@ export default {
     Registered () {
       this.$refs['userinfova'].validate((valid) => {
         if (valid) {
+          alert(this.userinfo.username)
           axios.post(util.url + '/userinfo/', {
               'username': this.userinfo.username,
               'password': this.userinfo.password,
@@ -507,11 +521,14 @@ export default {
         }
       })
     },
-    getModuleList () {
-      axios.get(`${util.url}/userinfo/all?page=${vl}`)
+    getModuleList ( type = 1, flow = 1) {
+      axios.get(`${util.url}/config?type=${type}&flow=${flow}`)
         .then(res => {
-          this.data5 = res.data.data
-          this.pagenumber = parseInt(res.data.page.alter_number)
+          res.data.forEach(item => {
+            item.key = item.id + ''
+          })
+          this.module_list = res.data
+          console.log(this.module_list, 'qqq')
         })
         .catch(error => {
           util.ajanxerrorcode(this, error)
@@ -604,6 +621,8 @@ export default {
   },
   mounted () {
     this.refreshuser()
+    this.getModuleList()/*
+    this.targetKeys = this.getTargetKeys()*/
   }
 }
 </script>
