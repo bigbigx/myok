@@ -4,8 +4,8 @@
 '''
 
 def readfile():
-        # filename ='/root/myok/src/libs/business.txt'
-        filename = 'D:\\devops\\myok\\src\\libs\\business.txt'
+        filename ='/root/myok/src/libs/business.txt'
+        # filename = 'D:\\devops\\myok\\src\\libs\\business.txt'
         # exmail_addr = []
         # user_name = []
         result_inner = {'mail': '', 'username': ''}
