@@ -4,7 +4,7 @@
 </style>
 <template>
 <div>
-  <Col span="6">
+  <Col span="9">
   <Card>
     <p slot="title">
       <Icon type="load-b"></Icon>
@@ -24,7 +24,7 @@
         <FormItem label="部门" prop="department">
           <Input v-model="userinfo.department" placeholder="请输入"></Input>
         </FormItem>
-        <FormItem label="角色" prop="group">
+        <FormItem label="角色:" prop="group">
           <Select v-model="userinfo.group" placeholder="请选择">
               <Option value="admin">管理员</Option>
               <Option value="approver">审核员</Option>
@@ -32,15 +32,25 @@
               <Option value="guest">使用者</Option>
             </Select>
         </FormItem>
-        <FormItem label="电子邮箱">
+        <FormItem label="电子邮箱:" prop="email">
           <Input v-model="userinfo.email" placeholder="请输入"></Input>
         </FormItem>
+        <FormItem label="平台模块:" prop="module">
+
+        <Transfer
+        :data="desc_data"
+        :target-keys="targetKeys"
+        :render-format="render"
+        :filter-method="filterMethod"
+        @on-change="handleChange1"></Transfer>
+          </FormItem>
+        <br><br>
         <Button type="primary" @click.native="Registered" style="margin-left: 35%">注册</Button>
       </Form>
     </div>
   </Card>
   </Col>
-  <Col span="18" class="padding-left-10">
+  <Col span="15" class="padding-left-10">
   <Card>
     <p slot="title">
       <Icon type="ios-crop-strong"></Icon>
@@ -151,31 +161,44 @@ export default {
       }
     };
     return {
+      desc_data: this.getMockData(),
+      targetKeys: this.getTargetKeys(),
       columns6: [
         {
           title: '用户名',
           key: 'username',
+          width: 80,
+          fixed: 'left',
           sortable: true
         },
         {
           title: '角色',
           key: 'group',
+          width: 120,
           sortable: true
         },
         {
           title: '部门',
           key: 'department',
+          width: 120,
+          sortable: true
+        },
+        {
+          title: '模块权限',
+          key: 'module',
+          width: 250,
           sortable: true
         },
         {
           title: 'email',
           key: 'email',
+          width: 250,
           sortable: true
         },
         {
           title: '操作',
           key: 'action',
-          width: 400,
+          width: 350,
           align: 'center',
           render: (h, params) => {
             if (params.row.username !== this.data5[0].username) {
@@ -303,6 +326,11 @@ export default {
             trigger: 'blur'
           }
         ],
+        module: [{
+          required: true,
+          message: '请选择平台模块权限',
+          trigger: 'blur'
+        }],
         confirmpassword: [{
             required: true,
             message: '请再次输入新密码',
@@ -313,6 +341,11 @@ export default {
             trigger: 'blur'
           }
         ],
+        email: [{
+          required: true,
+          message: '请输入邮箱地址',
+          trigger: 'blur'
+        }],
         group: [{
           required: true,
           message: '请输入角色',
@@ -384,6 +417,35 @@ export default {
     }
   },
   methods: {
+    // 注册用户时选择平台模块的获取源和目标的数据源
+    getMockData () {
+                let mockData = [];
+                mymodules = getModuleList
+                for (let i = 1; i <= mymodules.length; i++) {
+                    mockData.push({
+                        key: i.name.toString(),
+                        label: i,
+                        description: 'The desc of content  ' + i,
+                        disabled: Math.random() * 3 < 1
+                    });
+                }
+                return mockData;
+            },
+            getTargetKeys () {
+                return this.getMockData()
+                        .filter(() => Math.random() * 2 > 1)
+                        .map(item => item.key);
+            },
+            render (item) {
+                return item.label;
+            },
+            handleChange1 (newTargetKeys, direction, moveKeys) {
+                console.log(newTargetKeys);
+                console.log(direction);
+                console.log(moveKeys);
+                this.targetKeys = newTargetKeys;
+            },
+
     edituser (index) {
       this.editPasswordModal = true
       this.username = this.data5[index].username
@@ -444,6 +506,16 @@ export default {
             })
         }
       })
+    },
+    getModuleList () {
+      axios.get(`${util.url}/userinfo/all?page=${vl}`)
+        .then(res => {
+          this.data5 = res.data.data
+          this.pagenumber = parseInt(res.data.page.alter_number)
+        })
+        .catch(error => {
+          util.ajanxerrorcode(this, error)
+        })
     },
     refreshuser (vl = 1) {
       axios.get(`${util.url}/userinfo/all?page=${vl}`)

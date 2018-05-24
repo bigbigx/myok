@@ -358,6 +358,7 @@ class execute(baseview.Approverpermissions):
                             content = DatabaseList.objects.filter(id=c.bundle_id).first()
                             apply_man_mail = Account.objects.filter(username=apply_man).first()  # 工单发起人
                             approve_man_mail = Account.objects.filter(username=approve_man).first()  # 指派人，即审核人
+                            execute_man_mail = Account.objects.filter(username=execute_man).first()  # 执行者
                             tag = globalpermissions.objects.filter(authorization='global').first()
                             ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
                             #
@@ -379,7 +380,7 @@ class execute(baseview.Approverpermissions):
                                 pass
                             else:
                                 try:
-                                    if approve_man_mail.email and apply_man_mail.email:
+                                    if approve_man_mail.email and apply_man_mail.email and execute_man_mail.email:
                                         mess_info = {
                                             'workid': c.work_id,
                                             'apply_man': apply_man,
@@ -403,9 +404,9 @@ class execute(baseview.Approverpermissions):
                                             'note': content.after,
                                             'cc_list': cc_list,
                                             'file': file_path}
-                                        mail_address = approve_man_mail.email + ";" + apply_man_mail.email
+                                        mail_address = approve_man_mail.email + ";" + apply_man_mail.email+ ";" + execute_man_mail.email
                                         print("execute sql successlly")
-                                        #print(mail_address)
+                                        print(mail_address)
                                         put_mess = send_email.send_email(to_addr=mail_address)  # 发送给申请人
                                         put_mess.send_mail(mail_data=mess_info, type=3)
                                     else:

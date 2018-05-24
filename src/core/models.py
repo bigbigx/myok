@@ -150,6 +150,11 @@ class HostUserPwd(models.Model):
     server_status = models.IntegerField(blank=True, default=1)  # 服务器启用状态  0--禁用   1-- 启用
     workgroup_id = models.CharField(max_length=30, blank=True)  # 工作组编号，此账号分配给的工作组
 
+class Config(models.Model):
+    name = models.CharField(max_length=50, blank=True)  # 配置名称
+    type = models.CharField(max_length=50, blank=True)  # 配置类型
+    status = models.CharField(max_length=50, blank=True) #配置启用状态
+    remark = models.CharField(max_length=50, blank=True) # 配置
 
 class YunAssetObj(models.Model):
     '''

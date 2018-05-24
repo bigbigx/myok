@@ -297,7 +297,8 @@ class exetoken(baseview.AnyLogin):
 
                                     content = DatabaseList.objects.filter(id=c.bundle_id).first()
                                     approve_man_mail = Account.objects.filter(username=approve_man).first() #指派人，即审核人
-                                    apply_man_mail = Account.objects.filter(username=apply_man).first()
+                                    apply_man_mail = Account.objects.filter(username=apply_man).first()  # 申请人
+                                    execute_man_mail = Account.objects.filter(username=execute_man).first()   # 执行者
                                     tag = globalpermissions.objects.filter(authorization='global').first()
                                     ret_info = '操作成功，该执行请求已经完成!并且已在相应库执行！详细执行信息请前往执行记录页面查看！'
 
@@ -319,7 +320,7 @@ class exetoken(baseview.AnyLogin):
                                         pass
                                     else:
                                         try:
-                                            if approve_man_mail.email and apply_man_mail.email: # 发送执行成功的邮件给到审核人和发起人
+                                            if approve_man_mail.email and apply_man_mail.email and execute_man_mail.email: # 发送执行成功的邮件给到审核人和发起人和执行者
                                                 mess_info = {
                                                     'workid': c.work_id,
                                                     'approve_man': approve_man,
@@ -342,14 +343,14 @@ class exetoken(baseview.AnyLogin):
                                                     'note': content.after,
                                                     'cc_list': cc_list,
                                                     'file': file_path}
-                                                mail_address = approve_man_mail.email + ";" +apply_man_mail.email
+                                                mail_address = approve_man_mail.email + ";" +apply_man_mail.email + ";" + execute_man_mail.email
                                                 #print(mail_address)
                                                 put_mess = send_email.send_email(to_addr=mail_address)
                                                 put_mess.send_mail(mail_data=mess_info, type=3)
                                                 # put_mess1 = send_email.send_email(to_addr=mail_approver.email)
                                                 # put_mess1.send_mail(mail_data=mess_info, type=3)
                                             else:
-                                                ret_info = 'the mail address of apply_man or approve_man  is none'
+                                                ret_info = "发起人、审核人或者执行人的邮箱为空或者邮箱不正确，请检查！"
                                                 #print(ret_info)
                                                 CUSTOM_ERROR.error(ret_info)
                                                 return HttpResponse(ret_info)
@@ -362,8 +363,6 @@ class exetoken(baseview.AnyLogin):
                                 except Exception as e:
                                     CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
                                     return HttpResponse(status=500)
-
-
                                 # ----删除token
 
                                 try:
