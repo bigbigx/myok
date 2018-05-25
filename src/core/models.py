@@ -13,6 +13,10 @@ class Account(AbstractUser):
     #group = models.CharField(max_length=40)   #权限组 guest/admin
     group = models.CharField(max_length=40)   #权限组 guest/approver/executer/admin
     department = models.CharField(max_length=40) #部门
+    is_master_approve =  models.IntegerField(default=99) # 是否主要审核人还是备用审核人  1--是  0--否  99 --都不是
+    is_master_execute =  models.IntegerField(default=99) # 是否主执行人还是备用执行人  1--是  0--否  99 --都不是
+    # module_list = models.CharField(max_length=100, blank=True)  # 模块清单
+
     # workgroup_id = models.CharField(max_length=50, blank=True)  # 工作分组，跟group属性不一样，group是角色分组
 
 # class AccountGroup(models.Model):
@@ -150,13 +154,20 @@ class HostUserPwd(models.Model):
     server_status = models.IntegerField(blank=True, default=1)  # 服务器启用状态  0--禁用   1-- 启用
     workgroup_id = models.CharField(max_length=30, blank=True)  # 工作组编号，此账号分配给的工作组
 
+class ConfigAccount(models.Model):
+    user_id = models.IntegerField(default=1, blank=True)  # 用户编号
+    module_code = models.CharField(max_length=50, blank=True) # 用户拥有的模块编号
+
+
+
 class Config(models.Model):
+    code = models.CharField(max_length=50, blank=True)  # 配置编号
     name = models.CharField(max_length=50, blank=True)  # 配置名称
     type = models.IntegerField(default=1, blank=True)  # 配置类型编号  1--平台模块 2--系统配置
     flow_or_not = models.IntegerField(default=1, blank=True)  # 配置类型编号  1----需要走流程  0---不需要走流程
     type_name = models.CharField(max_length=50, blank=True)  # 配置类型
     status = models.CharField(max_length=50, blank=True) #配置启用状态
-    remark = models.CharField(max_length=50, blank=True) # 配置
+    remark = models.CharField(max_length=50, blank=True) # 配置备注
 
 class YunAssetObj(models.Model):
     '''

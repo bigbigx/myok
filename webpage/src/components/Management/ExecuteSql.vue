@@ -27,7 +27,7 @@
       </Row>
     </Card>
   </Row>
-  <Modal v-model="modal2" width="800">
+  <Modal v-model="modal2" :mask-closable=false :closable='false' width="800">
     <p slot="header" style="color:#f60;font-size: 16px">
       <Icon type="information-circled"></Icon>
       <span>SQL工单详细信息</span>

@@ -7,10 +7,14 @@ from libs import gen_ddl
 from libs import baseview
 from libs import con_database
 from libs import util
+from core.config import (
+    CommonConfig
+)
 from core.models import (
     SqlOrder,
     DatabaseList,
-    Account
+    Account,
+    ConfigAccount
 )
 from libs.serializers import (
     Area,
@@ -63,7 +67,18 @@ class addressing(baseview.BaseView):
                 _serializers = Area(info, many=True)
                 #info = Account.objects.filter(is_staff=1).all()
                 #info = Account.objects.filter(is_staff=0).all()
-                info = Account.objects.filter(group='approver').all()
+                # info = Account.objects.filter(group='approver').all()
+                info = Account.objects.raw(
+                    '''
+                    select  a.*  \
+                    from core_account a  \
+                    left join  core_configaccount b on b.user_id = a.id \
+                    left  join core_config c on  c.code = b.module_code \
+                    where   b.module_code='%s' \
+                    and a.`group`= '%s'  \
+                    order by a.id  asc ;
+                    '''% (CommonConfig.SQL_CODE, CommonConfig.APPROVE_GROUP)
+                )
                 cc_mail_list = util.readfile()
                 serializers = UserINFO(info, many=True)
                 return Response({'connection': _serializers.data, 'person': serializers.data, 'cc_mail_list': cc_mail_list})

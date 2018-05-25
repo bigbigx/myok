@@ -63,6 +63,36 @@
     <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
   </Card>
   </Col>
+  <Modal v-model="showUserModuleModal" :closable='false' :mask-closable=false :width="500">
+    <h3 slot="header" style="color:#2D8CF0">显示用户模块信息</h3>
+    <Form ref="showUserModuleForm" :model="showUserModuleForm" :label-width="100" label-position="right" :rules="passwordValidate">
+      <FormItem label="用户名">
+        <Input v-model="username" readonly="readonly"></Input>
+      </FormItem>
+      <FormItem label="模块名称" prop="oldPass">
+        <Table border :columns="columns_usermodule" :data="userModule" stripe ref="selection"></Table>    </FormItem>
+    </Form>
+  </Modal>
+
+    <Modal v-model="editUserModuleModal" :closable='false' :mask-closable=false :width="700">
+    <h3 slot="header" style="color:#2D8CF0">编辑用户模块信息</h3>
+    <Form ref="editUserModuleForm" :model="editUserModuleForm" :label-width="100" label-position="right" :rules="passwordValidate">
+      <FormItem label="用户名">
+        <Input v-model="username" readonly="readonly"></Input>
+      </FormItem>
+      <FormItem label="模块名称" prop="oldPass">
+         <Transfer
+          :data="module_list"
+          :target-keys="targetKeys"
+          :render-format="myrender"
+          @on-change="handleChange">
+          <!--:filter-method="filterMethod"-->
+        </Transfer>
+      </FormItem>
+     </Form>
+  </Modal>
+
+
   <Modal v-model="editPasswordModal" :closable='false' :mask-closable=false :width="500">
     <h3 slot="header" style="color:#2D8CF0">修改用户密码</h3>
     <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
@@ -163,6 +193,18 @@ export default {
     return {
       module_list: [],
       targetKeys: [],
+      columns_usermodule: [
+        {
+          title: '模块编号',
+          key: 'code'
+        },
+        {
+          title: '模块名称',
+          key: 'name',
+          width: 120,
+          sortable: true
+        }
+      ],
       columns6: [
         {
           title: '用户名',
@@ -185,9 +227,40 @@ export default {
         },
         {
           title: '模块权限',
-          key: 'module',
-          width: 250,
-          sortable: true
+          key: 'module_list',
+          width: 140,
+          render: (h, params) => {
+             return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.showUserModule(params.index)
+                    }
+                  }
+                }, '查看'),
+                h('Button', {
+                  props: {
+                    type: 'success',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.editUserModule(params.index)
+                    }
+                  }
+                }, '编辑')
+              ])
+          }
         },
         {
           title: 'email',
@@ -327,11 +400,6 @@ export default {
             trigger: 'blur'
           }
         ],
-        module: [{
-          required: true,
-          message: '请选择平台模块权限',
-          trigger: 'blur'
-        }],
         confirmpassword: [{
             required: true,
             message: '请再次输入新密码',
@@ -409,6 +477,8 @@ export default {
       },
       // 更改部门及权限遮罩层状态
       editInfodModal: false,
+      editUserModuleModal: false,
+      showUserModuleModal: false,
       editemail: false,
       email: '',
       // 用户名
@@ -416,39 +486,16 @@ export default {
       confirmuser: '',
       deluserModal: false
     }
-  },/*
-  computed: {
-    desc_data () {
-      return this.module_list.map(item => {
-        return item.name
-      })
-    }
-  },*/
+  },
   methods: {
-    /*// 注册用户时选择平台模块的获取源和目标的数据源
-    getMockData () {
-                let mockData = [];
-                my_data =  this.module_list
-                console.log(my_data, 'test')
-                for (let i = 1; i <= my_data.length; i++) {
-                    mockData.push({
-                        key: my_data[i],
-                        label: 'Content ' + i,
-                        description: 'The desc of content  ' + i,
-                        disabled: Math.random() * 3 < 1
-                    });
-                }
-                return mockData;
-            },*/
-    /*getTargetKeys () {
-                return this.getMockData()
-                        .filter(() => Math.random() * 2 > 1)
-                        .map(item => item.key);
-                // data1 = this.getMockData().map(item => item.key)
-                // alert(data1)
-                // console.log(data1, 'data-jianglb')
-                // return this.module_list.map(item => item.key)
-            },*/
+    showUserModule () {
+      this.showUserModuleModal = true
+
+    },
+    editUserModule () {
+      this.editUserModuleModal = true
+
+    },
     myrender (item) {
                 return item.name;
             },
@@ -497,13 +544,13 @@ export default {
     Registered () {
       this.$refs['userinfova'].validate((valid) => {
         if (valid) {
-          alert(this.userinfo.username)
           axios.post(util.url + '/userinfo/', {
               'username': this.userinfo.username,
               'password': this.userinfo.password,
               'group': this.userinfo.group,
               'department': this.userinfo.department,
-              'email': this.userinfo.email
+              'email': this.userinfo.email,
+              'module_list': this.targetKeys,
             })
             .then(res => {
               this.$Notice.success({

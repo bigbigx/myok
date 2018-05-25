@@ -27,7 +27,7 @@
       </Row>
     </Card>
   </Row>
-  <Modal v-model="modal2" width="800">
+  <Modal v-model="modal2" :mask-closable=false :closable='false' width="800">
     <p slot="header" style="color:#f60;font-size: 16px">
       <Icon type="information-circled"></Icon>
       <span>SQL工单详细信息</span>
@@ -85,7 +85,7 @@
     </div>
   </Modal>
 
-  <Modal v-model="reject.reje" @on-ok="rejecttext" >
+  <Modal v-model="reject.reje" :mask-closable=false :closable='false' @on-ok="rejecttext" >
   <!--<Modal v-model="reject.reje" >-->
     <p slot="header" style="color:#f60;font-size: 16px">
       <Icon type="information-circled"></Icon>
@@ -102,7 +102,7 @@
     </Form>
   </Modal>
 
-    <Modal v-model="pass.pass" @on-ok="passtext">
+    <Modal v-model="pass.pass" :mask-closable=false :closable='false' @on-ok="passtext">
     <p slot="header" style="color:#f60;font-size: 16px">
       <Icon type="information-circled"></Icon>
       <span>SQL工单同意备注</span>
