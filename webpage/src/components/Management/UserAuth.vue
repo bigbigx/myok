@@ -4,129 +4,78 @@
 </style>
 <template>
 <div>
-  <Col span="9">
+  <!--<Col span="9">-->
+  <!--<Card>-->
+    <!---->
+    <!---->
+    <!--<p slot="title">-->
+      <!--<Icon type="load-b"></Icon>-->
+      <!--新增模块-->
+    <!--</p>-->
+    <!--<div class="edittable-testauto-con">-->
+      <!--<Form :model="usermodule" :label-width="80" ref="usermoduleva" :rules="userinfoValidate">-->
+        <!--<FormItem label="编号" prop="modulenum">-->
+          <!--<Input v-model="usermodule.code" placeholder="请输入"></Input>-->
+        <!--</FormItem>-->
+        <!--<FormItem label="名称" prop="modulename">-->
+          <!--<Input v-model="usermodule.name" placeholder="请输入" type="password"></Input>-->
+        <!--</FormItem>-->
+        <!--<FormItem label="类型" prop="moduletype">-->
+          <!--<Input v-model="usermodule.type" placeholder="请输入" type="password"></Input>-->
+        <!--</FormItem>-->
+        <!--<FormItem label="备注" prop="moduleremark">-->
+          <!--<Input v-model="usermodule.remark" placeholder="请输入" type="password"></Input>-->
+        <!--</FormItem>-->
+        <!--<FormItem label="启用状态" prop="modulestatus">-->
+          <!--<Input v-model="usermodule.status" placeholder="请输入"></Input>-->
+        <!--</FormItem>-->
+        <!--&lt;!&ndash;<FormItem label="电子邮箱:" prop="email">&ndash;&gt;-->
+          <!--&lt;!&ndash;<Input v-model="usermodule.email" placeholder="请输入"></Input>&ndash;&gt;-->
+        <!--&lt;!&ndash;</FormItem>&ndash;&gt;-->
+        <!--&lt;!&ndash;<FormItem label="平台模块:" prop="module">&ndash;&gt;-->
+        <!--&lt;!&ndash;<Transfer&ndash;&gt;-->
+          <!--&lt;!&ndash;:data="module_list"&ndash;&gt;-->
+          <!--&lt;!&ndash;:target-keys="targetKeys"&ndash;&gt;-->
+          <!--&lt;!&ndash;:render-format="myrender"&ndash;&gt;-->
+          <!--&lt;!&ndash;@on-change="handleChange">&ndash;&gt;-->
+          <!--&lt;!&ndash;&lt;!&ndash;:filter-method="filterMethod"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;</Transfer>&ndash;&gt;-->
+          <!--&lt;!&ndash;</FormItem>&ndash;&gt;-->
+        <!--<br><br>-->
+        <!--<Button type="primary" @click.native="Registered" style="margin-left: 35%">注册</Button>-->
+      <!--</Form>-->
+    <!--</div>-->
+  <!--</Card>-->
+  <!--</Col>-->
+  <Col span="24" class="padding-left-10">
   <Card>
-    <p slot="title">
-      <Icon type="load-b"></Icon>
-      添加模块
-    </p>
-    <div class="edittable-testauto-con">
-      <Form :model="usermodule" :label-width="80" ref="usermoduleva" :rules="userinfoValidate">
-        <FormItem label="编号" prop="modulenum">
-          <Input v-model="usermodule.num" placeholder="请输入"></Input>
-        </FormItem>
-        <FormItem label="名称" prop="modulename">
-          <Input v-model="usermodule.name" placeholder="请输入" type="password"></Input>
-        </FormItem>
-        <FormItem label="类型" prop="moduletype">
-          <Input v-model="usermodule.type" placeholder="请输入" type="password"></Input>
-        </FormItem>
-        <FormItem label="备注" prop="moduleremark">
-          <Input v-model="usermodule.remark" placeholder="请输入" type="password"></Input>
-        </FormItem>
-        <FormItem label="启用状态" prop="modulestatus">
-          <Input v-model="usermodule.status" placeholder="请输入"></Input>
-        </FormItem>
-        <FormItem label="电子邮箱:" prop="email">
-          <Input v-model="usermodule.email" placeholder="请输入"></Input>
-        </FormItem>
-        <FormItem label="平台模块:" prop="module">
-        <Transfer
-          :data="module_list"
-          :target-keys="targetKeys"
-          :render-format="myrender"
-          @on-change="handleChange">
-          <!--:filter-method="filterMethod"-->
-        </Transfer>
-          </FormItem>
-        <br><br>
-        <Button type="primary" @click.native="Registered" style="margin-left: 35%">注册</Button>
-      </Form>
-    </div>
-  </Card>
-  </Col>
-  <Col span="15" class="padding-left-10">
-  <Card>
-    <p slot="title">
-      <Icon type="ios-crop-strong"></Icon>
-      系统用户表
+    <p style="height: 29px;"  slot="title">
+      <Icon size="20" type="ios-crop-strong"></Icon>
+      模块清单
+          <Button  type="primary" shape="circle" style="margin-left: 80%" @click="showAddModule">新增模块</Button>
+
     </p>
     <div class="edittable-con-1">
-      <Table border :columns="columns6" :data="data5" stripe height="550"></Table>
+      <Table border :columns="columns_module" :data="data_module" stripe height="550"></Table>
     </div>
     <br>
     <Page :total="pagenumber" show-elevator @on-change="splicpage" :page-size="10"></Page>
+    <br><br>
+    <Button type="primary" @click.native="Registered" style="margin-left: 35%">注册</Button>
+
   </Card>
   </Col>
-  <Modal v-model="editPasswordModal" :closable='false' :mask-closable=false :width="500">
-    <h3 slot="header" style="color:#2D8CF0">修改用户密码</h3>
-    <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
-      <FormItem label="用户名">
-        <Input v-model="username" readonly="readonly"></Input>
-      </FormItem>
-      <FormItem label="原密码" prop="oldPass">
-        <Input v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码"></Input>
-      </FormItem>
-      <FormItem label="新密码" prop="newPass">
-        <Input v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符"></Input>
-      </FormItem>
-      <FormItem label="确认新密码" prop="rePass">
-        <Input v-model="editPasswordForm.rePass" placeholder="请再次输入新密码"></Input>
-      </FormItem>
-    </Form>
-    <div slot="footer">
-      <Button type="text" @click="cancelEditPass">取消</Button>
-      <Button type="primary" @click="saveEditPass" :loading="savePassLoading">保存</Button>
-    </div>
-  </Modal>
-  <!-- 配置执行人对话框-->
-  <Modal v-model="editExecuteManModal" :closable='false' :mask-closable=false :width="500">
-    <h3 slot="header" style="color:#2D8CF0">编辑执行人信息</h3>
-    <Form :model="editExecuteManForm" :label-width="100" label-position="right">
-      <FormItem label="模块名">
-        <Input v-model="modulename" readonly="readonly"></Input>
-      </FormItem>
-      <!--只能选一个执行人-->
-      <FormItem label="执行人">
-        <Select v-model="editExecuteManForm.module_execute_man" placeholder="请选择">
-            <Option value="admin">管理员</Option>
-            <Option value="approver">审核员</Option>
-            <Option value="executer">执行者</Option>
-            <Option value="guest">使用者</Option>
-          </Select>
-      </FormItem>
-    </Form>
-    <div slot="footer">
-      <Button type="text" @click="cancelEditInfo">取消</Button>
-      <Button type="primary" @click="saveEditInfo">保存</Button>
-    </div>
-  </Modal>
 
-  <Modal v-model="deluserModal" :closable='false' :mask-closable=false :width="500">
-    <h3 slot="header" style="color:#2D8CF0">删除用户</h3>
-    <Form :label-width="100" label-position="right">
-      <FormItem label="用户名">
-        <Input v-model="username" readonly="readonly"></Input>
-      </FormItem>
-      <FormItem label="请输入用户名">
-        <Input v-model="confirmuser" placeholder="请确认用户名"></Input>
-      </FormItem>
-    </Form>
-    <div slot="footer">
-      <Button type="text" @click="cancelDelInfo">取消</Button>
-      <Button type="warning" @click="delUser">删除</Button>
-    </div>
-  </Modal>
 
-  <Modal v-model="editemail" :closable='false' :mask-closable=false :width="500">
-    <h3 slot="header" style="color:#2D8CF0">更改email邮箱</h3>
+  <Modal v-model="addModule" :closable='false' :mask-closable=false :width="500">
+    <h3 slot="header" style="color:#2D8CF0">添加新的平台模块</h3>
     <Form :label-width="100" label-position="right">
       <FormItem label="E-mail">
         <Input v-model="email"></Input>
       </FormItem>
     </Form>
     <div slot="footer">
-      <Button type="text" @click="editemail=false">取消</Button>
+      <Button type="text" @click="addModule=false">取消</Button>
       <Button type="warning" @click="putemail">更改</Button>
     </div>
   </Modal>
@@ -156,263 +105,86 @@ export default {
     return {
       module_list: [],
       targetKeys: [],
-      columns_new: [
+      usermodule: {
+        code: '',
+        name: '',
+        type: '',
+        remark: '',
+        status: ''
+      },
+      columns_module: [
         {
           title: '模块名称',
           key: 'name',
-          width: 80,
-          fixed: 'left',
-          sortable: true
+          width: 180
         },
         {
-          title: '执行人',
-          key: 'group',
+          title: '第一审核人',
+          key: 'first_approve_man',
           width: 120,
-          sortable: true
-        },
-        {
-          title: '执行人配置',
-          key: 'department',
-          width: 120,
-          sortable: true
-        },
-        {
-          title: '审核人',
-          key: 'module_list',
-          width: 250,
-          sortable: true
-        },
-        {
-          title: '审核人配置',
-          key: 'email',
-          width: 250,
-          sortable: true
-        },
-        {
-          title: '操作',
-          key: 'action',
-          width: 350,
-          align: 'center',
           render: (h, params) => {
-            if (params.row.username !== this.data5[0].username) {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.edituser(params.index)
-                    }
-                  }
-                }, '更改密码'),
-                h('Button', {
-                  props: {
-                    type: 'info',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.editgroup(params.index)
-                    }
-                  }
-                }, '更改所属组'),
-                h('Button', {
-                  props: {
-                    type: 'success',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.editEmail(params.index)
-                    }
-                  }
-                }, 'email更改'),
-                h('Button', {
-                  props: {
-                    type: 'warning',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      this.deleteUser(params.index)
-                    }
-                  }
-                }, '删除')
-              ])
-            } else {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.edituser(params.index)
-                    }
-                  }
-                }, '更改密码'),
-                h('Button', {
-                  props: {
-                    type: 'success',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.editEmail(params.index)
-                    }
-                  }
-                }, 'email更改')
-              ])
-            }
+             return h('Dropdown', {
+                      props: {
+                        style: 'margin-left: 20px',
+                        placement: 'bottom-end'
+                      },
+                    }, [
+                        h('a', {
+                            on: {
+                          click: () => {
+                             javascript:void(0)
+                          }
+                      }, },
+                            [h('Icon',{
+                              props: {
+                                style: 'arrow-down-b'
+                             }
+                            })],
+                             '更多'),
+                        h('DropdownMenu',{
+                            props:{
+                               slot:'list'
+                            }
+                        },[
+                            h('DropdownItem','1'),
+                            h('DropdownItem','2')
+                          ]
+                         )
+                    ])
           }
+        },
+        {
+          title: '备用审核人',
+          key: 'second_approve_man',
+          width: 120,
+        },
+        {
+          title: '第一执行人',
+          key: 'first_execute_man',
+          width: 120,
+        },
+        {
+          title: '备用执行人',
+          key: 'second_execute_man',
+          width: 120,
         }
       ],
-      data5: [],
+      data_module: [],
 
       pagenumber: 1,
+      addModule: false,
       // 新建用户
-      userinfo: {
-        username: '',
-        password: '',
-        confirmpassword: '',
-        group: '',
-        checkbox: '',
-        department: '',
-        email: ''
-      },
-      userinfoValidate: {
-        username: [{
-          required: true,
-          message: '请输入用户名',
-          trigger: 'blur'
-        }],
-        password: [{
-            required: true,
-            message: '请输入密码',
-            trigger: 'blur'
-          },
-          {
-            min: 6,
-            message: '请至少输入6个字符',
-            trigger: 'blur'
-          },
-          {
-            max: 32,
-            message: '最多输入32个字符',
-            trigger: 'blur'
-          }
-        ],
-        confirmpassword: [{
-            required: true,
-            message: '请再次输入新密码',
-            trigger: 'blur'
-          },
-          {
-            validator: valideuserinfoPassword,
-            trigger: 'blur'
-          }
-        ],
-        email: [{
-          required: true,
-          message: '请输入邮箱地址',
-          trigger: 'blur'
-        }],
-        group: [{
-          required: true,
-          message: '请输入角色',
-          trigger: 'blur'
-        }],
-        department: [{
-          required: true,
-          message: '请输入部门名称',
-          trigger: 'blur'
-        }]
-      },
-      // 更改密码遮罩层状态
-      editPasswordModal: false,
-      // 更改密码
-      editPasswordForm: {
-        oldPass: '',
-        newPass: '',
-        rePass: ''
-      },
-      // 保存更改密码loding按钮状态
-      savePassLoading: false,
-      // 更改密码表单验证规则
-      passwordValidate: {
-        oldPass: [{
-          required: true,
-          message: '请输入原密码',
-          trigger: 'blur'
-        }],
-        newPass: [{
-            required: true,
-            message: '请输入新密码',
-            trigger: 'blur'
-          },
-          {
-            min: 6,
-            message: '请至少输入6个字符',
-            trigger: 'blur'
-          },
-          {
-            max: 32,
-            message: '最多输入32个字符',
-            trigger: 'blur'
-          }
-        ],
-        rePass: [{
-            required: true,
-            message: '请再次输入新密码',
-            trigger: 'blur'
-          },
-          {
-            validator: valideRePassword,
-            trigger: 'blur'
-          }
-        ]
-      },
-      // 更改部门及权限
-      editInfodForm: {
-        group: '',
-        department: ''
-      },
-      // 更改部门及权限遮罩层状态
-      editInfodModal: false,
-      editemail: false,
       email: '',
       // 用户名
       username: '',
       confirmuser: '',
       deluserModal: false
     }
-  },/*
-  computed: {
-    desc_data () {
-      return this.module_list.map(item => {
-        return item.name
-      })
-    }
-  },*/
+  },
   methods: {
+    showAddModule () {
+      this.addModule = true
+    },
     myrender (item) {
                 return item.name;
             },
@@ -485,24 +257,14 @@ export default {
         }
       })
     },
-    getModuleList ( type = 1, flow = 1) {
+    refreshModule (type = 1, flow = 1) {
+      // axios.get(`${util.url}/config?type=${type}&flow=${flow}&page=${vl}`)
       axios.get(`${util.url}/config?type=${type}&flow=${flow}`)
         .then(res => {
-          res.data.forEach(item => {
-            item.key = item.id + ''
-          })
-          this.module_list = res.data
-          console.log(this.module_list, 'qqq')
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
-    },
-    refreshuser (vl = 1) {
-      axios.get(`${util.url}/userinfo/all?page=${vl}`)
-        .then(res => {
-          this.data5 = res.data.data
-          this.pagenumber = parseInt(res.data.page.alter_number)
+          // res.data.forEach(item => {
+          //   item.key = item.id + ''
+          // })
+          this.data_module = res.data
         })
         .catch(error => {
           util.ajanxerrorcode(this, error)
@@ -510,83 +272,11 @@ export default {
     },
     splicpage (page) {
       this.refreshuser(page)
-    },
-    cancelEditPass () {
-      this.editPasswordForm = {}
-      this.editPasswordModal = false
-    },
-    cancelEditInfo () {
-      this.editInfodModal = false;
-      this.editInfodForm = {}
-    },
-    cancelDelInfo () {
-      this.deluserModal = false;
-      this.confirmuser = ''
-    },
-    saveEditPass () {
-      this.$refs['editPasswordForm'].validate((valid) => {
-        if (valid) {
-          this.savePassLoading = true;
-          axios.put(util.url + '/userinfo/changepwd', {
-              'username': this.username,
-              'new': this.editPasswordForm.newPass,
-              'old': this.editPasswordForm.oldPass
-            })
-            .then(res => {
-              this.$Notice.success({
-                title: '通知',
-                desc: res.data
-              })
-              this.editPasswordModal = false;
-            })
-            .catch(error => {
-              util.ajanxerrorcode(this, error)
-            })
-          this.savePassLoading = false
-        }
-      });
-    },
-    saveEditInfo () {
-      axios.put(util.url + '/userinfo/changegroup', {
-          'username': this.username,
-          'group': this.editInfodForm.group,
-          'department': this.editInfodForm.department
-        })
-        .then(res => {
-          this.$Notice.success({
-            title: '通知',
-            desc: res.data
-          })
-          this.refreshuser()
-        })
-        .catch(error => {
-          util.ajanxerrorcode(this, error)
-        })
-      this.editInfodModal = false
-    },
-    delUser () {
-      if (this.username === this.confirmuser) {
-        axios.delete(util.url + '/userinfo/' + this.username)
-          .then(res => {
-            this.$Notice.success({
-              title: '通知',
-              desc: res.data
-            })
-            this.deluserModal = false
-            this.refreshuser()
-          })
-          .catch(error => {
-            util.ajanxerrorcode(this, error)
-          })
-      } else {
-        this.$Message.error('用户名不一致!请重新操作!')
-      }
     }
   },
   mounted () {
-    this.refreshuser()
-    this.getModuleList()/*
-    this.targetKeys = this.getTargetKeys()*/
+    this.refreshModule()
+
   }
 }
 </script>

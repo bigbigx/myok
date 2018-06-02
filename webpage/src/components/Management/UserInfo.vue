@@ -214,26 +214,15 @@ export default {
           sortable: true
         },
         {
-          title: '角色',
-          key: 'group',
-          width: 120,
-          sortable: true
-        },
-        {
-          title: '部门',
-          key: 'department',
-          width: 120,
-          sortable: true
-        },
-        {
           title: '模块权限',
           key: 'module_list',
           width: 140,
+          fixed: 'left',
           render: (h, params) => {
              return h('div', [
                 h('Button', {
                   props: {
-                    type: 'primary',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {
@@ -247,7 +236,7 @@ export default {
                 }, '查看'),
                 h('Button', {
                   props: {
-                    type: 'success',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {
@@ -261,6 +250,18 @@ export default {
                 }, '编辑')
               ])
           }
+        },
+        {
+          title: '角色',
+          key: 'group',
+          width: 120,
+          sortable: true
+        },
+        {
+          title: '部门',
+          key: 'department',
+          width: 120,
+          sortable: true
         },
         {
           title: 'email',
@@ -278,7 +279,7 @@ export default {
               return h('div', [
                 h('Button', {
                   props: {
-                    type: 'primary',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {
@@ -292,7 +293,7 @@ export default {
                 }, '更改密码'),
                 h('Button', {
                   props: {
-                    type: 'info',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {
@@ -306,7 +307,7 @@ export default {
                 }, '更改所属组'),
                 h('Button', {
                   props: {
-                    type: 'success',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {
@@ -320,7 +321,7 @@ export default {
                 }, 'email更改'),
                 h('Button', {
                   props: {
-                    type: 'warning',
+                    type: 'default',
                     size: 'small'
                   },
                   on: {
@@ -334,7 +335,7 @@ export default {
               return h('div', [
                 h('Button', {
                   props: {
-                    type: 'primary',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {
@@ -348,7 +349,7 @@ export default {
                 }, '更改密码'),
                 h('Button', {
                   props: {
-                    type: 'success',
+                    type: 'default',
                     size: 'small'
                   },
                   style: {

@@ -76,6 +76,7 @@ class addressing(baseview.BaseView):
                     left  join core_config c on  c.code = b.module_code \
                     where   b.module_code='%s' \
                     and a.`group`= '%s'  \
+                    and a.is_master_approve=1 \
                     order by a.id  asc ;
                     '''% (CommonConfig.SQL_CODE, CommonConfig.APPROVE_GROUP)
                 )
